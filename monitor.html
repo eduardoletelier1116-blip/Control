@@ -153,32 +153,23 @@
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
-            let kilos = f[5] ? f[5] + "k" : ""; // Obtenemos los kilos
+            let kilos = f[5] ? f[5] + "k" : "";
             let fuera = (val < range[0] || val > range[1]);
             
             let estilo = fuera ? 'point { size: 9; fill-color: #ff3b3b; visible: true; }' : 'point { size: 6; fill-color: ' + baseColor + '; visible: true; }';
             let anot = f[6] === "SI" ? "CORREC." : null;
             
-            // Aquí agregamos los Kilos debajo de la hora en el eje X
             dt.addRow([h + "\n" + kilos, val, estilo, anot, range[0], range[1]]);
         });
 
+        // CÁLCULO DE ESCALA DINÁMICA (Para que el rango se vea amplio)
+        // Agregamos un margen del 20% arriba y abajo del rango objetivo
+        const margin = (range[1] - range[0]) * 1.5;
+        const vMin = Math.max(0, range[0] - margin);
+        const vMax = range[1] + margin;
+
         const chart = new google.visualization.ComboChart(document.getElementById(divId));
         
-        google.visualization.events.addListener(chart, 'select', function() {
-            let sel = chart.getSelection()[0];
-            if (sel && sel.row !== null) {
-                let registro = data[sel.row];
-                let urlFoto = registro[7]; 
-                if (urlFoto && urlFoto !== "Sin foto") {
-                    document.getElementById('imgRegistro').src = urlFoto;
-                    document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
-                    document.getElementById('infoRegistro').innerText = "OPERADOR: " + registro[1] + " | CARGA: " + registro[5] + " KG";
-                    new bootstrap.Modal(document.getElementById('fotoModal')).show();
-                }
-            }
-        });
-
         chart.draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
@@ -190,16 +181,24 @@
             },
             vAxis: { 
                 textStyle: { color: '#c9d1d9', fontSize: 10, bold: true }, 
-                gridlines: { color: '#21262d' }
+                gridlines: { color: '#21262d' },
+                // AQUÍ HACEMOS EL ZOOM:
+                viewWindow: { min: vMin, max: vMax },
+                viewWindowMode: 'explicit'
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
-                // LÍNEAS DE RANGO: Más marcadas (Color gris claro y más gruesas)
-                1: { color: '#888', lineDashStyle: [6, 3], lineWidth: 2, pointSize: 0 }, 
-                2: { color: '#888', lineDashStyle: [6, 3], lineWidth: 2, pointSize: 0 } 
+                // LÍNEAS DE RANGO: Ahora en color Blanco Humo para máximo contraste
+                1: { color: '#ffffff', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }, 
+                2: { color: '#ffffff', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 } 
             },
             annotations: { textStyle: { fontSize: 9, color: '#ff7b72', bold: true, auraColor: 'none' } }
         });
+
+        const ultimoVal = Number(data[data.length-1][colIdx]);
+        const estaFueraAhora = (ultimoVal < range[0] || ultimoVal > range[1]);
+        document.getElementById(statusId).innerHTML = estaFueraAhora ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">NORMAL</span>';
+    }
 
         const ultimoVal = Number(data[data.length-1][colIdx]);
         const estaFueraAhora = (ultimoVal < range[0] || ultimoVal > range[1]);
