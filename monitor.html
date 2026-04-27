@@ -3,92 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Operativo</title>
+    <title>Monitor Industrial</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        body { background-color: #f8f9fa; padding: 20px; font-family: sans-serif; }
-        .card { border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none; max-width: 450px; margin: auto; }
-        .btn-success { padding: 12px; font-weight: bold; }
-        .form-check-input:checked { background-color: #dc3545; border-color: #dc3545; }
-        .label-corr { font-weight: bold; color: #555; transition: 0.3s; }
-        .form-check-input:checked + .label-corr { color: #dc3545; }
+        body { background-color: #050505; color: #fff; padding: 15px; font-family: sans-serif; }
+        .chart-card { background: #111; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #222; }
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .bg-danger-live { background-color: #ff3b3b; color: white; animation: blink 1.5s infinite; }
+        .bg-success-live { background-color: #2ecc71; color: white; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">🍎 Registro de Turno 🍒</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">CENTRO DE CONTROL</h4>
+        <div id="syncTime" style="color: #444; font-size: 0.8rem;">Sincronizando...</div>
     </div>
 
-    <div class="card p-4">
-        <form id="formControl">
-            <div class="mb-3">
-                <label class="form-label fw-bold">Operador</label>
-                <input type="text" id="operador" class="form-control" placeholder="Nombre" required>
-            </div>
-
-            <div class="form-check form-switch mb-4 p-3 bg-light rounded border d-flex align-items-center">
-                <input class="form-check-input ms-0 me-3" type="checkbox" id="esCorreccion" style="width: 3em; height: 1.5em;">
-                <label class="form-check-label label-corr" for="esCorreccion">CORRECCIÓN</label>
-            </div>
-
-            <div class="row">
-                <div class="col-6 mb-3">
-                    <label class="fw-bold small">PPM</label>
-                    <input type="number" id="ppm" class="form-control" step="0.1" required>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <div class="chart-card">
+                <div class="d-flex justify-content-between">
+                    <h6 style="color: #3498db;">PPM (30 - 60)</h6>
+                    <div id="status_ppm"></div>
                 </div>
-                <div class="col-6 mb-3">
-                    <label class="fw-bold small">ORP</label>
-                    <input type="number" id="orp" class="form-control" required>
-                </div>
+                <div id="chart_ppm" style="height: 230px;"></div>
             </div>
-
-            <div class="row">
-                <div class="col-6 mb-3">
-                    <label class="fw-bold small">PH</label>
-                    <input type="number" id="ph" class="form-control" step="0.1" required>
+        </div>
+        <div class="col-12 mb-3">
+            <div class="chart-card">
+                <div class="d-flex justify-content-between">
+                    <h6 style="color: #e67e22;">ORP (750 - 850)</h6>
+                    <div id="status_orp"></div>
                 </div>
-                <div class="col-6 mb-3">
-                    <label class="fw-bold small">Kilos Totales</label>
-                    <input type="number" id="kilos" class="form-control" required>
-                </div>
+                <div id="chart_orp" style="height: 230px;"></div>
             </div>
-
-            <button type="submit" id="btnEnviar" class="btn btn-success w-100 mt-2">GUARDAR REGISTRO</button>
-        </form>
+        </div>
+        <div class="col-12 mb-3">
+            <div class="chart-card">
+                <div class="d-flex justify-content-between">
+                    <h6 style="color: #2ecc71;">PH (6.5 - 7.5)</h6>
+                    <div id="status_ph"></div>
+                </div>
+                <div id="chart_ph" style="height: 230px;"></div>
+            </div>
+        </div>
     </div>
-    <div id="mensaje" class="alert alert-success mt-3 d-none text-center fw-bold">✅ Registrado con éxito</div>
 </div>
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvMblUnsikPSaGe_VpQVSIYHxrvFfoLiK-cgaY7iTWYnilk2djGQZS_OTtUYkQUhQrVw/exec";
+    const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
 
-    document.getElementById('formControl').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btnEnviar');
-        btn.disabled = true;
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(refresh);
+    setInterval(refresh, 30000);
 
-        const datos = {
-            operador: document.getElementById('operador').value,
-            ppm: parseFloat(document.getElementById('ppm').value),
-            orp: parseInt(document.getElementById('orp').value),
-            ph: parseFloat(document.getElementById('ph').value),
-            kilos: parseInt(document.getElementById('kilos').value),
-            correccion: document.getElementById('esCorreccion').checked
+    function refresh() {
+        fetch(WEB_APP_URL).then(r => r.json()).then(res => {
+            const hoy = new Date().setHours(0,0,0,0);
+            const dataHoy = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
+            document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
+
+            draw(dataHoy, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#3498db', 2);
+            draw(dataHoy, 'chart_orp', 'status_orp', LIMITS.orp, '#e67e22', 3);
+            draw(dataHoy, 'chart_ph', 'status_ph', LIMITS.ph, '#2ecc71', 4);
+        });
+    }
+
+    function draw(data, divId, statusId, range, baseColor, colIdx) {
+        if (data.length === 0) return;
+
+        let dt = new google.visualization.DataTable();
+        dt.addColumn('string', 'H');
+        dt.addColumn('number', 'Valor');
+        dt.addColumn({type: 'string', role: 'style'});
+        dt.addColumn({type: 'string', role: 'annotation'});
+        dt.addColumn('number', 'Límite Min');
+        dt.addColumn('number', 'Límite Max');
+
+        const ultimo = data[data.length - 1];
+        const estaFueraAhora = (ultimo[colIdx] < range[0] || ultimo[colIdx] > range[1]);
+
+        data.forEach(f => {
+            let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            let val = f[colIdx];
+            let kilos = f[5];
+            let esCorr = f[6] === "SI";
+            
+            let fuera = (val < range[0] || val > range[1]);
+            // Historial: Si estuvo fuera, queda marcado en ROJO siempre
+            let punto = fuera ? 'point { size: 7; fill-color: #ff3b3b; }' : 'point { size: 4; fill-color: ' + baseColor + '; }';
+            let anot = esCorr ? "C" : null;
+            
+            dt.addRow([h + "\n(" + kilos + ")", val, punto, anot, range[0], range[1]]);
+        });
+
+        const sDiv = document.getElementById(statusId);
+        sDiv.innerHTML = estaFueraAhora ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">NORMAL</span>';
+
+        const opt = {
+            backgroundColor: 'transparent', legend: 'none',
+            chartArea: { width: '90%', height: '70%' },
+            hAxis: { textStyle: { color: '#555', fontSize: 9 } },
+            vAxis: { textStyle: { color: '#888' }, gridlines: { color: '#222' } },
+            series: {
+                0: { type: 'line', color: baseColor, lineWidth: 3 },
+                1: { type: 'line', color: '#444', lineWidth: 1, lineDashStyle: [4, 4] },
+                2: { type: 'line', color: '#444', lineWidth: 1, lineDashStyle: [4, 4] }
+            },
+            annotations: { textStyle: { fontSize: 11, color: '#fff', bold: true } }
         };
 
-        fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
-        .then(() => {
-            document.getElementById('mensaje').classList.remove('d-none');
-            document.getElementById('formControl').reset();
-            setTimeout(() => { document.getElementById('mensaje').classList.add('d-none'); }, 3000);
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btn.innerText = "GUARDAR REGISTRO";
-        });
-    });
+        new google.visualization.ComboChart(document.getElementById(divId)).draw(dt, opt);
+    }
 </script>
 </body>
 </html>
