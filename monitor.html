@@ -126,11 +126,19 @@
         });
 
         chart.draw(dt, {
-            backgroundColor: 'transparent', legend: 'none',
+            backgroundColor: 'transparent', 
+            legend: 'none',
             chartArea: { width: '92%', height: '70%', top: 10 },
+            // Esta línea de abajo activa los puntos para todas las series
+            pointSize: 6, 
             hAxis: { textStyle: { color: '#444', fontSize: 8 } },
             vAxis: { textStyle: { color: '#666', fontSize: 9 }, gridlines: { color: '#1a1a1a' } },
-            series: { 0: { color: baseColor, lineWidth: 2 }, 1: { color: '#333', lineDashStyle: [3, 3] }, 2: { color: '#333', lineDashStyle: [3, 3] } },
+            series: { 
+                // Aquí también forzamos el tamaño en la serie 0 (la de los datos)
+                0: { color: baseColor, lineWidth: 2, pointsVisible: true, pointSize: 6 }, 
+                1: { color: '#333', lineDashStyle: [3, 3], pointSize: 0 }, 
+                2: { color: '#333', lineDashStyle: [3, 3], pointSize: 0 } 
+            },
             annotations: { textStyle: { fontSize: 9, color: '#f8d7da', bold: true } }
         });
 
