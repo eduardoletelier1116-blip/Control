@@ -1,234 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Pesos</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos - Variaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f4f6f9; color: #333; }
-        header { background: #1e3c72; color: white; padding: 20px; text-align: center; font-size: 22px; position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .logo { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); height: 45px; }
-        .codigo-empresa { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 13px; opacity: 0.8; }
-        .container { max-width: 1100px; margin: 20px auto; padding: 0 20px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e1e4e8; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
-        button { background: #2a5298; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        button:hover { background: #1e3c72; }
-        .btn-secundario { background: #6c757d; }
-        .btn-peligro { background: #d9534f; }
-        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th { background: #f8f9fa; color: #1e3c72; padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6; font-size: 12px; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .hidden { display: none; }
-        .chart-container { position: relative; height: 400px; width: 100%; margin-top: 20px; }
-        .estado-sync { font-size: 11px; color: #888; text-align: right; margin-top: 5px; }
-        @media (max-width: 768px) { .row-3 { grid-template-columns: 1fr; } }
+        body { background-color: #f4f7f6; padding: 20px; }
+        .chart-container { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="https://raw.githubusercontent.com/eduardoletelier1116-blip/app-pesaje-manzana/main/fondo-blanco.jpg" class="logo" onerror="this.style.display='none'">
-    Gestión de Pesaje Real vs Objetivo
-    <div class="codigo-empresa">R02 POE 29</div>
-</header>
-
-<div class="container">
-    <div class="card" id="loginCard">
-        <h3>Acceso Operador</h3>
-        <input type="text" id="nombreOperador" placeholder="Nombre completo">
-        <input type="password" id="claveOperador" placeholder="Contraseña">
-        <button onclick="ingresar()" style="width:100%">Entrar al Sistema</button>
+<div class="container text-center">
+    <div class="mb-3 text-start">
+        <a href="index.html" class="btn btn-outline-secondary">⬅ Volver al Registro</a>
     </div>
+    <h3 class="mb-4">Tendencias del Día</h3>
 
-    <div class="card hidden" id="objetivosCard">
-        <h4 style="margin-top:0">Configuración de Calibres (Turno Actual)</h4>
-        <div class="row-3">
-            <div><label>precalibre</label><input type="number" id="calDesde"></div>
-            <div><label>sobrecalibre</label><input type="number" id="calHasta"></div>
-            <div><label>Peso Objetivo (kg)</label><input type="text" id="pObj"></div>
-            <button onclick="agregarRegla()">Añadir</button>
-        </div>
-        <table id="tablaObj">
-            <thead><tr><th>Desde</th><th>Hasta</th><th>Objetivo</th><th>Acción</th></tr></thead>
-            <tbody></tbody>
-        </table>
-        <div style="margin-top:15px; display:flex; gap:10px;">
-            <button class="btn-secundario" onclick="sincronizarMaestro()">Sincronizar Maestro Excel</button>
-            <button class="btn-peligro" onclick="borrarReglas()">Limpiar Todo</button>
-        </div>
-    </div>
-
-    <div class="card hidden" id="formCard">
-        <form id="pesajeForm">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                <select id="exp" required onchange="actualizarPorExportadora()"><option value="">Exportadora</option><option>Fruclem</option><option>SK Gyan</option><option>JHB</option><option>Talamaya</option></select>
-                <select id="var" required onchange="cargarDatos()"><option value="">Variedad</option><option>Royal Gala</option><option>Red Delicious</option><option>Granny</option><option>Fuji</option><option>Pink Lady</option></select>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
-                <input type="text" id="cal" placeholder="Calibre" required>
-                <input type="text" id="lot" placeholder="Lote">
-                <select id="sal" required></select>
-            </div>
-            <input type="number" step="0.01" id="pes" placeholder="PESO REGISTRADO (KG)" style="font-size:1.2em; font-weight:bold; border: 2px solid #2a5298;" required>
-            <button type="submit" style="width:100%; background:#28a745">GUARDAR REGISTRO</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <h4 style="margin:0">Gráfico de Control: Peso Real vs Objetivo</h4>
-        <div class="chart-container">
-            <canvas id="miGrafico"></canvas>
-        </div>
-        <div class="estado-sync" id="syncStatus">Esperando conexión...</div>
-    </div>
-
-    <div class="card">
-        <h4>Registros Recientes (Hoy)</h4>
-        <div style="overflow-x:auto">
-            <table id="tablaReg">
-                <thead><tr><th>Hora</th><th>Export.</th><th>Cal</th><th>Var</th><th>Peso</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
+    <div class="chart-container">
+        <div id="chart_div" style="width: 100%; height: 450px;">Cargando datos...</div>
     </div>
 </div>
 
 <script>
-    const URL_APP = "https://script.google.com/macros/s/AKfycbyLJDQ1KOM0c-9ikGk8vzeiz3Flqy7ERL4SUckABpEYK3_902vUvboTTfqbwF2XFlfn-g/exec";
-    let misReglas = [];
-    let miChart = null;
-    let usuarioLogueado = "";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyLJDQ1KOM0c-9ikGk8vzeiz3Flqy7ERL4SUckABpEYK3_902vUvboTTfqbwF2XFlfn-g/exec";
 
-    // Poblar salidas
-    const s = document.getElementById("sal");
-    for(let i=1; i<=41; i++) { s.options.add(new Option("Salida "+i, i)); }
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(dibujar);
 
-    function ingresar() {
-        if(document.getElementById("claveOperador").value === "fresh") {
-            usuarioLogueado = document.getElementById("nombreOperador").value;
-            document.getElementById("loginCard").classList.add("hidden");
-            document.getElementById("objetivosCard").classList.remove("hidden");
-            document.getElementById("formCard").classList.remove("hidden");
-            cargarDatos();
-            setInterval(cargarDatos, 15000);
-        } else { alert("Clave incorrecta"); }
-    }
+    function dibujar() {
+        fetch(WEB_APP_URL)
+        .then(r => r.json())
+        .then(res => {
+            const dataRows = [["Hora", "PPM", "ORP", "PH"]];
+            // Tomamos los últimos 15 registros para el gráfico
+            const filas = res.slice(1).slice(-15); 
 
-    function dibujarGrafico(datos) {
-        const ctx = document.getElementById('miGrafico').getContext('2d');
-        const expActual = document.getElementById("exp").value;
-        const varActual = document.getElementById("var").value;
-
-        // Filtrar datos para el gráfico
-        const filtrados = datos.filter(r => r[3] == expActual && r[7] == varActual);
-        
-        const grupos = {};
-        filtrados.forEach(r => {
-            const c = r[5], p = parseFloat(String(r[9]).replace(",","."));
-            if(!grupos[c]) grupos[c] = [];
-            grupos[c].push(p);
-        });
-
-        const datasets = [];
-        const paleta = ['#1e3c72', '#4caf50', '#ff9800', '#e91e63', '#00bcd4'];
-        let i = 0;
-
-        Object.keys(grupos).forEach(cal => {
-            const color = paleta[i % paleta.length];
-            // Línea real
-            datasets.push({
-                label: 'C' + cal + ' Real',
-                data: grupos[cal],
-                borderColor: color,
-                backgroundColor: color,
-                tension: 0.3
-            });
-            // Línea objetivo
-            const reg = misReglas.find(o => parseInt(cal) >= o.desde && parseInt(cal) <= o.hasta);
-            if(reg) {
-                datasets.push({
-                    label: 'C' + cal + ' Obj',
-                    data: Array(grupos[cal].length).fill(reg.objetivo),
-                    borderColor: color,
-                    borderDash: [5, 5],
-                    pointRadius: 0
-                });
-            }
-            i++;
-        });
-
-        if(miChart) miChart.destroy();
-        miChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: Array.from({length: 15}, (_, i) => i + 1), datasets: datasets },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
-
-    async function cargarDatos() {
-        try {
-            const res = await fetch(URL_APP + "?t=" + Date.now());
-            const data = await res.json();
-            
-            // Cargar Reglas primero
-            const res2 = await fetch(URL_APP + "?tipo=objetivos&t=" + Date.now());
-            const dataObj = await res2.json();
-            misReglas = dataObj.slice(1).map(r => ({desde: r[0], hasta: r[1], objetivo: parseFloat(String(r[2]).replace(",","."))}));
-
-            // Mostrar tabla de registros (solo hoy)
-            const hoy = new Date().toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/');
-            const hoyRegistros = data.filter(r => r[0].includes(hoy));
-            
-            const tbody = document.querySelector("#tablaReg tbody");
-            tbody.innerHTML = "";
-            hoyRegistros.slice(-10).reverse().forEach(r => {
-                tbody.innerHTML += `<tr><td>${r[1]}</td><td>${r[3]}</td><td>${r[5]}</td><td>${r[7]}</td><td><b>${r[9]}</b></td></tr>`;
+            filas.forEach(f => {
+                let h = new Date(f[0]);
+                let etiqueta = h.getHours() + ":" + (h.getMinutes() < 10 ? '0' : '') + h.getMinutes();
+                dataRows.push([etiqueta, f[2], f[3], f[4]]);
             });
 
-            dibujarGrafico(data);
-            document.getElementById("syncStatus").innerText = "Sincronizado: " + new Date().toLocaleTimeString();
-        } catch(e) {
-            document.getElementById("syncStatus").innerText = "Error de conexión (404/Network)";
-        }
-    }
+            const data = google.visualization.arrayToDataTable(dataRows);
+            const options = {
+                curveType: 'function',
+                legend: { position: 'bottom' },
+                vAxes: { 0: {title: 'PPM / PH'}, 1: {title: 'ORP'} },
+                series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 0} },
+                colors: ['#3498db', '#e67e22', '#2ecc71']
+            };
 
-    document.getElementById("pesajeForm").onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector("button");
-        btn.disabled = true;
-        btn.innerText = "Enviando...";
-
-        const params = new URLSearchParams({
-            operador: usuarioLogueado,
-            exportadora: document.getElementById("exp").value,
-            variedad: document.getElementById("var").value,
-            calibre: document.getElementById("cal").value,
-            lote: document.getElementById("lot").value,
-            salida: document.getElementById("sal").value,
-            peso: document.getElementById("pes").value,
-            categoria: "Standard" // o lo que necesites
+            const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
         });
-
-        await fetch(URL_APP, { method: 'POST', body: params });
-        
-        // Limpiar solo calibre y peso
-        document.getElementById("cal").value = "";
-        document.getElementById("pes").value = "";
-        btn.disabled = false;
-        btn.innerText = "GUARDAR REGISTRO";
-        cargarDatos();
-    };
-
-    // Funciones de gestión de reglas (Iguales a las anteriores simplificadas)
-    async function agregarRegla() {
-        const r = { desde: document.getElementById("calDesde").value, hasta: document.getElementById("calHasta").value, objetivo: document.getElementById("pObj").value };
-        misReglas.push(r);
-        await fetch(URL_APP, { method: 'POST', body: new URLSearchParams({ accion: 'guardarObjetivos', objetivos: JSON.stringify(misReglas) }) });
-        cargarDatos();
     }
 </script>
-
 </body>
 </html>
