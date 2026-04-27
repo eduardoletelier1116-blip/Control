@@ -46,7 +46,6 @@
             height: 29vh; 
             margin-bottom: 1vh; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: relative;
         }
 
         .chart-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
@@ -79,7 +78,7 @@
 
     <div class="chart-card">
         <div class="d-flex justify-content-between align-items-center mb-0">
-            <span class="chart-title" style="color: #58a6ff;">PPM</span>
+            <span class="chart-title" style="color: #58a6ff;">PPM (30-60)</span>
             <div id="status_ppm"></div>
         </div>
         <div id="chart_ppm" style="height: 90%; width: 100%;"></div>
@@ -87,7 +86,7 @@
 
     <div class="chart-card">
         <div class="d-flex justify-content-between align-items-center mb-0">
-            <span class="chart-title" style="color: #ffa657;">ORP</span>
+            <span class="chart-title" style="color: #ffa657;">ORP (750-850)</span>
             <div id="status_orp"></div>
         </div>
         <div id="chart_orp" style="height: 90%; width: 100%;"></div>
@@ -95,7 +94,7 @@
 
     <div class="chart-card">
         <div class="d-flex justify-content-between align-items-center mb-0">
-            <span class="chart-title" style="color: #3fb950;">PH</span>
+            <span class="chart-title" style="color: #3fb950;">PH (6.5-7.5)</span>
             <div id="status_ph"></div>
         </div>
         <div id="chart_ph" style="height: 90%; width: 100%;"></div>
@@ -148,48 +147,53 @@
         dt.addColumn('number', 'Min');
         dt.addColumn('number', 'Max');
 
+        let minValEncontrado = range[0];
+        let maxValEncontrado = range[1];
+
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
+            if(val < minValEncontrado) minValEncontrado = val;
+            if(val > maxValEncontrado) maxValEncontrado = val;
+
             let kilos = f[5] ? f[5] + "k" : "";
             let fuera = (val < range[0] || val > range[1]);
             let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; visible: true; }' : 'point { size: 5; fill-color: ' + baseColor + '; visible: true; }';
             dt.addRow([h + "\n" + kilos, val, estilo, f[6] === "SI" ? "C" : null, range[0], range[1]]);
         });
 
-        // ZOOM AGRESIVO: El área visible será casi puramente el rango
-        const padding = (range[1] - range[0]) * 0.8; 
-        const vMin = range[0] - padding;
-        const vMax = range[1] + padding;
+        // ZOOM INTELIGENTE: Asegura que el punto más bajo/alto sea visible
+        const padding = (range[1] - range[0]) * 0.4; 
+        const vMin = Math.min(range[0], minValEncontrado) - padding;
+        const vMax = Math.max(range[1], maxValEncontrado) + padding;
 
         const chart = new google.visualization.ComboChart(document.getElementById(divId));
         
         chart.draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
-            // Maximizamos el uso del espacio eliminando márgenes innecesarios
-            chartArea: { width: '95%', height: '80%', top: 5, left: 40, right: 10, bottom: 40 },
+            chartArea: { width: '92%', height: '75%', top: 10, left: 45, right: 10, bottom: 45 },
             hAxis: { 
                 textStyle: { color: '#8b949e', fontSize: 8 }, 
-                gridlines: { color: 'transparent' },
-                showTextEvery: 1 // Asegura que se vean todas las etiquetas si hay espacio
+                gridlines: { color: 'transparent' }
             },
             vAxis: { 
-                textStyle: { color: '#ffffff', fontSize: 10, bold: true }, 
+                textStyle: { color: '#ffffff', fontSize: 9, bold: true }, 
                 gridlines: { color: '#21262d' },
                 viewWindow: { min: vMin, max: vMax },
                 viewWindowMode: 'explicit',
-                format: '#' // Quita decimales innecesarios en ORP/PPM
+                // Forzamos marcas en los límites y el centro
+                ticks: [range[0], (range[0] + range[1])/2, range[1]],
+                format: '#'
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
-                1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 2, pointSize: 0 }, 
-                2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 2, pointSize: 0 } 
+                1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 }, 
+                2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 } 
             },
-            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true } }
+            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' } }
         });
 
-        // Evento de clic
         google.visualization.events.addListener(chart, 'select', function() {
             let sel = chart.getSelection()[0];
             if (sel && sel.row !== null) {
