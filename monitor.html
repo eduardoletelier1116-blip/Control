@@ -61,7 +61,6 @@
         .bg-success-live { background-color: #238636; color: #fff; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
         .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); }
     </style>
 </head>
@@ -71,7 +70,7 @@
     <div class="header-bar">
         <div class="brand-zone">
             <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-            <h6 class="mb-0 fw-bold text-white">MONITOREO DE VACIADO</h6>
+            <h6 class="mb-0 fw-bold text-white">SISTEMA DE MONITOREO INDUSTRIAL</h6>
         </div>
         <div id="syncTime" style="color: var(--text-dim); font-size: 0.75rem; font-family: monospace;">SINCRONIZANDO...</div>
     </div>
@@ -121,6 +120,9 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx4Cmdk612iYqcURZgdOsUNzjFHmd9tIM6Mv2yCYv2d7iNPwg5UpCcWNdSV4bhky6hz1g/exec";
     const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
     
+    // Guardamos los objetos de los gráficos para que la animación funcione al actualizar
+    let charts = {};
+
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(refresh);
     setInterval(refresh, 30000);
@@ -147,74 +149,69 @@
         dt.addColumn('number', 'Min');
         dt.addColumn('number', 'Max');
 
-        let minVal = range[0];
-        let maxVal = range[1];
+        let minVal = range[0], maxVal = range[1];
 
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
             if(val < minVal) minVal = val;
             if(val > maxVal) maxVal = val;
-
-            let kilos = f[5] ? f[5] + "k" : "";
             let fuera = (val < range[0] || val > range[1]);
-            let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; visible: true; }' : 'point { size: 5; fill-color: ' + baseColor + '; visible: true; }';
-            
-            // "CORRECCIÓN" completa en lugar de "C"
-            let anotacion = f[6] === "SI" ? "CORRECCIÓN" : null;
-            
-            dt.addRow([h + "\n" + kilos, val, estilo, anotacion, range[0], range[1]]);
+            let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; }' : 'point { size: 5; fill-color: ' + baseColor + '; }';
+            dt.addRow([h + "\n" + (f[5]||"") + "k", val, estilo, f[6] === "SI" ? "CORRECCIÓN" : null, range[0], range[1]]);
         });
 
         const padding = (range[1] - range[0]) * 0.5; 
         const vMin = Math.min(range[0], minVal) - padding;
         const vMax = Math.max(range[1], maxVal) + padding;
 
-        const chart = new google.visualization.ComboChart(document.getElementById(divId));
+        // Inicializar gráfico si no existe para permitir animación
+        if (!charts[divId]) {
+            charts[divId] = new google.visualization.ComboChart(document.getElementById(divId));
+            
+            google.visualization.events.addListener(charts[divId], 'select', function() {
+                let sel = charts[divId].getSelection()[0];
+                if (sel && sel.row !== null) {
+                    let registro = data[sel.row];
+                    if (registro[7] && registro[7] !== "Sin foto") {
+                        document.getElementById('imgRegistro').src = registro[7];
+                        document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
+                        document.getElementById('infoRegistro').innerText = `OPERADOR: ${registro[1]} | ${registro[5]} KG`;
+                        new bootstrap.Modal(document.getElementById('fotoModal')).show();
+                    }
+                }
+            });
+        }
         
-        chart.draw(dt, {
+        charts[divId].draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
             chartArea: { width: '92%', height: '70%', top: 15, left: 50, right: 15, bottom: 50 },
-            hAxis: { 
-                textStyle: { color: '#8b949e', fontSize: 8 }, 
-                gridlines: { color: 'transparent' }
+            // CONFIGURACIÓN DE ANIMACIÓN
+            animation: {
+                duration: 1000,
+                easing: 'out',
+                startup: true
             },
+            hAxis: { textStyle: { color: '#8b949e', fontSize: 8 }, gridlines: { color: 'transparent' } },
             vAxis: { 
                 textStyle: { color: '#ffffff', fontSize: 9, bold: true }, 
                 gridlines: { color: '#21262d' },
                 viewWindow: { min: vMin, max: vMax },
-                viewWindowMode: 'explicit',
                 ticks: [range[0], (range[0] + range[1])/2, range[1]],
-                format: format // Aquí usamos '#.0' para el PH
+                format: format
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
                 1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 }, 
                 2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 } 
             },
-            annotations: { 
-                textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' },
-                alwaysOutside: true 
-            }
-        });
-
-        google.visualization.events.addListener(chart, 'select', function() {
-            let sel = chart.getSelection()[0];
-            if (sel && sel.row !== null) {
-                let registro = data[sel.row];
-                if (registro[7] && registro[7] !== "Sin foto") {
-                    document.getElementById('imgRegistro').src = registro[7];
-                    document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
-                    document.getElementById('infoRegistro').innerText = `OPERADOR: ${registro[1]} | ${registro[5]} KG`;
-                    new bootstrap.Modal(document.getElementById('fotoModal')).show();
-                }
-            }
+            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' }, alwaysOutside: true }
         });
 
         const ultimoVal = Number(data[data.length-1][colIdx]);
-        const estaFuera = (ultimoVal < range[0] || ultimoVal > range[1]);
-        document.getElementById(statusId).innerHTML = estaFuera ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">OK</span>';
+        document.getElementById(statusId).innerHTML = (ultimoVal < range[0] || ultimoVal > range[1]) ? 
+            '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">OK</span>';
     }
 </script>
 </body>
