@@ -36,7 +36,7 @@
         }
 
         .brand-zone { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 35px; width: auto; }
+        .logo-img { height: 40px; width: auto; }
 
         .chart-card { 
             background: var(--card-bg); 
@@ -48,7 +48,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        .chart-title { font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px; }
+        .chart-title { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; }
 
         .status-pill { 
             padding: 4px 12px; 
@@ -73,9 +73,9 @@
     <div class="header-bar">
         <div class="brand-zone">
             <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-            <h5 class="mb-0 fw-bold text-white">MONITOREO DE VACIADO INDUSTRIAL</h5>
+            <h5 class="mb-0 fw-bold text-white">SISTEMA DE MONITOREO INDUSTRIAL</h5>
         </div>
-        <div id="syncTime" style="color: var(--text-dim); font-size: 0.8rem; font-family: monospace;">SINCRONIZANDO...</div>
+        <div id="syncTime" style="color: var(--text-dim); font-size: 0.8rem; font-family: monospace;">CARGANDO...</div>
     </div>
 
     <div class="chart-card" id="card_ppm">
@@ -107,12 +107,12 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h6 class="modal-title" id="modalTitulo">Detalle del Registro</h6>
+        <h6 class="modal-title" id="modalTitulo">Evidencia del Registro</h6>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center">
         <img id="imgRegistro" src="" class="img-fluid rounded shadow mb-3">
-        <div id="infoRegistro" class="p-2 rounded bg-dark small text-info"></div>
+        <div id="infoRegistro" class="p-2 rounded bg-dark small text-info font-monospace"></div>
       </div>
     </div>
   </div>
@@ -157,48 +157,55 @@
             let fuera = (val < range[0] || val > range[1]);
             
             let estilo = fuera ? 'point { size: 9; fill-color: #ff3b3b; visible: true; }' : 'point { size: 6; fill-color: ' + baseColor + '; visible: true; }';
-            let anot = f[6] === "SI" ? "CORREC." : null;
+            let anot = f[6] === "SI" ? "CORRECCIÓN" : null;
             
             dt.addRow([h + "\n" + kilos, val, estilo, anot, range[0], range[1]]);
         });
 
-        // CÁLCULO DE ESCALA DINÁMICA (Para que el rango se vea amplio)
-        // Agregamos un margen del 20% arriba y abajo del rango objetivo
-        const margin = (range[1] - range[0]) * 1.5;
-        const vMin = Math.max(0, range[0] - margin);
-        const vMax = range[1] + margin;
+        // ZOOM DINÁMICO: Ajusta el eje vertical para que el rango sea visiblemente amplio
+        const rangeSpread = range[1] - range[0];
+        const vMin = Math.max(0, range[0] - (rangeSpread * 1.5));
+        const vMax = range[1] + (rangeSpread * 1.5);
 
         const chart = new google.visualization.ComboChart(document.getElementById(divId));
         
+        google.visualization.events.addListener(chart, 'select', function() {
+            let sel = chart.getSelection()[0];
+            if (sel && sel.row !== null) {
+                let registro = data[sel.row];
+                let urlFoto = registro[7]; 
+                if (urlFoto && urlFoto !== "Sin foto") {
+                    document.getElementById('imgRegistro').src = urlFoto;
+                    document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
+                    document.getElementById('infoRegistro').innerText = "OPERADOR: " + registro[1] + " | CARGA: " + registro[5] + " KG";
+                    new bootstrap.Modal(document.getElementById('fotoModal')).show();
+                }
+            }
+        });
+
         chart.draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
-            chartArea: { width: '90%', height: '70%', top: 10, bottom: 40 },
+            chartArea: { width: '90%', height: '70%', top: 10, bottom: 45 },
             pointSize: 6, 
             hAxis: { 
                 textStyle: { color: '#8b949e', fontSize: 8 }, 
                 gridlines: { color: 'transparent' } 
             },
             vAxis: { 
-                textStyle: { color: '#c9d1d9', fontSize: 10, bold: true }, 
+                textStyle: { color: '#ffffff', fontSize: 11, bold: true }, 
                 gridlines: { color: '#21262d' },
-                // AQUÍ HACEMOS EL ZOOM:
                 viewWindow: { min: vMin, max: vMax },
                 viewWindowMode: 'explicit'
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
-                // LÍNEAS DE RANGO: Ahora en color Blanco Humo para máximo contraste
+                // Líneas de rango blancas y gruesas
                 1: { color: '#ffffff', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }, 
                 2: { color: '#ffffff', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 } 
             },
-            annotations: { textStyle: { fontSize: 9, color: '#ff7b72', bold: true, auraColor: 'none' } }
+            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' } }
         });
-
-        const ultimoVal = Number(data[data.length-1][colIdx]);
-        const estaFueraAhora = (ultimoVal < range[0] || ultimoVal > range[1]);
-        document.getElementById(statusId).innerHTML = estaFueraAhora ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">NORMAL</span>';
-    }
 
         const ultimoVal = Number(data[data.length-1][colIdx]);
         const estaFueraAhora = (ultimoVal < range[0] || ultimoVal > range[1]);
