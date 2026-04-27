@@ -3,54 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Industrial</title>
+    <title>Monitor Central Industrial</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        body { background-color: #050505; color: #fff; padding: 15px; font-family: sans-serif; }
-        .chart-card { background: #111; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #222; }
-        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-        .bg-danger-live { background-color: #ff3b3b; color: white; animation: blink 1.5s infinite; }
-        .bg-success-live { background-color: #2ecc71; color: white; }
+        body { background-color: #050505; color: #fff; padding: 10px; height: 100vh; overflow: hidden; }
+        .chart-card { background: #111; border-radius: 10px; padding: 10px; border: 1px solid #222; height: 30vh; margin-bottom: 1vh; }
+        h6 { font-size: 0.8rem; margin: 0; }
+        .status-pill { padding: 2px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; }
+        .bg-danger-live { background-color: #ff3b3b; animation: blink 1.5s infinite; }
+        .bg-success-live { background-color: #2ecc71; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="mb-0">CENTRO DE CONTROL</h4>
-        <div id="syncTime" style="color: #444; font-size: 0.8rem;">Sincronizando...</div>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0 fw-bold">PANEL DE CONTROL EN VIVO</h5>
+        <div id="syncTime" style="color: #444; font-size: 0.7rem;">Sincronizando...</div>
     </div>
 
-    <div class="row">
-        <div class="col-12 mb-3">
-            <div class="chart-card">
-                <div class="d-flex justify-content-between">
-                    <h6 style="color: #3498db;">PPM (30 - 60)</h6>
-                    <div id="status_ppm"></div>
-                </div>
-                <div id="chart_ppm" style="height: 230px;"></div>
-            </div>
+    <div class="chart-card">
+        <div class="d-flex justify-content-between mb-1">
+            <h6 style="color: #3498db;">PPM (30 - 60)</h6>
+            <div id="status_ppm"></div>
         </div>
-        <div class="col-12 mb-3">
-            <div class="chart-card">
-                <div class="d-flex justify-content-between">
-                    <h6 style="color: #e67e22;">ORP (750 - 850)</h6>
-                    <div id="status_orp"></div>
-                </div>
-                <div id="chart_orp" style="height: 230px;"></div>
-            </div>
+        <div id="chart_ppm" style="height: 90%;"></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="d-flex justify-content-between mb-1">
+            <h6 style="color: #e67e22;">ORP (750 - 850)</h6>
+            <div id="status_orp"></div>
         </div>
-        <div class="col-12 mb-3">
-            <div class="chart-card">
-                <div class="d-flex justify-content-between">
-                    <h6 style="color: #2ecc71;">PH (6.5 - 7.5)</h6>
-                    <div id="status_ph"></div>
-                </div>
-                <div id="chart_ph" style="height: 230px;"></div>
-            </div>
+        <div id="chart_orp" style="height: 90%;"></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="d-flex justify-content-between mb-1">
+            <h6 style="color: #2ecc71;">PH (6.5 - 7.5)</h6>
+            <div id="status_ph"></div>
         </div>
+        <div id="chart_ph" style="height: 90%;"></div>
     </div>
 </div>
 
@@ -66,7 +61,7 @@
         fetch(WEB_APP_URL).then(r => r.json()).then(res => {
             const hoy = new Date().setHours(0,0,0,0);
             const dataHoy = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
-            document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
+            document.getElementById('syncTime').innerText = "SINCRONIZADO: " + new Date().toLocaleTimeString();
 
             draw(dataHoy, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#3498db', 2);
             draw(dataHoy, 'chart_orp', 'status_orp', LIMITS.orp, '#e67e22', 3);
@@ -82,8 +77,8 @@
         dt.addColumn('number', 'Valor');
         dt.addColumn({type: 'string', role: 'style'});
         dt.addColumn({type: 'string', role: 'annotation'});
-        dt.addColumn('number', 'Límite Min');
-        dt.addColumn('number', 'Límite Max');
+        dt.addColumn('number', 'Min');
+        dt.addColumn('number', 'Max');
 
         const ultimo = data[data.length - 1];
         const estaFueraAhora = (ultimo[colIdx] < range[0] || ultimo[colIdx] > range[1]);
@@ -95,11 +90,11 @@
             let esCorr = f[6] === "SI";
             
             let fuera = (val < range[0] || val > range[1]);
-            // Historial: Si estuvo fuera, queda marcado en ROJO siempre
-            let punto = fuera ? 'point { size: 7; fill-color: #ff3b3b; }' : 'point { size: 4; fill-color: ' + baseColor + '; }';
-            let anot = esCorr ? "C" : null;
+            // El punto se mantiene rojo si estuvo fuera de rango
+            let punto = fuera ? 'point { size: 6; fill-color: #ff3b3b; }' : 'point { size: 3; fill-color: ' + baseColor + '; }';
+            let anot = esCorr ? "CORRECCIÓN MANUAL" : null;
             
-            dt.addRow([h + "\n(" + kilos + ")", val, punto, anot, range[0], range[1]]);
+            dt.addRow([h + " (" + kilos + "k)", val, punto, anot, range[0], range[1]]);
         });
 
         const sDiv = document.getElementById(statusId);
@@ -107,15 +102,18 @@
 
         const opt = {
             backgroundColor: 'transparent', legend: 'none',
-            chartArea: { width: '90%', height: '70%' },
-            hAxis: { textStyle: { color: '#555', fontSize: 9 } },
-            vAxis: { textStyle: { color: '#888' }, gridlines: { color: '#222' } },
+            chartArea: { width: '92%', height: '70%', top: 10 },
+            hAxis: { textStyle: { color: '#444', fontSize: 8 } },
+            vAxis: { textStyle: { color: '#666', fontSize: 9 }, gridlines: { color: '#1a1a1a' } },
             series: {
-                0: { type: 'line', color: baseColor, lineWidth: 3 },
-                1: { type: 'line', color: '#444', lineWidth: 1, lineDashStyle: [4, 4] },
-                2: { type: 'line', color: '#444', lineWidth: 1, lineDashStyle: [4, 4] }
+                0: { type: 'line', color: baseColor, lineWidth: 2 },
+                1: { type: 'line', color: '#333', lineWidth: 1, lineDashStyle: [3, 3] },
+                2: { type: 'line', color: '#333', lineWidth: 1, lineDashStyle: [3, 3] }
             },
-            annotations: { textStyle: { fontSize: 11, color: '#fff', bold: true } }
+            annotations: { 
+                textStyle: { fontSize: 9, color: '#f8d7da', bold: true },
+                alwaysOutside: true 
+            }
         };
 
         new google.visualization.ComboChart(document.getElementById(divId)).draw(dt, opt);
