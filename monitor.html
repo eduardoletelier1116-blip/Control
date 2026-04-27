@@ -36,7 +36,7 @@
         }
 
         .brand-zone { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 30px; width: auto; }
+        .logo-img { height: 35px; width: auto; }
 
         .chart-card { 
             background: var(--card-bg); 
@@ -128,16 +128,16 @@
     function refresh() {
         fetch(WEB_APP_URL).then(r => r.json()).then(res => {
             const hoy = new Date().setHours(0,0,0,0);
-            const rawData = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
+            const rawData = res.slice(1).filter(f => f[0] && new Date(f[0]).setHours(0,0,0,0) === hoy);
             document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
 
-            drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2);
-            drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3);
-            drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4);
+            drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2, '#');
+            drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3, '#');
+            drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4, '#.0');
         });
     }
 
-    function drawChart(data, divId, statusId, range, baseColor, colIdx) {
+    function drawChart(data, divId, statusId, range, baseColor, colIdx, format) {
         if (data.length === 0) return;
         let dt = new google.visualization.DataTable();
         dt.addColumn('string', 'X');
@@ -147,32 +147,35 @@
         dt.addColumn('number', 'Min');
         dt.addColumn('number', 'Max');
 
-        let minValEncontrado = range[0];
-        let maxValEncontrado = range[1];
+        let minVal = range[0];
+        let maxVal = range[1];
 
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
-            if(val < minValEncontrado) minValEncontrado = val;
-            if(val > maxValEncontrado) maxValEncontrado = val;
+            if(val < minVal) minVal = val;
+            if(val > maxVal) maxVal = val;
 
             let kilos = f[5] ? f[5] + "k" : "";
             let fuera = (val < range[0] || val > range[1]);
             let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; visible: true; }' : 'point { size: 5; fill-color: ' + baseColor + '; visible: true; }';
-            dt.addRow([h + "\n" + kilos, val, estilo, f[6] === "SI" ? "C" : null, range[0], range[1]]);
+            
+            // "CORRECCIÓN" completa en lugar de "C"
+            let anotacion = f[6] === "SI" ? "CORRECCIÓN" : null;
+            
+            dt.addRow([h + "\n" + kilos, val, estilo, anotacion, range[0], range[1]]);
         });
 
-        // ZOOM INTELIGENTE: Asegura que el punto más bajo/alto sea visible
-        const padding = (range[1] - range[0]) * 0.4; 
-        const vMin = Math.min(range[0], minValEncontrado) - padding;
-        const vMax = Math.max(range[1], maxValEncontrado) + padding;
+        const padding = (range[1] - range[0]) * 0.5; 
+        const vMin = Math.min(range[0], minVal) - padding;
+        const vMax = Math.max(range[1], maxVal) + padding;
 
         const chart = new google.visualization.ComboChart(document.getElementById(divId));
         
         chart.draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
-            chartArea: { width: '92%', height: '75%', top: 10, left: 45, right: 10, bottom: 45 },
+            chartArea: { width: '92%', height: '70%', top: 15, left: 50, right: 15, bottom: 50 },
             hAxis: { 
                 textStyle: { color: '#8b949e', fontSize: 8 }, 
                 gridlines: { color: 'transparent' }
@@ -182,16 +185,18 @@
                 gridlines: { color: '#21262d' },
                 viewWindow: { min: vMin, max: vMax },
                 viewWindowMode: 'explicit',
-                // Forzamos marcas en los límites y el centro
                 ticks: [range[0], (range[0] + range[1])/2, range[1]],
-                format: '#'
+                format: format // Aquí usamos '#.0' para el PH
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
                 1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 }, 
                 2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 } 
             },
-            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' } }
+            annotations: { 
+                textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' },
+                alwaysOutside: true 
+            }
         });
 
         google.visualization.events.addListener(chart, 'select', function() {
@@ -200,6 +205,7 @@
                 let registro = data[sel.row];
                 if (registro[7] && registro[7] !== "Sin foto") {
                     document.getElementById('imgRegistro').src = registro[7];
+                    document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
                     document.getElementById('infoRegistro').innerText = `OPERADOR: ${registro[1]} | ${registro[5]} KG`;
                     new bootstrap.Modal(document.getElementById('fotoModal')).show();
                 }
