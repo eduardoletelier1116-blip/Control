@@ -18,7 +18,7 @@
         body { 
             background-color: var(--bg-dark); 
             color: var(--text-main); 
-            padding: 10px; 
+            padding: 5px; 
             height: 100vh; 
             overflow: hidden; 
             font-family: 'Segoe UI', Roboto, sans-serif;
@@ -27,35 +27,35 @@
         .header-bar {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px 20px;
-            margin-bottom: 15px;
+            border-radius: 8px;
+            padding: 8px 15px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .brand-zone { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 40px; width: auto; }
+        .brand-zone { display: flex; align-items: center; gap: 12px; }
+        .logo-img { height: 30px; width: auto; }
 
         .chart-card { 
             background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 15px; 
+            border-radius: 10px; 
+            padding: 10px; 
             border: 1px solid var(--border-color); 
-            height: 28vh; 
-            margin-bottom: 1.5vh; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            height: 29vh; 
+            margin-bottom: 1vh; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: relative;
         }
 
-        .chart-title { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; }
+        .chart-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
 
         .status-pill { 
-            padding: 4px 12px; 
-            border-radius: 6px; 
-            font-size: 0.75rem; 
-            font-weight: 800; 
-            letter-spacing: 1px;
+            padding: 3px 10px; 
+            border-radius: 4px; 
+            font-size: 0.7rem; 
+            font-weight: 800;
         }
 
         .bg-danger-live { background-color: #f85149; color: #fff; animation: blink 1.2s infinite; }
@@ -64,7 +64,6 @@
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
         .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); }
-        .modal-header { border-bottom: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
@@ -73,41 +72,41 @@
     <div class="header-bar">
         <div class="brand-zone">
             <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-            <h5 class="mb-0 fw-bold text-white">SISTEMA DE MONITOREO INDUSTRIAL</h5>
+            <h6 class="mb-0 fw-bold text-white">MONITOREO DE VACIADO</h6>
         </div>
-        <div id="syncTime" style="color: var(--text-dim); font-size: 0.8rem; font-family: monospace;">CARGANDO...</div>
+        <div id="syncTime" style="color: var(--text-dim); font-size: 0.75rem; font-family: monospace;">SINCRONIZANDO...</div>
     </div>
 
-    <div class="chart-card" id="card_ppm">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="chart-title" style="color: #58a6ff;">PPM (30 - 60)</span>
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-0">
+            <span class="chart-title" style="color: #58a6ff;">PPM</span>
             <div id="status_ppm"></div>
         </div>
-        <div id="chart_ppm" style="height: 85%;"></div>
+        <div id="chart_ppm" style="height: 90%; width: 100%;"></div>
     </div>
 
-    <div class="chart-card" id="card_orp">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="chart-title" style="color: #ffa657;">ORP (750 - 850)</span>
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-0">
+            <span class="chart-title" style="color: #ffa657;">ORP</span>
             <div id="status_orp"></div>
         </div>
-        <div id="chart_orp" style="height: 85%;"></div>
+        <div id="chart_orp" style="height: 90%; width: 100%;"></div>
     </div>
 
-    <div class="chart-card" id="card_ph">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="chart-title" style="color: #3fb950;">PH (6.5 - 7.5)</span>
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-0">
+            <span class="chart-title" style="color: #3fb950;">PH</span>
             <div id="status_ph"></div>
         </div>
-        <div id="chart_ph" style="height: 85%;"></div>
+        <div id="chart_ph" style="height: 90%; width: 100%;"></div>
     </div>
 </div>
 
 <div class="modal fade" id="fotoModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
-        <h6 class="modal-title" id="modalTitulo">Evidencia del Registro</h6>
+      <div class="modal-header border-0">
+        <h6 class="modal-title" id="modalTitulo">Registro Detallado</h6>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center">
@@ -122,8 +121,7 @@
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx4Cmdk612iYqcURZgdOsUNzjFHmd9tIM6Mv2yCYv2d7iNPwg5UpCcWNdSV4bhky6hz1g/exec";
     const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
-    let rawData = [];
-
+    
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(refresh);
     setInterval(refresh, 30000);
@@ -131,8 +129,8 @@
     function refresh() {
         fetch(WEB_APP_URL).then(r => r.json()).then(res => {
             const hoy = new Date().setHours(0,0,0,0);
-            rawData = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
-            document.getElementById('syncTime').innerText = "VIVO: " + new Date().toLocaleTimeString();
+            const rawData = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
+            document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
 
             drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2);
             drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3);
@@ -143,7 +141,7 @@
     function drawChart(data, divId, statusId, range, baseColor, colIdx) {
         if (data.length === 0) return;
         let dt = new google.visualization.DataTable();
-        dt.addColumn('string', 'Etiqueta');
+        dt.addColumn('string', 'X');
         dt.addColumn('number', 'Valor');
         dt.addColumn({type: 'string', role: 'style'});
         dt.addColumn({type: 'string', role: 'annotation'});
@@ -155,61 +153,58 @@
             let val = Number(f[colIdx]);
             let kilos = f[5] ? f[5] + "k" : "";
             let fuera = (val < range[0] || val > range[1]);
-            
-            let estilo = fuera ? 'point { size: 9; fill-color: #ff3b3b; visible: true; }' : 'point { size: 6; fill-color: ' + baseColor + '; visible: true; }';
-            let anot = f[6] === "SI" ? "CORRECCIÓN" : null;
-            
-            dt.addRow([h + "\n" + kilos, val, estilo, anot, range[0], range[1]]);
+            let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; visible: true; }' : 'point { size: 5; fill-color: ' + baseColor + '; visible: true; }';
+            dt.addRow([h + "\n" + kilos, val, estilo, f[6] === "SI" ? "C" : null, range[0], range[1]]);
         });
 
-        // ZOOM DINÁMICO: Ajusta el eje vertical para que el rango sea visiblemente amplio
-        const rangeSpread = range[1] - range[0];
-        const vMin = Math.max(0, range[0] - (rangeSpread * 1.5));
-        const vMax = range[1] + (rangeSpread * 1.5);
+        // ZOOM AGRESIVO: El área visible será casi puramente el rango
+        const padding = (range[1] - range[0]) * 0.8; 
+        const vMin = range[0] - padding;
+        const vMax = range[1] + padding;
 
         const chart = new google.visualization.ComboChart(document.getElementById(divId));
         
+        chart.draw(dt, {
+            backgroundColor: 'transparent', 
+            legend: 'none',
+            // Maximizamos el uso del espacio eliminando márgenes innecesarios
+            chartArea: { width: '95%', height: '80%', top: 5, left: 40, right: 10, bottom: 40 },
+            hAxis: { 
+                textStyle: { color: '#8b949e', fontSize: 8 }, 
+                gridlines: { color: 'transparent' },
+                showTextEvery: 1 // Asegura que se vean todas las etiquetas si hay espacio
+            },
+            vAxis: { 
+                textStyle: { color: '#ffffff', fontSize: 10, bold: true }, 
+                gridlines: { color: '#21262d' },
+                viewWindow: { min: vMin, max: vMax },
+                viewWindowMode: 'explicit',
+                format: '#' // Quita decimales innecesarios en ORP/PPM
+            },
+            series: { 
+                0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
+                1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 2, pointSize: 0 }, 
+                2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 2, pointSize: 0 } 
+            },
+            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true } }
+        });
+
+        // Evento de clic
         google.visualization.events.addListener(chart, 'select', function() {
             let sel = chart.getSelection()[0];
             if (sel && sel.row !== null) {
                 let registro = data[sel.row];
-                let urlFoto = registro[7]; 
-                if (urlFoto && urlFoto !== "Sin foto") {
-                    document.getElementById('imgRegistro').src = urlFoto;
-                    document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
-                    document.getElementById('infoRegistro').innerText = "OPERADOR: " + registro[1] + " | CARGA: " + registro[5] + " KG";
+                if (registro[7] && registro[7] !== "Sin foto") {
+                    document.getElementById('imgRegistro').src = registro[7];
+                    document.getElementById('infoRegistro').innerText = `OPERADOR: ${registro[1]} | ${registro[5]} KG`;
                     new bootstrap.Modal(document.getElementById('fotoModal')).show();
                 }
             }
         });
 
-        chart.draw(dt, {
-            backgroundColor: 'transparent', 
-            legend: 'none',
-            chartArea: { width: '90%', height: '70%', top: 10, bottom: 45 },
-            pointSize: 6, 
-            hAxis: { 
-                textStyle: { color: '#8b949e', fontSize: 8 }, 
-                gridlines: { color: 'transparent' } 
-            },
-            vAxis: { 
-                textStyle: { color: '#ffffff', fontSize: 11, bold: true }, 
-                gridlines: { color: '#21262d' },
-                viewWindow: { min: vMin, max: vMax },
-                viewWindowMode: 'explicit'
-            },
-            series: { 
-                0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
-                // Líneas de rango blancas y gruesas
-                1: { color: '#ffffff', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }, 
-                2: { color: '#ffffff', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 } 
-            },
-            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' } }
-        });
-
         const ultimoVal = Number(data[data.length-1][colIdx]);
-        const estaFueraAhora = (ultimoVal < range[0] || ultimoVal > range[1]);
-        document.getElementById(statusId).innerHTML = estaFueraAhora ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">NORMAL</span>';
+        const estaFuera = (ultimoVal < range[0] || ultimoVal > range[1]);
+        document.getElementById(statusId).innerHTML = estaFuera ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">OK</span>';
     }
 </script>
 </body>
