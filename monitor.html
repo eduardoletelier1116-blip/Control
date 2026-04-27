@@ -3,81 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Industrial en Vivo</title>
+    <title>Monitor Industrial Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        body { background-color: #050505; color: #fff; padding: 10px; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        .chart-card { background: #111; border-radius: 10px; padding: 10px; border: 1px solid #222; height: 30vh; margin-bottom: 1vh; position: relative; }
-        h6 { font-size: 0.85rem; font-weight: bold; margin: 0; letter-spacing: 1px; }
-        .status-pill { padding: 2px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        .bg-danger-live { background-color: #ff3b3b; color: #fff; box-shadow: 0 0 10px rgba(255, 59, 59, 0.5); animation: blink 1s infinite; }
-        .bg-success-live { background-color: #2ecc71; color: #fff; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        #syncTime { color: #444; font-size: 0.7rem; font-weight: bold; }
+        body { background-color: #050505; color: #fff; padding: 10px; height: 100vh; overflow: hidden; }
+        .chart-card { background: #111; border-radius: 10px; padding: 10px; border: 1px solid #222; height: 30vh; margin-bottom: 1vh; cursor: crosshair; }
+        .status-pill { padding: 2px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; }
+        .bg-danger-live { background-color: #ff3b3b; animation: blink 1.5s infinite; }
+        .bg-success-live { background-color: #2ecc71; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        /* Modal para la foto */
+        .modal-content { background-color: #111; border: 1px solid #444; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-2 px-2">
-        <h5 class="mb-0 fw-bold" style="color: #eee;">SISTEMA DE MONITOREO CRÍTICO</h5>
-        <div id="syncTime">INICIALIZANDO...</div>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0 fw-bold">MONITOREO DE PARÁMETROS CRÍTICOS</h5>
+        <div id="syncTime" style="color: #444; font-size: 0.7rem;">Sincronizando...</div>
     </div>
 
-    <div class="chart-card">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <h6 style="color: #3498db;">PPM (RANGO 30 - 60)</h6>
+    <div class="chart-card" id="card_ppm">
+        <div class="d-flex justify-content-between mb-1">
+            <h6 style="color: #3498db;">PPM (30 - 60)</h6>
             <div id="status_ppm"></div>
         </div>
-        <div id="chart_ppm" style="height: 90%; width: 100%;"></div>
+        <div id="chart_ppm" style="height: 90%;"></div>
     </div>
 
-    <div class="chart-card">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <h6 style="color: #e67e22;">ORP (RANGO 750 - 850)</h6>
+    <div class="chart-card" id="card_orp">
+        <div class="d-flex justify-content-between mb-1">
+            <h6 style="color: #e67e22;">ORP (750 - 850)</h6>
             <div id="status_orp"></div>
         </div>
-        <div id="chart_orp" style="height: 90%; width: 100%;"></div>
+        <div id="chart_orp" style="height: 90%;"></div>
     </div>
 
-    <div class="chart-card">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <h6 style="color: #2ecc71;">PH (RANGO 6.5 - 7.5)</h6>
+    <div class="chart-card" id="card_ph">
+        <div class="d-flex justify-content-between mb-1">
+            <h6 style="color: #2ecc71;">PH (6.5 - 7.5)</h6>
             <div id="status_ph"></div>
         </div>
-        <div id="chart_ph" style="height: 90%; width: 100%;"></div>
+        <div id="chart_ph" style="height: 90%;"></div>
     </div>
 </div>
 
+<div class="modal fade" id="fotoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h6 class="modal-title" id="modalTitulo">Evidencia de Registro</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="imgRegistro" src="" class="img-fluid rounded shadow" alt="Cargando...">
+        <div id="infoRegistro" class="mt-2 small text-muted"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvMblUnsikPSaGe_VpQVSIYHxrvFfoLiK-cgaY7iTWYnilk2djGQZS_OTtUYkQUhQrVw/exec";
     const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
+    let rawData = [];
 
     google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(refreshData);
-    
-    // Intervalo de actualización automática (30 segundos)
-    setInterval(refreshData, 30000);
+    google.charts.setOnLoadCallback(refresh);
+    setInterval(refresh, 30000);
 
-    function refreshData() {
-        fetch(WEB_APP_URL)
-        .then(r => r.json())
-        .then(res => {
+    function refresh() {
+        fetch(WEB_APP_URL).then(r => r.json()).then(res => {
             const hoy = new Date().setHours(0,0,0,0);
-            const dataHoy = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
-            
+            rawData = res.slice(1).filter(f => new Date(f[0]).setHours(0,0,0,0) === hoy);
             document.getElementById('syncTime').innerText = "VIVO: " + new Date().toLocaleTimeString();
 
-            renderChart(dataHoy, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#3498db', 2);
-            renderChart(dataHoy, 'chart_orp', 'status_orp', LIMITS.orp, '#e67e22', 3);
-            renderChart(dataHoy, 'chart_ph', 'status_ph', LIMITS.ph, '#2ecc71', 4);
+            drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#3498db', 2);
+            drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#e67e22', 3);
+            drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#2ecc71', 4);
         });
     }
 
-    function renderChart(data, divId, statusId, range, baseColor, colIdx) {
+    function drawChart(data, divId, statusId, range, baseColor, colIdx) {
         if (data.length === 0) return;
-
         let dt = new google.visualization.DataTable();
         dt.addColumn('string', 'H');
         dt.addColumn('number', 'Valor');
@@ -86,61 +97,45 @@
         dt.addColumn('number', 'Min');
         dt.addColumn('number', 'Max');
 
-        const ultimoRegistro = data[data.length - 1];
-        const estaFueraAhora = (ultimoRegistro[colIdx] < range[0] || ultimoRegistro[colIdx] > range[1]);
-
         data.forEach(f => {
-            let hora = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = f[colIdx];
-            let kilos = f[5];
-            let esCorr = f[6] === "SI";
-            
             let fuera = (val < range[0] || val > range[1]);
-            
-            // FORZAMOS EL PUNTO ROJO: pointSize mayor y color explícito
-            // Si está fuera, el punto es rojo y grande (size 8). Si está bien, es pequeño (size 4).
-            let estiloPunto = fuera 
-                ? 'point { size: 8; fill-color: #ff3b3b; stroke-color: #ffffff; stroke-width: 1; }' 
-                : 'point { size: 4; fill-color: ' + baseColor + '; }';
-            
-            let textoAnotacion = esCorr ? "CORRECCIÓN" : null;
-            
-            dt.addRow([hora + "\n(" + kilos + "k)", val, estiloPunto, textoAnotacion, range[0], range[1]]);
+            let estilo = fuera ? 'point { size: 7; fill-color: #ff3b3b; }' : 'point { size: 4; fill-color: ' + baseColor + '; }';
+            let anot = f[6] === "SI" ? "CORRECCIÓN MANUAL" : null;
+            dt.addRow([h + "\n(" + f[5] + "k)", val, estilo, anot, range[0], range[1]]);
         });
 
-        // Actualizar el estado visual del panel
-        const sDiv = document.getElementById(statusId);
-        if (estaFueraAhora) {
-            sDiv.className = "status-pill bg-danger-live";
-            sDiv.innerText = "ALERTA";
-        } else {
-            sDiv.className = "status-pill bg-success-live";
-            sDiv.innerText = "NORMAL";
-        }
-
-        const options = {
-            backgroundColor: 'transparent',
-            legend: 'none',
-            chartArea: { width: '94%', height: '70%', top: 15 },
-            animation: { duration: 1000, easing: 'out', startup: true },
-            hAxis: { textStyle: { color: '#444', fontSize: 8 } },
-            vAxis: { 
-                textStyle: { color: '#666', fontSize: 9 }, 
-                gridlines: { color: '#1a1a1a' },
-                baselineColor: '#333'
-            },
-            series: {
-                0: { type: 'line', color: baseColor, lineWidth: 2, pointSize: 4 }, // Línea principal
-                1: { type: 'line', color: '#444', lineWidth: 1, lineDashStyle: [4, 4], pointSize: 0 }, // Límite Min
-                2: { type: 'line', color: '#444', lineWidth: 1, lineDashStyle: [4, 4], pointSize: 0 }  // Límite Max
-            },
-            annotations: { 
-                textStyle: { fontSize: 9, color: '#ff3b3b', bold: true },
-                alwaysOutside: false 
+        const chart = new google.visualization.ComboChart(document.getElementById(divId));
+        
+        // EVENTO DE CLIC PARA LA FOTO
+        google.visualization.events.addListener(chart, 'select', function() {
+            let sel = chart.getSelection()[0];
+            if (sel && sel.row !== null) {
+                let registro = data[sel.row];
+                let urlFoto = registro[7]; // Asumiendo que la foto está en la columna H
+                if (urlFoto && urlFoto !== "Sin foto") {
+                    document.getElementById('imgRegistro').src = urlFoto;
+                    document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
+                    document.getElementById('infoRegistro').innerText = "Operador: " + registro[1] + " | Kilos: " + registro[5];
+                    new bootstrap.Modal(document.getElementById('fotoModal')).show();
+                } else {
+                    alert("Este registro no tiene foto de respaldo.");
+                }
             }
-        };
+        });
 
-        new google.visualization.ComboChart(document.getElementById(divId)).draw(dt, options);
+        chart.draw(dt, {
+            backgroundColor: 'transparent', legend: 'none',
+            chartArea: { width: '92%', height: '70%', top: 10 },
+            hAxis: { textStyle: { color: '#444', fontSize: 8 } },
+            vAxis: { textStyle: { color: '#666', fontSize: 9 }, gridlines: { color: '#1a1a1a' } },
+            series: { 0: { color: baseColor, lineWidth: 2 }, 1: { color: '#333', lineDashStyle: [3, 3] }, 2: { color: '#333', lineDashStyle: [3, 3] } },
+            annotations: { textStyle: { fontSize: 9, color: '#f8d7da', bold: true } }
+        });
+
+        const estaFueraAhora = (data[data.length-1][colIdx] < range[0] || data[data.length-1][colIdx] > range[1]);
+        document.getElementById(statusId).innerHTML = estaFueraAhora ? '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">NORMAL</span>';
     }
 </script>
 </body>
