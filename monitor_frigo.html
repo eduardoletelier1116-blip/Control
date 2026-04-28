@@ -2,190 +2,161 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor Frigorífico - Enlace Pestaña</title>
+    <title>Monitor Frigorífico - Estable</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; margin: 0; }
         
-        .header-monitor { background: #1e293b; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; flex-shrink: 0; }
+        .header-monitor { background: #1e293b; padding: 10px 25px; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         
-        /* Área Superior: Cámaras (40%) */
-        .cams-section { height: 40%; display: flex; align-items: center; justify-content: center; position: relative; padding: 10px 40px; background: rgba(30, 41, 59, 0.3); }
-        .cam-card { background: #1e293b; border: 1px solid #475569; border-radius: 15px; flex: 1; margin: 0 10px; padding: 15px; position: relative; max-width: 280px; min-height: 190px; display: flex; flex-direction: column; transition: all 0.3s; }
-        .cam-card.alert { border: 2px solid #ef4444; background: #2d1a1a; animation: pulse-red 2s infinite; }
+        /* Área Cámaras (40%) */
+        .cams-section { height: 40%; position: relative; display: flex; align-items: center; justify-content: center; padding: 0 50px; }
         
-        /* Área Inferior: Lista (60%) */
-        .list-section { flex-grow: 1; background: #020617; padding: 20px; overflow-y: auto; border-top: 2px solid #1e293b; }
-        .table { color: #cbd5e1; font-size: 0.88rem; }
-        .table thead th { background: #1e293b; color: #3b82f6; position: sticky; top: -20px; border: none; }
+        .cam-card { background: #1e293b; border: 1px solid #475569; border-radius: 12px; flex: 1; margin: 0 8px; padding: 12px; position: relative; max-width: 250px; min-height: 175px; display: flex; flex-direction: column; }
+        .cam-card.alert { border: 2px solid #ef4444; background: #2d1a1a; animation: pulse 2s infinite; }
+        
+        /* Área Lista (60%) */
+        .list-section { flex-grow: 1; background: #020617; padding: 15px; overflow-y: auto; border-top: 2px solid #1e293b; }
+        .table { color: #cbd5e1; font-size: 0.85rem; }
+        .table thead th { background: #1e293b; color: #3b82f6; position: sticky; top: -16px; z-index: 10; border: none; }
 
-        .cam-id-bg { font-size: 3rem; font-weight: 900; opacity: 0.05; position: absolute; right: 10px; top: -5px; }
-        .label-small { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
-        .val-unit { font-size: 1.25rem; font-weight: bold; line-height: 1; }
-        .text-critico { color: #f87171; }
-        .text-ok { color: #4ade80; }
+        .cam-number-bg { font-size: 2.5rem; font-weight: 900; opacity: 0.05; position: absolute; right: 10px; top: -5px; }
+        .label-text { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-bottom: 0; }
+        .value-text { font-size: 1.15rem; font-weight: bold; }
+        
+        .text-danger { color: #f87171 !important; }
+        .text-success { color: #4ade80 !important; }
+        
+        .nav-btn { background: #1e293b; border: 1px solid #3b82f6; color: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; position: absolute; z-index: 20; }
+        .btn-L { left: 10px; }
+        .btn-R { right: 10px; }
 
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .btn-nav { background: rgba(30, 41, 59, 0.8); border: 1px solid #3b82f6; color: white; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; position: absolute; z-index: 10; }
-        .btn-prev { left: 15px; }
-        .btn-next { right: 15px; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body>
 
 <div class="header-monitor">
     <div class="d-flex align-items-center">
-        <img src="logo-icono.png" alt="Logo" style="height: 40px;" class="me-3">
-        <h5 class="mb-0 fw-bold">SISTEMA DE CONTROL <span class="text-info">| FRIGORÍFICO</span></h5>
+        <img src="logo-icono.png" alt="Logo" style="height: 35px;" class="me-3">
+        <h6 class="mb-0 fw-bold">MONITOREO <span class="text-info">FRIGORÍFICO</span></h6>
     </div>
-    <div id="reloj" class="fs-4 fw-bold">00:00:00</div>
+    <div id="reloj" class="fw-bold text-info">00:00:00</div>
 </div>
 
-<div class="cams-section" id="cams-area">
-    <button class="btn-nav btn-prev" onclick="cambiarGrupo(-1)"><i class="bi bi-chevron-left"></i></button>
-    
+<div class="cams-section" id="interactive-area">
+    <button class="nav-btn btn-L" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
     <div id="cards-container" class="d-flex justify-content-center w-100">
-        <div class="spinner-border text-info" role="status"></div>
+        <span class="text-muted">Cargando base de datos...</span>
     </div>
-
-    <button class="btn-nav btn-next" onclick="cambiarGrupo(1)"><i class="bi bi-chevron-right"></i></button>
+    <button class="nav-btn btn-R" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
 </div>
 
 <div class="list-section">
     <table class="table table-dark table-hover">
         <thead>
             <tr>
-                <th>HORA</th>
-                <th>CÁMARA</th>
-                <th>VARIEDAD(ES)</th>
-                <th>OPERADOR</th>
-                <th class="text-center">T. AMB</th>
-                <th class="text-center">T. PULPA</th>
-                <th class="text-center">HUM %</th>
-                <th class="text-center">FOTO</th>
+                <th>HORA</th><th>CÁMARA</th><th>VARIEDADES</th><th>OP</th><th class="text-center">T. AMB</th><th class="text-center">PULPA</th><th class="text-center">HUM %</th><th>VER</th>
             </tr>
         </thead>
-        <tbody id="tabla-body"></tbody>
+        <tbody id="data-table-body"></tbody>
     </table>
 </div>
 
 <script>
-    // URL CON EL PARÁMETRO DE PESTAÑA EXPLÍCITO
-    const URL_BASE = "https://script.google.com/macros/s/AKfycbyuIeIvQuLiaVSwlQInOiRYIT_NvtY5-TUCrnZu-xAFyLA8aYWRP7XaWwVCbVN0L_uSLA/exec";
-    const URL_CON_FILTRO = URL_BASE + "?pestana=frigo";
+    // URL CON EL PARÁMETRO DE HOJA REINSTALADO
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec?pestana=frigo";
     
-    let datosApp = [];
-    let indiceGrupo = 0;
-    let ratonEncima = false;
+    let allData = [];
+    let currentGroup = 0;
+    let isPaused = false;
 
-    async function actualizarDatos() {
+    async function syncData() {
         try {
-            const respuesta = await fetch(URL_CON_FILTRO);
-            const raw = await respuesta.json();
+            const response = await fetch(SCRIPT_URL);
+            const json = await response.json();
+            // Invertimos: el registro de la última fila de Excel queda en la posición [0]
+            allData = json.slice(1).reverse();
             
-            // Filtramos encabezados y revertimos para que el más nuevo sea el índice 0
-            datosApp = raw.slice(1).reverse();
-            
-            renderTabla();
-            if(!ratonEncima) renderCards();
-        } catch (error) {
-            console.error("Error:", error);
-            document.getElementById('cards-container').innerHTML = "<h5 class='text-danger'>Error de conexión con la base de datos</h5>";
-        }
+            drawTable();
+            if(!isPaused) drawCards();
+        } catch (e) { console.error("Error de sincronización."); }
     }
 
-    function renderCards() {
-        const contenedor = document.getElementById('cards-container');
-        
-        // Obtenemos el ÚLTIMO registro de cada cámara
-        const mapeoUltimos = {};
-        datosApp.forEach(reg => {
-            const camID = reg[3]; // Columna de nombre de cámara
-            if (!mapeoUltimos[camID]) mapeoUltimos[camID] = reg;
+    function drawCards() {
+        const container = document.getElementById('cards-container');
+        const latestByCam = {};
+
+        // ALGORITMO DE PRIORIDAD: Como allData está al revés, 
+        // la primera vez que encontramos una cámara, ES la más reciente.
+        allData.forEach(row => {
+            const camName = String(row[3]).trim();
+            if (!latestByCam[camName]) latestByCam[camName] = row;
         });
 
-        const camarasPorGrupo = [
+        const groups = [
             ["Cámara 2", "Cámara 3", "Cámara 4", "Cámara 5"],
             ["Cámara 6", "Cámara 7", "Cámara 8", "Cámara 9"],
             ["Cámara 10", "Cámara 11", "Cámara 12"]
         ];
 
-        const seleccion = camarasPorGrupo[indiceGrupo];
-        contenedor.innerHTML = "";
+        const activeSelection = groups[currentGroup];
+        container.innerHTML = "";
 
-        seleccion.forEach(nombre => {
-            const r = mapeoUltimos[nombre];
-            const card = document.createElement('div');
-            card.className = "cam-card";
+        activeSelection.forEach(name => {
+            const r = latestByCam[name];
+            const div = document.createElement('div');
+            div.className = "cam-card";
             
             if(!r) {
-                card.innerHTML = `<div class="cam-id-bg">${nombre.split(' ')[1]}</div><h5 class="fw-bold">${nombre}</h5><p class="text-muted small mt-4">Sin datos registrados hoy</p>`;
+                div.innerHTML = `<div class="cam-number-bg">${name.split(' ')[1]}</div><h6 class="fw-bold">${name}</h6><p class="text-muted small">Sin datos</p>`;
             } else {
-                const [fecha, op, variedades, cam, tAmb, tPulpa, hum] = r;
-                
-                // Validación rápida de rangos (puedes ajustar según variedad)
-                const critico = (tAmb > 1.5 || tPulpa > 2 || hum < 85);
-                if(critico) card.classList.add('alert');
+                const [fecha, op, vars, cam, tAmb, tPulp, hum] = r;
+                const alert = (tAmb > 1.5 || tPulp > 2 || hum < 85);
+                if(alert) div.classList.add('alert');
 
-                card.innerHTML = `
-                    <div class="cam-id-bg">${nombre.split(' ')[1]}</div>
-                    <h5 class="fw-bold mb-1">${nombre}</h5>
-                    <div class="small text-info text-truncate mb-3" style="z-index:1">${variedades}</div>
-                    
-                    <div class="row g-2 mt-auto">
-                        <div class="col-6">
-                            <p class="label-small">Ambiente</p>
-                            <div class="val-unit ${(tAmb > 1.5)?'text-critico':'text-ok'}">${tAmb}°</div>
-                        </div>
-                        <div class="col-6">
-                            <p class="label-small">Pulpa</p>
-                            <div class="val-unit ${(tPulpa > 2)?'text-critico':'text-ok'}">${tPulpa}°</div>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <p class="label-small">Humedad</p>
-                            <div class="val-unit ${(hum < 85)?'text-critico':'text-ok'}">${hum}%</div>
-                        </div>
-                    </div>
-                `;
+                div.innerHTML = `
+                    <div class="cam-number-bg">${name.split(' ')[1]}</div>
+                    <h6 class="fw-bold mb-1">${name}</h6>
+                    <div class="small text-info text-truncate mb-2" style="font-size:0.7rem; z-index:1; position:relative;">${vars}</div>
+                    <div class="row g-1 mt-auto">
+                        <div class="col-6"><p class="label-text">Ambiente</p><div class="value-text ${tAmb>1.5?'text-danger':'text-success'}">${tAmb}°</div></div>
+                        <div class="col-6"><p class="label-text">Pulpa</p><div class="value-text ${tPulp>2?'text-danger':'text-success'}">${tPulp}°</div></div>
+                        <div class="col-12 mt-1"><p class="label-text">Humedad</p><div class="value-text ${hum<85?'text-danger':'text-success'}">${hum}%</div></div>
+                    </div>`;
             }
-            contenedor.appendChild(card);
+            container.appendChild(div);
         });
-        
-        indiceGrupo = (indiceGrupo + 1) % 3;
+        currentGroup = (currentGroup + 1) % 3;
     }
 
-    function renderTabla() {
-        const tbody = document.getElementById('tabla-body');
-        tbody.innerHTML = datosApp.slice(0, 20).map(r => `
+    function drawTable() {
+        const body = document.getElementById('data-table-body');
+        body.innerHTML = allData.slice(0, 25).map(r => `
             <tr>
                 <td class="text-info fw-bold">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
-                <td><span class="badge bg-primary px-2">${r[3]}</span></td>
-                <td class="small" style="max-width:200px">${r[2]}</td>
-                <td class="text-uppercase small">${r[1]}</td>
-                <td class="text-center fw-bold">${r[4]}°</td>
-                <td class="text-center fw-bold">${r[5]}°</td>
-                <td class="text-center fw-bold">${r[6]}%</td>
-                <td class="text-center">${r[7] ? `<a href="${r[7]}" target="_blank" class="text-primary fs-5"><i class="bi bi-camera-fill"></i></a>` : '-'}</td>
+                <td><span class="badge bg-primary">${r[3]}</span></td>
+                <td class="small" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${r[2]}</td>
+                <td class="text-uppercase" style="font-size:0.7rem">${r[1]}</td>
+                <td class="text-center fw-bold ${r[4]>1.5?'text-danger':''}">${r[4]}°</td>
+                <td class="text-center fw-bold ${r[5]>2?'text-danger':''}">${r[5]}°</td>
+                <td class="text-center fw-bold ${r[6]<85?'text-danger':''}">${r[6]}%</td>
+                <td class="text-center">${r[7] ? `<a href="${r[7]}" target="_blank" class="text-primary"><i class="bi bi-image-fill"></i></a>` : '-'}</td>
             </tr>
         `).join('');
     }
 
-    function cambiarGrupo(n) {
-        indiceGrupo = (indiceGrupo + n + 3) % 3;
-        renderCards();
-    }
-
-    // Pausar rotación al pasar el mouse
-    const areaCams = document.getElementById('cams-area');
-    areaCams.onmouseenter = () => ratonEncima = true;
-    areaCams.onmouseleave = () => ratonEncima = false;
+    function changeGroup(n) { currentGroup = (currentGroup + n + 3) % 3; drawCards(); }
+    
+    document.getElementById('interactive-area').onmouseenter = () => isPaused = true;
+    document.getElementById('interactive-area').onmouseleave = () => isPaused = false;
 
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(actualizarDatos, 60000); // Sincroniza con Excel cada 1 min
-    setInterval(() => { if(!ratonEncima) renderCards(); }, 8000); // Rota visualmente cada 8 seg
+    setInterval(syncData, 60000); // Sincroniza cada 1 min
+    setInterval(() => { if(!isPaused) drawCards(); }, 8000); // Rota cada 8 seg
 
-    actualizarDatos();
+    syncData();
 </script>
 </body>
 </html>
