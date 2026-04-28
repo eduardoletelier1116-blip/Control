@@ -3,100 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Frigorífico Pro</title>
+    <title>Control Frigorífico</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8fafc; padding: 15px; font-family: 'Segoe UI', sans-serif; }
-        .card { border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: none; max-width: 450px; margin: auto; overflow: hidden; background: #fff; }
-        .header-accent { background: #fff; padding: 20px; text-align: center; border-bottom: 3px solid #0d6efd; }
+        body { background-color: #f0f2f5; padding: 15px; font-family: sans-serif; }
+        .card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: none; max-width: 450px; margin: auto; overflow: hidden; }
+        .header-blue { background: #ffffff; padding: 20px; text-align: center; border-bottom: 4px solid #0d6efd; }
+        .form-label { font-size: 0.8rem; font-weight: bold; color: #444; text-transform: uppercase; }
         
-        .form-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
-        .form-control, .form-select { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #e2e8f0; background: #f1f5f9; }
-        .form-control:focus, .form-select:focus { background: #fff; box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1); border-color: #0d6efd; }
+        /* Estilo idéntico a Vaciado */
+        .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; }
+        .form-control, .form-select { border-left: none; }
+        .form-control:focus, .form-select:focus { box-shadow: none; border-color: #ced4da; }
         
-        /* Diseño de Mediciones Compacto */
-        .medicion-box { text-align: center; background: #fff; border-radius: 16px; padding: 10px 5px; }
-        .medicion-box i { font-size: 1.1rem; margin-bottom: 2px; display: inline-block; }
-        .medicion-box input { font-weight: bold; border: 1px solid #e2e8f0 !important; }
-
-        .btn-save { padding: 14px; font-weight: 800; border-radius: 14px; background-color: #0d6efd; border: none; transition: 0.2s; margin-top: 10px; font-size: 0.9rem; }
-        .btn-save:active { transform: scale(0.98); }
-        .file-label { display: block; background: #f8fafc; border: 2px dashed #cbd5e1; padding: 12px; border-radius: 14px; text-align: center; cursor: pointer; color: #64748b; }
+        .btn-save { padding: 15px; font-weight: bold; border-radius: 12px; background: #0d6efd; border: none; transition: 0.3s; }
+        .btn-save:active { transform: scale(0.95); }
+        
+        .file-label { display: block; background: #f8f9fa; border: 2px dashed #dee2e6; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; }
+        
+        /* Ajuste fino para iconos de mediciones */
+        .icon-small { font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="container py-2">
-    <div class="card shadow-sm">
-        <div class="header-accent">
-            <h5 class="fw-bold mb-0" style="color: #1e293b;">FRIGORÍFICO</h5>
+    <div class="card">
+        <div class="header-blue">
+            <h4 class="fw-bold mb-0" style="color: #0d6efd;">FRIGORÍFICO</h4>
             <p class="text-muted small mb-0">Control Técnico de Cámaras</p>
         </div>
 
         <div class="card-body p-4">
             <form id="formFrigo">
                 <div class="mb-3">
-                    <label class="form-label">Operador Responsable</label>
-                    <input type="text" id="operador" class="form-control" placeholder="Nombre completo" required>
+                    <label class="form-label">OPERADOR</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                        <input type="text" id="operador" class="form-control" placeholder="Nombre" required>
+                    </div>
                 </div>
 
                 <div class="row g-2 mb-3">
                     <div class="col-7">
-                        <label class="form-label">Variedad</label>
-                        <select id="variedad" class="form-select" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="Galas">Galas</option>
-                            <option value="Granny">Granny</option>
-                            <option value="Fuji">Fuji</option>
-                            <option value="Red Delicius">Red Delicius</option>
-                            <option value="Cripps Pink">Cripps Pink</option>
-                        </select>
+                        <label class="form-label">VARIEDAD</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                            <select id="variedad" class="form-select" required>
+                                <option value="">Variedad...</option>
+                                <option value="Galas">Galas</option>
+                                <option value="Granny">Granny</option>
+                                <option value="Fuji">Fuji</option>
+                                <option value="Red Delicius">Red Delicius</option>
+                                <option value="Cripps Pink">Cripps Pink</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-5">
-                        <label class="form-label">Cámara</label>
-                        <select id="camara" class="form-select" required>
-                            <option value="">N°...</option>
-                            <option value="2">Cámara 2</option>
-                            <option value="3">Cámara 3</option>
-                            <option value="4">Cámara 4</option>
-                            <option value="5">Cámara 5</option>
-                            <option value="6">Cámara 6</option>
-                            <option value="7">Cámara 7</option>
-                            <option value="8">Cámara 8</option>
-                            <option value="9">Cámara 9</option>
-                            <option value="10">Cámara 10</option>
-                            <option value="11">Cámara 11</option>
-                            <option value="12">Cámara 12</option>
-                        </select>
+                        <label class="form-label">CÁMARA</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-door-closed"></i></span>
+                            <select id="camara" class="form-select" required>
+                                <option value="">N°...</option>
+                                <option value="2">2</option><option value="3">3</option>
+                                <option value="4">4</option><option value="5">5</option>
+                                <option value="6">6</option><option value="7">7</option>
+                                <option value="8">8</option><option value="9">9</option>
+                                <option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row g-2 mb-4">
-                    <div class="col-4 medicion-box">
-                        <label class="form-label d-block text-primary">
-                            <i class="bi bi-thermometer-snow me-1"></i> T. Amb
-                        </label>
-                        <input type="number" id="tAmbiente" class="form-control text-center" step="0.1" placeholder="0.0" required>
+                <div class="mb-3">
+                    <label class="form-label">TEMPERATURA AMBIENTE (°C)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-thermometer-snow icon-small"></i></span>
+                        <input type="number" id="tAmbiente" class="form-control" step="0.1" placeholder="0.0" required>
                     </div>
-                    <div class="col-4 medicion-box">
-                        <label class="form-label d-block text-danger">
-                            <i class="bi bi-thermometer-half me-1"></i> Pulpa
-                        </label>
-                        <input type="number" id="tPulpa" class="form-control text-center" step="0.1" placeholder="0.0" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">TEMPERATURA PULPA (°C)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-thermometer-half icon-small"></i></span>
+                        <input type="number" id="tPulpa" class="form-control" step="0.1" placeholder="0.0" required>
                     </div>
-                    <div class="col-4 medicion-box">
-                        <label class="form-label d-block text-info">
-                            <i class="bi bi-droplets-fill me-1"></i> Hum %
-                        </label>
-                        <input type="number" id="humedad" class="form-control text-center" placeholder="90" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">HUMEDAD RELATIVA (%)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-droplets-fill icon-small"></i></span>
+                        <input type="number" id="humedad" class="form-control" placeholder="85 - 95" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
                     <label for="fotoInput" class="file-label" id="fileLabel">
-                        <i class="bi bi-camera me-1"></i> <span id="fileName">Tomar Foto de Respaldo</span>
+                        <i class="bi bi-camera fs-3 d-block mb-1 text-primary"></i>
+                        <span id="fileName" class="small fw-bold">CAPTURAR EVIDENCIA</span>
                     </label>
                 </div>
 
@@ -107,7 +116,7 @@
         </div>
     </div>
     
-    <div id="mensaje" class="alert alert-success mt-3 d-none text-center fw-bold rounded-4 border-0">
+    <div id="mensaje" class="alert alert-primary mt-3 d-none text-center fw-bold">
         ✅ REGISTRO ENVIADO CON ÉXITO
     </div>
 </div>
@@ -122,24 +131,20 @@
 
     document.getElementById('fotoInput').addEventListener('change', function(e) {
         if(e.target.files[0]) {
-            document.getElementById('fileName').innerText = "✅ Foto Cargada";
-            document.getElementById('fileLabel').style.backgroundColor = "#f0fdf4";
-            document.getElementById('fileLabel').style.borderColor = "#22c55e";
+            document.getElementById('fileName').innerText = "✅ FOTO LISTA";
+            document.getElementById('fileLabel').style.backgroundColor = "#e7f1ff";
         }
     });
 
     document.getElementById('formFrigo').addEventListener('submit', function(e) {
         e.preventDefault();
-        const nombreActual = document.getElementById('operador').value;
-        localStorage.setItem('nombreOperador', nombreActual);
+        localStorage.setItem('nombreOperador', document.getElementById('operador').value);
 
         const btn = document.getElementById('btnEnviar');
-        const fotoFile = document.getElementById('fotoInput').files[0];
-        
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ENVIANDO...';
 
-        const enviarDatos = (fotoBase64) => {
+        const enviar = (base64) => {
             const datos = {
                 origen: "frigorifico",
                 operador: document.getElementById('operador').value,
@@ -148,7 +153,7 @@
                 tAmbiente: document.getElementById('tAmbiente').value,
                 tPulpa: document.getElementById('tPulpa').value,
                 humedad: document.getElementById('humedad').value,
-                foto: fotoBase64
+                foto: base64
             };
 
             fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
@@ -156,17 +161,15 @@
                 document.getElementById('mensaje').classList.remove('d-none');
                 setTimeout(() => { location.reload(); }, 2000);
             })
-            .catch(() => {
-                alert("Error de conexión");
-                btn.disabled = false;
-            });
+            .catch(() => { alert("Error"); btn.disabled = false; });
         };
 
-        if (fotoFile) {
+        const file = document.getElementById('fotoInput').files[0];
+        if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => enviarDatos(reader.result);
-            reader.readAsDataURL(fotoFile);
-        } else { enviarDatos(null); }
+            reader.onloadend = () => enviar(reader.result);
+            reader.readAsDataURL(file);
+        } else { enviar(null); }
     });
 </script>
 </body>
