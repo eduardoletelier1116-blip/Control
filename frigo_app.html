@@ -10,9 +10,10 @@
         body { background-color: #f0f2f5; padding: 15px; font-family: sans-serif; }
         .card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: none; max-width: 450px; margin: auto; overflow: hidden; }
         .header-blue { background: #ffffff; padding: 20px; text-align: center; border-bottom: 4px solid #0d6efd; }
+        .logo-img { height: 60px; margin-bottom: 10px; }
         .form-label { font-size: 0.8rem; font-weight: bold; color: #444; text-transform: uppercase; }
         
-        /* Estilo idéntico a Vaciado */
+        /* Estética idéntica a Vaciado */
         .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; }
         .form-control, .form-select { border-left: none; }
         .form-control:focus, .form-select:focus { box-shadow: none; border-color: #ced4da; }
@@ -21,18 +22,17 @@
         .btn-save:active { transform: scale(0.95); }
         
         .file-label { display: block; background: #f8f9fa; border: 2px dashed #dee2e6; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; }
-        
-        /* Ajuste fino para iconos de mediciones */
-        .icon-small { font-size: 1rem; }
+        .icon-small { font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
 <div class="container py-2">
-    <div class="card">
+    <div class="card shadow">
         <div class="header-blue">
-            <h4 class="fw-bold mb-0" style="color: #0d6efd;">FRIGORÍFICO</h4>
-            <p class="text-muted small mb-0">Control Técnico de Cámaras</p>
+            <img src="https://tu-logo-aqui.com/logo.png" alt="Logo" class="logo-img">
+            <h4 class="fw-bold mb-0" style="color: #333;">CONTROL FRIGORÍFICO</h4>
+            <p class="text-muted small mb-0">MONITOREO DE CÁMARAS</p>
         </div>
 
         <div class="card-body p-4">
@@ -41,7 +41,7 @@
                     <label class="form-label">OPERADOR</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" id="operador" class="form-control" placeholder="Nombre" required>
+                        <input type="text" id="operador" class="form-control" placeholder="Su nombre" required>
                     </div>
                 </div>
 
@@ -51,7 +51,7 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-tag"></i></span>
                             <select id="variedad" class="form-select" required>
-                                <option value="">Variedad...</option>
+                                <option value="">Seleccionar...</option>
                                 <option value="Galas">Galas</option>
                                 <option value="Granny">Granny</option>
                                 <option value="Fuji">Fuji</option>
@@ -78,17 +78,17 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">TEMPERATURA AMBIENTE (°C)</label>
+                    <label class="form-label">T° AMBIENTE (°C)</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-thermometer-snow icon-small"></i></span>
+                        <span class="input-group-text"><i class="bi bi-thermometer-snow icon-small text-primary"></i></span>
                         <input type="number" id="tAmbiente" class="form-control" step="0.1" placeholder="0.0" required>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">TEMPERATURA PULPA (°C)</label>
+                    <label class="form-label">T° PULPA (°C)</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-thermometer-half icon-small"></i></span>
+                        <span class="input-group-text"><i class="bi bi-thermometer-half icon-small text-danger"></i></span>
                         <input type="number" id="tPulpa" class="form-control" step="0.1" placeholder="0.0" required>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                 <div class="mb-4">
                     <label class="form-label">HUMEDAD RELATIVA (%)</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-droplets-fill icon-small"></i></span>
+                        <span class="input-group-text"><i class="bi bi-droplets-fill icon-small text-info"></i></span>
                         <input type="number" id="humedad" class="form-control" placeholder="85 - 95" required>
                     </div>
                 </div>
@@ -104,31 +104,33 @@
                 <div class="mb-4">
                     <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
                     <label for="fotoInput" class="file-label" id="fileLabel">
-                        <i class="bi bi-camera fs-3 d-block mb-1 text-primary"></i>
-                        <span id="fileName" class="small fw-bold">CAPTURAR EVIDENCIA</span>
+                        <i class="bi bi-camera fs-2 d-block mb-1 text-primary"></i>
+                        <span id="fileName" class="fw-bold">TOCAR PARA TOMAR FOTO</span>
                     </label>
                 </div>
 
-                <button type="submit" id="btnEnviar" class="btn btn-primary w-100 btn-save shadow-sm">
+                <button type="submit" id="btnEnviar" class="btn btn-primary w-100 btn-save">
                     GUARDAR REGISTRO
                 </button>
             </form>
         </div>
     </div>
     
-    <div id="mensaje" class="alert alert-primary mt-3 d-none text-center fw-bold">
+    <div id="mensaje" class="alert alert-primary mt-3 d-none text-center fw-bold rounded-4 shadow-sm">
         ✅ REGISTRO ENVIADO CON ÉXITO
     </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec";
+    const WEB_APP_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
 
+    // Cargar operador guardado
     window.onload = () => {
-        const nombreGuardado = localStorage.getItem('nombreOperador');
-        if (nombreGuardado) { document.getElementById('operador').value = nombreGuardado; }
+        const nombre = localStorage.getItem('nombreOperador');
+        if (nombre) document.getElementById('operador').value = nombre;
     };
 
+    // Actualizar texto al tomar foto
     document.getElementById('fotoInput').addEventListener('change', function(e) {
         if(e.target.files[0]) {
             document.getElementById('fileName').innerText = "✅ FOTO LISTA";
@@ -142,7 +144,7 @@
 
         const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ENVIANDO...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> ENVIANDO...';
 
         const enviar = (base64) => {
             const datos = {
@@ -161,7 +163,11 @@
                 document.getElementById('mensaje').classList.remove('d-none');
                 setTimeout(() => { location.reload(); }, 2000);
             })
-            .catch(() => { alert("Error"); btn.disabled = false; });
+            .catch(() => {
+                alert("Error al enviar");
+                btn.disabled = false;
+                btn.innerText = "REINTENTAR";
+            });
         };
 
         const file = document.getElementById('fotoInput').files[0];
@@ -169,7 +175,9 @@
             const reader = new FileReader();
             reader.onloadend = () => enviar(reader.result);
             reader.readAsDataURL(file);
-        } else { enviar(null); }
+        } else {
+            enviar(null);
+        }
     });
 </script>
 </body>
