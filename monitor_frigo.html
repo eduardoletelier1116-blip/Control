@@ -3,128 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Interactivo - Frigorífico</title>
+    <title>Monitor Frigorífico Optimizado</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
-        /* Estilos Base y Corrección de Recorte Superior */
         body { 
             background-color: #0f172a; 
             color: #e2e8f0; 
             font-family: 'Segoe UI', sans-serif; 
-            overflow: hidden; /* Evita scroll en pantalla completa */
+            overflow: hidden; 
             height: 100vh; 
             margin: 0; 
             display: flex;
-            flex-direction: column; /* Estructura vertical */
+            flex-direction: column;
         }
         
-        /* Cabecera (Header) - Ajuste de altura */
         .header-monitor { 
             background: #1e293b; 
-            padding: 10px 20px; /* Menos padding para ahorrar espacio */
+            padding: 8px 20px;
             border-bottom: 2px solid #334155; 
             display: flex; 
             justify-content: space-between; 
-            align-items: center; 
-            position: relative; 
-            z-index: 10;
-            height: auto; /* Altura automática basada en contenido */
-            flex-shrink: 0; /* No se encoge */
+            align-items: center;
+            flex-shrink: 0;
         }
-        .logo-small { height: 45px; } /* Logo un poco más pequeño */
+        .logo-small { height: 40px; }
 
-        /* Contenedor Principal Interactible */
+        /* Contenedor de Cámaras más compacto */
         .main-display-container { 
             position: relative; 
-            flex-grow: 1; /* Ocupa el espacio disponible */
+            height: 40%; /* Reducido de 55% a 40% para dar espacio a la lista */
             display: flex; 
             align-items: center; 
-            justify-content: center;
-            overflow: hidden; /* Importante para que no se corte */
-            margin-top: 10px; /* Separación sutil del header */
+            padding: 10px 0;
         }
         
-        /* Contenedor de Cámaras Rotativas - Altura Flexible */
         #display-rotativo { 
             width: 100%; 
             display: flex; 
-            align-items: stretch; /* Altura igual para todas las cartas */
             justify-content: center; 
-            padding: 0 50px; 
-            transition: opacity 0.4s;
-            height: 100%; /* Usa todo el alto del contenedor principal */
+            padding: 0 60px; 
+            transition: opacity 0.3s;
         }
         
-        /* Navegación (Flechas) */
-        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; color: white; padding: 15px; cursor: pointer; border-radius: 50%; z-index: 100; transition: 0.3s; }
-        .nav-arrow:hover { background: #0d6efd; scale: 1.1; }
-        .arrow-left { left: 10px; }
-        .arrow-right { right: 10px; }
+        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; color: white; padding: 12px; cursor: pointer; border-radius: 50%; z-index: 100; }
+        .arrow-left { left: 15px; }
+        .arrow-right { right: 15px; }
 
-        /* Estilo de Tarjeta de Cámara */
+        /* Tarjetas más pequeñas y eficientes */
         .cam-card { 
             background: #1e293b; 
-            border-radius: 20px; 
-            border: 1px solid #334155; 
-            padding: 20px; /* Menos padding interno */
-            margin: 5px; 
-            position: relative; 
-            flex: 1; /* Ancho igualitario */
-            max-width: 280px; /* Ancho máximo para mantener diseño */
+            border-radius: 15px; 
+            border: 1px solid #475569; 
+            padding: 12px; 
+            margin: 0 5px; 
+            flex: 1; 
+            max-width: 250px;
+            min-height: 180px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Distribución vertical */
         }
-        .cam-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
         .cam-card.fuera-rango { border: 2px solid #ef4444; background: #2d1a1a; animation: alert-pulse 2s infinite; }
-        .cam-id { font-size: 3rem; font-weight: 900; opacity: 0.08; position: absolute; right: 15px; top: 10px; z-index: 0; }
+        .cam-id { font-size: 2.5rem; font-weight: 900; opacity: 0.1; position: absolute; right: 10px; top: 5px; }
         
-        /* Contenedor de Múltiples Variedades (Coherencia de Datos) */
-        .variedad-lista {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px; /* Espacio entre variedades */
-            z-index: 1; /* Sobre el número de cámara */
-        }
-        .badge-variedad {
-            font-size: 0.8rem;
-            white-space: normal; /* Permite saltos de línea si es muy largo */
-            text-align: left;
-            border-radius: 6px;
-        }
+        .badge-variedad { font-size: 0.7rem; margin-bottom: 2px; display: block; text-align: left; }
 
-        /* Indicadores de grupo (puntitos) */
-        .group-indicators { position: absolute; bottom: 10px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 50; }
-        .dot { width: 30px; height: 4px; background: #334155; border-radius: 2px; transition: 0.3s; }
-        .dot.active { background: #0d6efd; width: 50px; }
-
-        /* Etiquetas Identificadoras de Datos (Mejora 3) */
-        .label-pequena {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: #94a3b8;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-            display: block;
-        }
-
-        /* Historial (Log) */
+        /* Sección de Lista (Log) más grande */
         .log-section { 
-            height: auto; /* Altura automática */
-            max-height: 30vh; /* Máximo 30% del alto de la pantalla */
+            flex-grow: 1; /* Ocupa todo el resto de la pantalla */
             background: #020617; 
-            padding: 10px 15px; 
+            padding: 15px; 
             overflow-y: auto; 
             border-top: 2px solid #1e293b; 
-            flex-shrink: 0;
         }
-        .table-dark { --bs-table-bg: transparent; font-size: 0.8rem; }
+        
+        .table { color: #cbd5e1; font-size: 0.85rem; vertical-align: middle; }
+        .table thead th { background: #1e293b; color: #94a3b8; border: none; position: sticky; top: 0; }
+
+        .label-pequena { font-size: 0.6rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 0; }
+        .fs-5 { font-size: 1.1rem !important; font-weight: bold; }
         
         @keyframes alert-pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .valor-critico { color: #f87171 !important; font-weight: bold; }
-        .valor-ok { color: #4ade80 !important; font-weight: bold; }
+        .valor-critico { color: #f87171 !important; }
+        .valor-ok { color: #4ade80 !important; }
     </style>
 </head>
 <body>
@@ -132,44 +93,41 @@
 <div class="header-monitor">
     <div class="d-flex align-items-center">
         <img src="logo-icono.png" alt="Logo" class="logo-small me-2">
-        <div>
-            <h5 class="mb-0 fw-bold text-white">CENTRAL FRIGORÍFICO</h5>
-            <span class="text-info small text-uppercase" style="font-size: 0.7rem;">Monitoreo Interactivo</span>
-        </div>
+        <h5 class="mb-0 fw-bold">MONITOREO FRIGORÍFICO</h5>
     </div>
-    <div id="reloj" class="fs-4 fw-bold text-white">00:00:00</div>
+    <div id="reloj" class="fs-4 fw-bold text-info">00:00:00</div>
 </div>
 
 <div class="main-display-container" id="main-container">
     <div class="nav-arrow arrow-left" onclick="cambiarGrupo(-1)"><i class="bi bi-chevron-left"></i></div>
-    
-    <div id="display-rotativo" class="row g-0">
-        </div>
-
+    <div id="display-rotativo" class="row g-0"></div>
     <div class="nav-arrow arrow-right" onclick="cambiarGrupo(1)"><i class="bi bi-chevron-right"></i></div>
-    
-    <div class="group-indicators">
-        <div class="dot" id="dot0"></div>
-        <div class="dot" id="dot1"></div>
-        <div class="dot" id="dot2"></div>
-    </div>
 </div>
 
 <div class="log-section">
-    <table class="table table-dark table-hover mb-0">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="text-uppercase text-muted fw-bold mb-0 small"><i class="bi bi-list-ul me-2"></i>Historial Detallado del Día</h6>
+        <span class="badge bg-secondary" id="count-registros">0 registros</span>
+    </div>
+    <table class="table table-dark table-hover">
         <thead>
-            <tr class="text-muted small" style="font-size: 0.75rem;">
-                <th>HORA</th><th>OPERADOR</th><th>CÁMARA</th><th>VARIEDAD</th><th>T. AMB</th><th>PULPA (PROM)</th><th>HUM %</th><th>FOTO</th>
+            <tr>
+                <th>HORA</th>
+                <th>CÁMARA</th>
+                <th>VARIEDAD(ES)</th>
+                <th>OPERADOR</th>
+                <th class="text-center">T. AMB</th>
+                <th class="text-center">PULPA</th>
+                <th class="text-center">HUM %</th>
+                <th class="text-center">FOTO</th>
             </tr>
         </thead>
-        <tbody id="log-body">
-            </tbody>
+        <tbody id="log-body"></tbody>
     </table>
 </div>
 
 <script>
-    const BASE_URL = "https://script.google.com/macros/s/AKfycbyuIeIvQuLiaVSwlQInOiRYIT_NvtY5-TUCrnZu-xAFyLA8aYWRP7XaWwVCbVN0L_uSLA/exec";
-    const URL_CON_FILTRO = BASE_URL + "?pestana=frigo";
+    const URL_CON_FILTRO = "https://script.google.com/macros/s/AKfycbyuIeIvQuLiaVSwlQInOiRYIT_NvtY5-TUCrnZu-xAFyLA8aYWRP7XaWwVCbVN0L_uSLA/exec";
     
     const RANGOS = {
         "Galas": { tA: [-1, 0.5], tP: [-0.5, 0.5] },
@@ -183,149 +141,104 @@
     let grupoActual = 0; 
     let pausaMonitor = false;
 
-    // Detectar si el mouse está encima para pausar
-    const container = document.getElementById('main-container');
-    container.addEventListener('mouseenter', () => { pausaMonitor = true; });
-    container.addEventListener('mouseleave', () => { pausaMonitor = false; });
+    document.getElementById('main-container').addEventListener('mouseenter', () => pausaMonitor = true);
+    document.getElementById('main-container').addEventListener('mouseleave', () => pausaMonitor = false);
 
     async function fetchData() {
         try {
             const res = await fetch(URL_CON_FILTRO);
             const data = await res.json();
-            // Invertimos para tener lo más reciente primero
+            // CORRECCIÓN: Los datos vienen del script. Los invertimos para que el primero sea el más NUEVO.
             datosGlobales = data.slice(1).reverse(); 
+            document.getElementById('count-registros').innerText = `${datosGlobales.length} registros`;
             renderLog();
             if (!pausaMonitor) renderRotativo(); 
-        } catch (e) { console.error("Error de red."); }
-    }
-
-    function cambiarGrupo(direccion) {
-        grupoActual += direccion;
-        if (grupoActual > 2) grupoActual = 0;
-        if (grupoActual < 0) grupoActual = 2;
-        renderRotativo();
-    }
-
-    function validar(valor, min, max) {
-        let v = parseFloat(valor);
-        return (v >= min && v <= max);
+        } catch (e) { console.error("Error cargando datos"); }
     }
 
     function renderRotativo() {
         const contenedor = document.getElementById('display-rotativo');
-        const ultimos = {};
-        datosGlobales.forEach(f => { if(!ultimos[f[3]]) ultimos[f[3]] = f; });
+        
+        // CORRECCIÓN LÓGICA: Buscar el registro más reciente para cada cámara
+        const ultimosPorCamara = {};
+        datosGlobales.forEach(reg => {
+            const nombreCam = reg[3]; // Columna de Cámara
+            if (!ultimosPorCamara[nombreCam]) {
+                ultimosPorCamara[nombreCam] = reg; // Al estar invertida la lista, el primero que encuentre es el último real
+            }
+        });
 
         const grupos = [ ["2", "3", "4", "5"], ["6", "7", "8", "9"], ["10", "11", "12"] ];
         const seleccion = grupos[grupoActual];
-
-        // Actualizar indicadores (puntitos)
-        document.querySelectorAll('.dot').forEach((d, i) => {
-            d.classList.toggle('active', i === grupoActual);
-        });
 
         contenedor.style.opacity = 0;
         setTimeout(() => {
             contenedor.innerHTML = "";
             seleccion.forEach(num => {
                 const nombreCam = "Cámara " + num;
-                const reg = ultimos[nombreCam];
+                const reg = ultimosPorCamara[nombreCam];
+                const col = document.createElement('div');
+                col.className = 'cam-card';
                 
                 if (!reg) {
-                    const col = document.createElement('div');
-                    col.className = 'cam-card text-muted justify-content-center align-items-center';
-                    col.innerHTML = `<h3>Cámara ${num}</h3><p class="small">Sin datos hoy</p>`;
-                    contenedor.appendChild(col);
+                    col.innerHTML = `<div class="cam-id">${num}</div><h5 class="fw-bold">Cámara ${num}</h5><p class="text-muted small">Sin datos</p>`;
                 } else {
                     const [fecha, op, variedadInput, cam, tAmb, tPulpa, hum] = reg;
+                    const variedades = variedadInput.split(',').map(v => v.trim());
+                    const r = RANGOS[variedades[0]] || { tA: [-1,1], tP: [-1,1] };
                     
-                    // SOLUCIÓN 1: Coherencia de Múltiples Variedades
-                    // Convertimos el string "Galas, Granny" en un array y generamos badges para cada una
-                    const variedadesArray = variedadInput.split(',').map(v => v.trim());
-                    let htmlVariedades = '<div class="variedad-lista">';
-                    variedadesArray.forEach(v => {
-                        htmlVariedades += `<span class="badge bg-primary badge-variedad text-truncate">${v}</span>`;
-                    });
-                    htmlVariedades += '</div>';
+                    const okA = (tAmb >= r.tA[0] && tAmb <= r.tA[1]);
+                    const okP = (tPulpa >= r.tP[0] && tPulpa <= r.tP[1]);
+                    const okH = (hum >= 85 && hum <= 95);
 
-                    // Tomamos la primera variedad para validar rangos (o ajusta lógica si prefieres)
-                    const variedadPrincipal = variedadesArray[0];
-                    const r = RANGOS[variedadPrincipal] || { tA: [-1,2], tP: [-1,2] };
-                    const isAmbOk = validar(tAmb, r.tA[0], r.tA[1]);
-                    const isPulpaOk = validar(tPulpa, r.tP[0], r.tP[1]);
-                    const isHumOk = validar(hum, 85, 95);
+                    if(!okA || !okP || !okH) col.classList.add('fuera-rango');
 
-                    const col = document.createElement('div');
-                    col.className = `cam-card ${(!isAmbOk || !isPulpaOk || !isHumOk) ? 'fuera-rango' : ''}`;
-                    
                     col.innerHTML = `
                         <div class="cam-id">${num}</div>
-                        <div>
-                            <h4 class="fw-bold mb-1">Cámara ${num}</h4>
-                            ${htmlVariedades}
+                        <h5 class="fw-bold mb-1">Cámara ${num}</h5>
+                        <div class="mb-2" style="max-height: 40px; overflow:hidden">
+                            ${variedades.map(v => `<span class="badge bg-primary badge-variedad text-truncate" style="width:100%">${v}</span>`).join('')}
                         </div>
-                        
-                        <div class="data-section mt-auto">
-                            <div class="row g-1">
-                                <div class="col-6">
-                                    <span class="label-pequena">Ambiente</span>
-                                    <div class="${isAmbOk ? 'valor-ok' : 'valor-critico'} fs-5">${tAmb}°</div>
-                                </div>
-                                <div class="col-6">
-                                    <span class="label-pequena">Pulpa (Prom)</span>
-                                    <div class="${isPulpaOk ? 'valor-ok' : 'valor-critico'} fs-5">${tPulpa}°</div>
-                                </div>
-                                <div class="col-12 mt-2">
-                                    <span class="label-pequena">Humedad Relativa</span>
-                                    <div class="${isHumOk ? 'valor-ok' : 'valor-critico'} fs-5">${hum}%</div>
-                                </div>
-                            </div>
-                            <div class="mt-2 text-muted" style="font-size: 0.65rem;">
-                                Última medida: ${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
-                            </div>
+                        <div class="row g-1 mt-auto">
+                            <div class="col-6"><p class="label-pequena">Amb.</p><div class="${okA?'valor-ok':'valor-critico'} fs-5">${tAmb}°</div></div>
+                            <div class="col-6"><p class="label-pequena">Pulpa</p><div class="${okP?'valor-ok':'valor-critico'} fs-5">${tPulpa}°</div></div>
+                            <div class="col-12"><p class="label-pequena">Hum.</p><div class="${okH?'valor-ok':'valor-critico'} fs-5">${hum}%</div></div>
                         </div>`;
-                    contenedor.appendChild(col);
                 }
+                contenedor.appendChild(col);
             });
             contenedor.style.opacity = 1;
-        }, 300);
+        }, 200);
+        grupoActual = (grupoActual + 1) % 3;
     }
 
     function renderLog() {
         const body = document.getElementById('log-body');
         body.innerHTML = "";
-        datosGlobales.slice(0, 15).forEach(f => {
+        datosGlobales.slice(0, 30).forEach(f => {
             const [fecha, op, variedad, cam, tAmb, tPulpa, hum, foto] = f;
-            
-            // Usamos la primera variedad del log para rangos de color en tabla
             const principal = variedad.split(',')[0].trim();
-            const r = RANGOS[principal] || { tA: [-1,1], tP: [-1,2] };
+            const r = RANGOS[principal] || { tA: [-10,10], tP: [-10,10] };
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                <td class="text-info fw-bold">${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                <td><span class="badge bg-dark border">${cam}</span></td>
+                <td class="small" style="max-width: 150px">${variedad}</td>
                 <td class="text-uppercase small">${op}</td>
-                <td class="fw-bold text-info">${cam}</td>
-                <td><span class="text-truncate d-inline-block" style="max-width:110px">${variedad}</span></td>
-                <td class="${validar(tAmb, r.tA[0], r.tA[1]) ? '' : 'valor-critico'} text-end">${tAmb}°</td>
-                <td class="${validar(tPulpa, r.tP[0], r.tP[1]) ? '' : 'valor-critico'} text-end">${tPulpa}°</td>
-                <td class="${validar(hum, 85, 95) ? '' : 'valor-critico'} text-end">${hum}%</td>
-                <td>${foto ? `<a href="${foto}" target="_blank" class="btn btn-sm btn-primary py-0 px-1"><i class="bi bi-camera"></i></a>` : '-'}</td>`;
+                <td class="text-center ${ (tAmb >= r.tA[0] && tAmb <= r.tA[1]) ? '' : 'valor-critico'}">${tAmb}°</td>
+                <td class="text-center ${ (tPulpa >= r.tP[0] && tPulpa <= r.tP[1]) ? '' : 'valor-critico'}">${tPulpa}°</td>
+                <td class="text-center ${ (hum >= 85 && hum <= 95) ? '' : 'valor-critico'}">${hum}%</td>
+                <td class="text-center">${foto ? `<a href="${foto}" target="_blank" class="text-primary fs-5"><i class="bi bi-image"></i></a>` : '-'}</td>`;
             body.appendChild(tr);
         });
     }
 
+    function cambiarGrupo(n) { grupoActual = (grupoActual + n + 3) % 3; renderRotativo(); }
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-
-    // Ciclo automático de rotación
-    setInterval(() => {
-        if (!pausaMonitor) {
-            cambiarGrupo(1);
-        }
-    }, 8000);
-
+    setInterval(() => { if(!pausaMonitor) renderRotativo(); }, 8000);
     fetchData();
-    setInterval(fetchData, 60000); // Actualiza datos de red cada minuto
+    setInterval(fetchData, 60000);
 </script>
 </body>
 </html>
