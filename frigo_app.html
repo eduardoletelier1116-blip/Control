@@ -3,162 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Frigorífico Pro</title>
+    <title>Control Frigorífico Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { 
-            background-color: #f0f2f5; 
-            padding: 15px; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .card { 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
-            border: none; 
-            max-width: 480px; 
-            margin: auto; 
-            overflow: hidden;
-        }
-
-        .header-accent {
-            background: #ffffff;
-            padding: 25px;
-            text-align: center;
-            border-bottom: 4px solid #0d6efd; /* Azul para Frío */
-        }
-
-        .logo-img { height: 60px; width: auto; margin-bottom: 10px; }
-        
-        .form-label { font-size: 0.75rem; color: #555; margin-bottom: 4px; text-transform: uppercase; }
-        
-        .input-group-text { background-color: #fff; border-right: none; color: #0d6efd; }
-        .form-control { border-left: none; padding: 12px; font-size: 1rem; }
-        .form-control:focus { box-shadow: none; border-color: #ced4da; }
-        
-        .input-group:focus-within {
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
-            border-radius: 0.375rem;
-        }
-
-        .btn-save {
-            padding: 15px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            border-radius: 12px;
-            transition: all 0.3s;
-            background-color: #0d6efd;
-            border: none;
-        }
-
-        .btn-save:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); 
-            background-color: #0b5ed7;
-        }
-
-        .file-label {
-            display: block;
-            background: #e9ecef;
-            border: 2px dashed #ced4da;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .file-label:hover { background: #dee2e6; }
+        body { background-color: #f0f2f5; padding: 15px; font-family: 'Segoe UI', sans-serif; }
+        .card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: none; max-width: 480px; margin: auto; overflow: hidden; }
+        .header-accent { background: #ffffff; padding: 25px; text-align: center; border-bottom: 4px solid #0d6efd; }
+        .logo-img { height: 50px; margin-bottom: 10px; }
+        .form-label { font-size: 0.75rem; color: #555; font-weight: 800; text-transform: uppercase; }
+        .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; }
+        .form-control, .form-select { border-left: none; padding: 12px; font-size: 1rem; }
+        .form-control:focus, .form-select:focus { box-shadow: none; border-color: #ced4da; }
+        .btn-save { padding: 15px; font-weight: 800; border-radius: 12px; background-color: #0d6efd; border: none; transition: 0.3s; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); }
+        .file-label { display: block; background: #e9ecef; border: 2px dashed #ced4da; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; }
+        .text-unit { font-size: 0.8rem; color: #999; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container py-4">
+<div class="container py-3">
     <div class="card">
         <div class="header-accent">
-            <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
             <h4 class="fw-bold mb-0" style="color: #333;">CONTROL FRIGORÍFICO</h4>
-            <p class="text-muted small mb-0"><i class="bi bi-snow me-1"></i> Monitoreo de Cámaras</p>
+            <p class="text-muted small mb-0"><i class="bi bi-snow me-1"></i> Monitoreo de Cámaras 2-12</p>
         </div>
 
         <div class="card-body p-4">
             <form id="formFrigo">
                 <div class="mb-3">
-                    <label class="form-label fw-bold">OPERADOR RESPONSABLE</label>
+                    <label class="form-label">OPERADOR RESPONSABLE</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" id="operador" class="form-control" placeholder="Nombre completo" required>
+                        <input type="text" id="operador" class="form-control" placeholder="Nombre" required>
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
+                <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="form-label fw-bold">CÁMARA 1 (°C)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-thermometer-snow"></i></span>
-                            <input type="number" id="c1" class="form-control" step="0.1" placeholder="0.0" required>
-                        </div>
+                        <label class="form-label">VARIEDAD</label>
+                        <select id="variedad" class="form-select" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Galas">Galas</option>
+                            <option value="Granny">Granny</option>
+                            <option value="Fuji">Fuji</option>
+                            <option value="Red Delicius">Red Delicius</option>
+                            <option value="Cripps Pink">Cripps Pink</option>
+                        </select>
                     </div>
                     <div class="col-6">
-                        <label class="form-label fw-bold">CÁMARA 2 (°C)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-thermometer-snow"></i></span>
-                            <input type="number" id="c2" class="form-control" step="0.1" placeholder="0.0" required>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-bold">CÁMARA 3 (°C)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-thermometer-snow"></i></span>
-                            <input type="number" id="c3" class="form-control" step="0.1" placeholder="0.0" required>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-bold">CÁMARA 4 (°C)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-thermometer-snow"></i></span>
-                            <input type="number" id="c4" class="form-control" step="0.1" placeholder="0.0" required>
-                        </div>
+                        <label class="form-label">CÁMARA</label>
+                        <select id="camara" class="form-select" required>
+                            <option value="">N°...</option>
+                            <option value="2">Cámara 2</option>
+                            <option value="3">Cámara 3</option>
+                            <option value="4">Cámara 4</option>
+                            <option value="5">Cámara 5</option>
+                            <option value="6">Cámara 6</option>
+                            <option value="7">Cámara 7</option>
+                            <option value="8">Cámara 8</option>
+                            <option value="9">Cámara 9</option>
+                            <option value="10">Cámara 10</option>
+                            <option value="11">Cámara 11</option>
+                            <option value="12">Cámara 12</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">OBSERVACIONES</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-chat-left-text"></i></span>
-                        <input type="text" id="observaciones" class="form-control" placeholder="Ej: Todo en rango">
+                <div class="row g-2 mb-4">
+                    <div class="col-4 text-center">
+                        <label class="form-label">T. AMB (°C)</label>
+                        <input type="number" id="tAmbiente" class="form-control text-center" step="0.1" placeholder="0.0" required>
+                    </div>
+                    <div class="col-4 text-center">
+                        <label class="form-label">T. PULPA (°C)</label>
+                        <input type="number" id="tPulpa" class="form-control text-center" step="0.1" placeholder="0.0" required>
+                    </div>
+                    <div class="col-4 text-center">
+                        <label class="form-label">HUM. (%)</label>
+                        <input type="number" id="humedad" class="form-control text-center" placeholder="90" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-bold">EVIDENCIA FOTOGRÁFICA</label>
-                    <input type="file" id="fotoInput" class="form-control d-none" accept="image/*" capture="environment">
+                    <label class="form-label">EVIDENCIA FOTOGRÁFICA</label>
+                    <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
                     <label for="fotoInput" class="file-label" id="fileLabel">
                         <i class="bi bi-camera-fill fs-3 d-block text-primary"></i>
-                        <span id="fileName">Tocar para tomar foto</span>
+                        <span id="fileName" class="small">Tocar para tomar foto</span>
                     </label>
                 </div>
 
                 <button type="submit" id="btnEnviar" class="btn btn-primary w-100 btn-save shadow-sm">
-                    <i class="bi bi-cloud-upload me-2"></i>GUARDAR TEMPERATURAS
+                    <i class="bi bi-cloud-upload me-2"></i>GUARDAR REGISTRO
                 </button>
             </form>
         </div>
     </div>
     
     <div id="mensaje" class="alert alert-primary mt-3 d-none text-center fw-bold">
-        ✅ TEMPERATURAS REGISTRADAS
+        ✅ REGISTRO ENVIADO CON ÉXITO
     </div>
 </div>
 
 <script>
-    // USA EL MISMO WEB_APP_URL QUE VACIADO
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx0D_NnXpUlZIaq0Y0IZMlMA5SgkrQS8kxbvReuooLAabTdt5zObFzIKST8CawFtE88nA/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec";
 
     document.getElementById('fotoInput').addEventListener('change', function(e) {
-        const name = e.target.files[0] ? "✅ Foto cargada" : "Tocar para tomar foto";
-        document.getElementById('fileName').innerText = name;
-        document.getElementById('fileLabel').style.borderColor = "#0d6efd";
+        if(e.target.files[0]) {
+            document.getElementById('fileName').innerText = "✅ Foto Cargada";
+            document.getElementById('fileLabel').style.borderColor = "#0d6efd";
+        }
     });
 
     document.getElementById('formFrigo').addEventListener('submit', function(e) {
@@ -167,7 +123,7 @@
         const fotoFile = document.getElementById('fotoInput').files[0];
         
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESANDO...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> ENVIANDO...';
 
         if (fotoFile) {
             const reader = new FileReader();
@@ -180,30 +136,26 @@
 
     function enviarDatos(fotoBase64) {
         const datos = {
-            origen: "frigorifico", // IMPORTANTE: Esto le dice al Script que guarde en la hoja 'Frigorifico'
+            origen: "frigorifico",
             operador: document.getElementById('operador').value,
-            c1: document.getElementById('c1').value,
-            c2: document.getElementById('c2').value,
-            c3: document.getElementById('c3').value,
-            c4: document.getElementById('c4').value,
-            observaciones: document.getElementById('observaciones').value || "Sin observaciones",
+            variedad: document.getElementById('variedad').value,
+            camara: document.getElementById('camara').value,
+            tAmbiente: document.getElementById('tAmbiente').value,
+            tPulpa: document.getElementById('tPulpa').value,
+            humedad: document.getElementById('humedad').value,
             foto: fotoBase64
         };
 
         fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
         .then(() => {
-            const msj = document.getElementById('mensaje');
-            msj.classList.remove('d-none');
+            document.getElementById('mensaje').classList.remove('d-none');
             document.getElementById('formFrigo').reset();
             document.getElementById('fileName').innerText = "Tocar para tomar foto";
-            document.getElementById('fileLabel').style.borderColor = "#ced4da";
-            
-            setTimeout(() => { msj.classList.add('d-none'); }, 3000);
+            setTimeout(() => { location.reload(); }, 2500);
         })
-        .finally(() => {
-            const btn = document.getElementById('btnEnviar');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>GUARDAR TEMPERATURAS';
+        .catch(() => {
+            alert("Error al enviar. Revisa tu conexión.");
+            document.getElementById('btnEnviar').disabled = false;
         });
     }
 </script>
