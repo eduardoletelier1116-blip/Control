@@ -2,25 +2,32 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor Frigorífico - Prioridad Absoluta</title>
+    <title>Monitor Frigorífico - Código Final</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; margin: 0; }
         .header-monitor { background: #1e293b; padding: 10px 25px; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .cams-section { height: 40%; position: relative; display: flex; align-items: center; justify-content: center; padding: 0 50px; }
-        .cam-card { background: #1e293b; border: 1px solid #475569; border-radius: 12px; flex: 1; margin: 0 8px; padding: 12px; position: relative; max-width: 250px; min-height: 175px; display: flex; flex-direction: column; }
+        
+        /* Área de Cámaras (40%) */
+        .cams-section { height: 40%; display: flex; align-items: center; justify-content: center; position: relative; padding: 0 50px; background: rgba(30, 41, 59, 0.2); }
+        .cam-card { background: #1e293b; border: 1px solid #475569; border-radius: 12px; flex: 1; margin: 0 8px; padding: 12px; position: relative; max-width: 250px; min-height: 180px; display: flex; flex-direction: column; }
         .cam-card.alert { border: 2px solid #ef4444; background: #2d1a1a; animation: pulse 2s infinite; }
+        
+        /* Área de Lista (60%) */
         .list-section { flex-grow: 1; background: #020617; padding: 15px; overflow-y: auto; border-top: 2px solid #1e293b; }
         .table { color: #cbd5e1; font-size: 0.85rem; }
-        .table thead th { background: #1e293b; color: #3b82f6; position: sticky; top: -16px; z-index: 10; border: none; }
+        .table thead th { background: #1e293b; color: #3b82f6; position: sticky; top: -16px; z-index: 10; }
+
         .label-text { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-bottom: 0; }
         .value-text { font-size: 1.2rem; font-weight: bold; }
         .text-danger { color: #f87171 !important; }
         .text-success { color: #4ade80 !important; }
+
         .nav-btn { background: #1e293b; border: 1px solid #3b82f6; color: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; position: absolute; z-index: 20; }
         .btn-L { left: 10px; }
         .btn-R { right: 10px; }
+
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
@@ -36,7 +43,7 @@
 <div class="cams-section" id="interactive-area">
     <button class="nav-btn btn-L" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
     <div id="cards-container" class="d-flex justify-content-center w-100">
-        <span class="text-muted">Sincronizando registros más recientes...</span>
+        <span class="text-muted">Cargando datos de Frigorífico...</span>
     </div>
     <button class="nav-btn btn-R" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
 </div>
@@ -45,7 +52,7 @@
     <table class="table table-dark table-hover">
         <thead>
             <tr>
-                <th>HORA</th><th>CÁMARA</th><th>VARIEDADES</th><th class="text-center">T. AMB</th><th class="text-center">PULPA</th><th class="text-center">HUM %</th>
+                <th>HORA</th><th>CÁMARA</th><th>VARIEDAD</th><th class="text-center">T. AMB</th><th class="text-center">PULPA</th><th class="text-center">HUM %</th>
             </tr>
         </thead>
         <tbody id="data-table-body"></tbody>
@@ -53,8 +60,8 @@
 </div>
 
 <script>
-    // Añadimos un parámetro de tiempo para que Google no envíe datos viejos guardados en caché
-    const BASE_URL = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec?pestana=frigo";
+    // URL CONFIGURADA PARA LA PESTAÑA FRIGORIFICO
+    const BASE_URL = "https://script.google.com/macros/s/AKfycbyuIeIvQuLiaVSwlQInOiRYIT_NvtY5-TUCrnZu-xAFyLA8aYWRP7XaWwVCbVN0L_uSLA/exec?pestana=Frigorifico";
     
     let allData = [];
     let currentGroup = 0;
@@ -62,29 +69,30 @@
 
     async function syncData() {
         try {
-            // El fetch ahora lleva un "cache buster" para forzar la descarga de datos nuevos
+            // "cachebuster" t para forzar datos nuevos de Google
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
             
-            // FILTRADO DE SEGURIDAD:
-            // 1. Quitamos la fila 1 (encabezados).
-            // 2. Ordenamos por FECHA de forma descendente (la más nueva arriba).
-            allData = json.slice(1).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+            // Procesamos: Quitamos cabecera y ponemos lo más NUEVO al principio del array [0]
+            allData = json.slice(1).reverse();
             
             drawTable();
             if(!isPaused) drawCards();
-        } catch (e) { console.error("Error de sincronización."); }
+        } catch (e) { 
+            document.getElementById('cards-container').innerHTML = "Error de conexión";
+        }
     }
 
     function drawCards() {
         const container = document.getElementById('cards-container');
         const latestByCam = {};
 
-        // Como ya ordenamos allData por fecha real, el primero de cada cámara es el último.
+        // Como allData ya viene invertido, el primer registro que encuentre de cada cámara
+        // es SIEMPRE el último que se ingresó en el formulario.
         allData.forEach(row => {
             const camName = String(row[3]).trim();
             if (!latestByCam[camName]) {
-                latestByCam[camName] = row;
+                latestByCam[camName] = row; 
             }
         });
 
@@ -103,9 +111,10 @@
             div.className = "cam-card";
             
             if(!r) {
-                div.innerHTML = `<h6 class="fw-bold">${name}</h6><p class="text-muted small">Sin datos registrados</p>`;
+                div.innerHTML = `<h6 class="fw-bold">${name}</h6><p class="text-muted small mt-4">Sin datos hoy</p>`;
             } else {
                 const [fecha, op, vars, cam, tAmb, tPulp, hum] = r;
+                // Rangos de alerta (personalizables)
                 const isErr = (tAmb > 1.5 || tPulp > 2 || hum < 85);
                 if(isErr) div.classList.add('alert');
 
@@ -117,7 +126,7 @@
                         <div class="col-6"><p class="label-text">Pulpa</p><div class="value-text ${tPulp>2?'text-danger':'text-success'}">${tPulp}°</div></div>
                         <div class="col-12 mt-1"><p class="label-text">Humedad</p><div class="value-text ${hum<85?'text-danger':'text-success'}">${hum}%</div></div>
                     </div>
-                    <div style="font-size: 0.55rem; color:#64748b; margin-top:5px;">Sinc: ${new Date(fecha).toLocaleTimeString()}</div>`;
+                    <div style="font-size:0.55rem; color:#64748b; margin-top:5px; text-align:right;">Act: ${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
             }
             container.appendChild(div);
         });
@@ -129,11 +138,11 @@
         body.innerHTML = allData.slice(0, 25).map(r => `
             <tr>
                 <td class="text-info fw-bold">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
-                <td><span class="badge bg-primary">${r[3]}</span></td>
-                <td class="small" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;">${r[2]}</td>
-                <td class="text-center ${r[4]>1.5?'text-danger':''}">${r[4]}°</td>
-                <td class="text-center ${r[5]>2?'text-danger':''}">${r[5]}°</td>
-                <td class="text-center ${r[6]<85?'text-danger':''}">${r[6]}%</td>
+                <td><span class="badge bg-primary px-2">${r[3]}</span></td>
+                <td class="small" style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${r[2]}</td>
+                <td class="text-center fw-bold ${r[4]>1.5?'text-danger':'text-success'}">${r[4]}°</td>
+                <td class="text-center fw-bold ${r[5]>2?'text-danger':'text-success'}">${r[5]}°</td>
+                <td class="text-center fw-bold ${r[6]<85?'text-danger':'text-success'}">${r[6]}%</td>
             </tr>
         `).join('');
     }
@@ -144,8 +153,8 @@
     document.getElementById('interactive-area').onmouseleave = () => isPaused = false;
 
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(syncData, 40000); // Actualiza cada 40 seg
-    setInterval(() => { if(!isPaused) drawCards(); }, 8000);
+    setInterval(syncData, 45000); // Sincroniza cada 45 seg
+    setInterval(() => { if(!isPaused) drawCards(); }, 8000); // Rota cada 8 seg
 
     syncData();
 </script>
