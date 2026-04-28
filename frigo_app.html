@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Frigorífico</title>
+    <title>Control Frigorífico Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
-        body { background-color: #f0f2f5; padding: 15px; font-family: sans-serif; }
-        .card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: none; max-width: 450px; margin: auto; overflow: hidden; }
-        .header-blue { background: #ffffff; padding: 20px; text-align: center; border-bottom: 4px solid #0d6efd; }
-        .logo-img { height: 70px; margin-bottom: 10px; object-fit: contain; }
-        .form-label { font-size: 0.8rem; font-weight: bold; color: #444; text-transform: uppercase; }
+        body { background-color: #f0f2f5; padding: 10px; font-family: sans-serif; }
+        .card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: none; max-width: 500px; margin: auto; overflow: hidden; }
+        .header-blue { background: #ffffff; padding: 15px; text-align: center; border-bottom: 4px solid #0d6efd; }
+        .logo-img { height: 60px; margin-bottom: 5px; object-fit: contain; }
+        .form-label { font-size: 0.75rem; font-weight: bold; color: #444; text-transform: uppercase; margin-bottom: 4px; display: block; }
         
-        .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; }
-        .form-control, .form-select { border-left: none; }
-        .form-control:focus, .form-select:focus { box-shadow: none; border-color: #ced4da; }
+        .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; padding: 0.5rem; }
+        .form-control, .form-select { border-left: none; font-size: 0.9rem; }
         
-        .btn-save { padding: 15px; font-weight: bold; border-radius: 12px; background: #0d6efd; border: none; transition: 0.3s; }
-        .btn-save:active { transform: scale(0.95); }
+        /* Estilo para múltiples variedades */
+        .variedad-badge { background: #e7f1ff; color: #0d6efd; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-block; margin: 2px; border: 1px solid #0d6efd; }
         
-        .file-label { display: block; background: #f8f9fa; border: 2px dashed #dee2e6; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; }
-        .icon-small { font-size: 1.1rem; }
+        /* Grid de 6 Temperaturas */
+        .pulpa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 12px; border: 1px solid #dee2e6; }
+        .pulpa-grid input { text-align: center; font-weight: bold; border-radius: 8px !important; border-left: 1px solid #dee2e6 !important; }
+
+        .btn-add { font-size: 0.8rem; padding: 2px 10px; }
+        .btn-save { padding: 15px; font-weight: bold; border-radius: 12px; background: #0d6efd; border: none; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -30,127 +33,133 @@
     <div class="card shadow">
         <div class="header-blue">
             <img src="logo-icono.png" alt="Logo" class="logo-img">
-            <h4 class="fw-bold mb-0" style="color: #333;">CONTROL FRIGORÍFICO</h4>
-            <p class="text-muted small mb-0 text-uppercase">Monitoreo de Cámaras</p>
+            <h5 class="fw-bold mb-0">CONTROL FRIGORÍFICO</h5>
+            <p class="text-muted small mb-0">MONITOREO DE CÁMARAS</p>
         </div>
 
-        <div class="card-body p-4">
+        <div class="card-body p-3">
             <form id="formFrigo">
-                <div class="mb-3">
-                    <label class="form-label">OPERADOR</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" id="operador" class="form-control" placeholder="Su nombre" required>
-                    </div>
-                </div>
-
                 <div class="row g-2 mb-3">
-                    <div class="col-7">
-                        <label class="form-label">VARIEDAD</label>
+                    <div class="col-8">
+                        <label class="form-label">OPERADOR</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
-                            <select id="variedad" class="form-select" required>
-                                <option value="">Seleccionar...</option>
-                                <option value="Galas">Galas</option>
-                                <option value="Granny">Granny</option>
-                                <option value="Fuji">Fuji</option>
-                                <option value="Red Delicius">Red Delicius</option>
-                                <option value="Cripps Pink">Cripps Pink</option>
-                            </select>
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <input type="text" id="operador" class="form-control" required>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-4">
                         <label class="form-label">CÁMARA</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-door-closed"></i></span>
-                            <select id="camara" class="form-select" required>
-                                <option value="">N°...</option>
-                                <option value="2">2</option><option value="3">3</option>
-                                <option value="4">4</option><option value="5">5</option>
-                                <option value="6">6</option><option value="7">7</option>
-                                <option value="8">8</option><option value="9">9</option>
-                                <option value="10">10</option><option value="11">11</option>
-                                <option value="12">12</option>
-                            </select>
+                        <select id="camara" class="form-select" style="border-left: 1px solid #dee2e6" required>
+                            <option value="">N°</option>
+                            <script>for(let i=2; i<=12; i++) document.write(`<option value="${i}">${i}</option>`);</script>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label">VARIEDADES EN CÁMARA</label>
+                        <button type="button" class="btn btn-outline-primary btn-add mb-1" onclick="agregarVariedad()">
+                            <i class="bi bi-plus-lg"></i> Agregar
+                        </button>
+                    </div>
+                    <div id="lista-variedades" class="mb-2">
                         </div>
-                    </div>
+                    <select id="selector-variedad" class="form-select" style="border-left: 1px solid #dee2e6">
+                        <option value="">Seleccionar variedad...</option>
+                        <option value="Galas">Galas</option>
+                        <option value="Granny">Granny</option>
+                        <option value="Fuji">Fuji</option>
+                        <option value="Red Delicius">Red Delicius</option>
+                        <option value="Cripps Pink">Cripps Pink</option>
+                    </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">T° AMBIENTE (°C)</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-thermometer-snow text-primary icon-small"></i></span>
-                        <input type="number" id="tAmbiente" class="form-control" step="0.1" placeholder="0.0" required>
-                    </div>
+                    <label class="form-label text-primary"><i class="bi bi-thermometer-snow"></i> T° AMBIENTE (°C)</label>
+                    <input type="number" id="tAmbiente" class="form-control text-center fw-bold" step="0.1" style="border-left: 1px solid #dee2e6" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">T° PULPA (°C)</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-thermometer-half text-danger icon-small"></i></span>
-                        <input type="number" id="tPulpa" class="form-control" step="0.1" placeholder="0.0" required>
+                    <label class="form-label text-danger"><i class="bi bi-thermometer-half"></i> T° PULPA (6 CONTROLES)</label>
+                    <div class="pulpa-grid">
+                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P1" required>
+                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P2" required>
+                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P3" required>
+                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P4" required>
+                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P5" required>
+                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P6" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">HUMEDAD RELATIVA (%)</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-droplets-fill text-info icon-small"></i></span>
-                        <input type="number" id="humedad" class="form-control" placeholder="85 - 95" required>
-                    </div>
+                    <label class="form-label text-info"><i class="bi bi-droplets-fill"></i> HUMEDAD (%)</label>
+                    <input type="number" id="humedad" class="form-control text-center fw-bold" style="border-left: 1px solid #dee2e6" required>
                 </div>
 
                 <div class="mb-4">
                     <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
-                    <label for="fotoInput" class="file-label" id="fileLabel">
+                    <label for="fotoInput" class="file-label" id="fileLabel" style="display: block; border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer;">
                         <i class="bi bi-camera fs-2 d-block mb-1 text-primary"></i>
-                        <span id="fileName" class="fw-bold text-uppercase">Tocar para tomar foto</span>
+                        <span id="fileName" class="fw-bold">TOCAR PARA TOMAR FOTO</span>
                     </label>
                 </div>
 
-                <button type="submit" id="btnEnviar" class="btn btn-primary w-100 btn-save">
-                    GUARDAR REGISTRO
-                </button>
+                <button type="submit" id="btnEnviar" class="btn btn-primary w-100 btn-save">GUARDAR REGISTRO</button>
             </form>
         </div>
     </div>
-    
-    <div id="mensaje" class="alert alert-primary mt-3 d-none text-center fw-bold rounded-4 shadow-sm">
-        ✅ REGISTRO ENVIADO CON ÉXITO
-    </div>
+    <div id="mensaje" class="alert alert-primary mt-3 d-none text-center fw-bold">✅ ENVIADO</div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyuIeIvQuLiaVSwlQInOiRYIT_NvtY5-TUCrnZu-xAFyLA8aYWRP7XaWwVCbVN0L_uSLA/exec";
+    const WEB_APP_URL = "TU_URL_AQUI";
+    let variedadesSeleccionadas = [];
 
-    window.onload = () => {
-        const nombre = localStorage.getItem('nombreOperador');
-        if (nombre) document.getElementById('operador').value = nombre;
-    };
-
-    document.getElementById('fotoInput').addEventListener('change', function(e) {
-        if(e.target.files[0]) {
-            document.getElementById('fileName').innerText = "✅ FOTO LISTA";
-            document.getElementById('fileLabel').style.backgroundColor = "#e7f1ff";
+    function agregarVariedad() {
+        const sel = document.getElementById('selector-variedad');
+        const valor = sel.value;
+        if (valor && !variedadesSeleccionadas.includes(valor)) {
+            variedadesSeleccionadas.push(valor);
+            renderVariedades();
         }
-    });
+        sel.value = "";
+    }
+
+    function eliminarVariedad(v) {
+        variedadesSeleccionadas = variedadesSeleccionadas.filter(item => item !== v);
+        renderVariedades();
+    }
+
+    function renderVariedades() {
+        const cont = document.getElementById('lista-variedades');
+        cont.innerHTML = variedadesSeleccionadas.map(v => `
+            <span class="variedad-badge">
+                ${v} <i class="bi bi-x-circle-fill ms-1" style="cursor:pointer" onclick="eliminarVariedad('${v}')"></i>
+            </span>
+        `).join('');
+    }
 
     document.getElementById('formFrigo').addEventListener('submit', function(e) {
         e.preventDefault();
-        localStorage.setItem('nombreOperador', document.getElementById('operador').value);
+        if (variedadesSeleccionadas.length === 0) { alert("Agrega al menos una variedad"); return; }
 
         const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> ENVIANDO...';
+
+        // Obtener promedio de las 6 pulpas
+        const pulpas = Array.from(document.querySelectorAll('.t-pulpa')).map(i => parseFloat(i.value));
+        const promedioPulpa = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(2);
 
         const enviar = (base64) => {
             const datos = {
                 origen: "frigorifico",
                 operador: document.getElementById('operador').value,
-                variedad: document.getElementById('variedad').value,
-                camara: document.getElementById('camara').value,
+                variedad: variedadesSeleccionadas.join(', '),
+                camara: "Cámara " + document.getElementById('camara').value,
                 tAmbiente: document.getElementById('tAmbiente').value,
-                tPulpa: document.getElementById('tPulpa').value,
+                tPulpa: promedioPulpa, // Enviamos el promedio al Excel
+                pulpasDetalle: pulpas.join('|'), // Opcional: enviamos el detalle de las 6
                 humedad: document.getElementById('humedad').value,
                 foto: base64
             };
@@ -158,12 +167,7 @@
             fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
             .then(() => {
                 document.getElementById('mensaje').classList.remove('d-none');
-                setTimeout(() => { location.reload(); }, 2000);
-            })
-            .catch(() => {
-                alert("Error al enviar");
-                btn.disabled = false;
-                btn.innerText = "GUARDAR REGISTRO";
+                setTimeout(() => location.reload(), 2000);
             });
         };
 
@@ -172,9 +176,7 @@
             const reader = new FileReader();
             reader.onloadend = () => enviar(reader.result);
             reader.readAsDataURL(file);
-        } else {
-            enviar(null);
-        }
+        } else { enviar(null); }
     });
 </script>
 </body>
