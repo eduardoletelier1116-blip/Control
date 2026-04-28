@@ -7,28 +7,25 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
         
-        /* Cabecera */
         .header-monitor { background: #1e293b; padding: 15px 30px; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; align-items: center; }
         .logo-small { height: 50px; }
 
-        /* Contenedor de Cámaras Rotativas */
-        #display-rotativo { height: 60%; display: flex; align-items: center; justify-content: center; padding: 20px; transition: all 0.5s ease-in-out; }
-        .cam-card { background: #1e293b; border-radius: 20px; border: 1px solid #334155; padding: 25px; margin: 10px; flex: 1; min-width: 280px; position: relative; }
+        #display-rotativo { height: 55%; display: flex; align-items: center; justify-content: center; padding: 20px; transition: all 0.5s ease-in-out; }
+        .cam-card { background: #1e293b; border-radius: 20px; border: 1px solid #334155; padding: 25px; margin: 10px; position: relative; min-height: 250px; }
         .cam-card.fuera-rango { border: 2px solid #ef4444; background: #2d1a1a; animation: alert-pulse 2s infinite; }
-        .cam-id { font-size: 3rem; font-weight: 900; opacity: 0.1; position: absolute; right: 20px; top: 10px; }
+        .cam-id { font-size: 3.5rem; font-weight: 900; opacity: 0.1; position: absolute; right: 20px; top: 10px; }
         
-        /* Tabla de Historial (Log) */
-        .log-section { height: 35%; background: #020617; padding: 15px; overflow-y: auto; border-top: 2px solid #1e293b; }
-        .table-dark { --bs-table-bg: transparent; font-size: 0.9rem; }
-        .btn-foto { padding: 2px 8px; font-size: 0.8rem; border-radius: 5px; }
+        .log-section { height: 40%; background: #020617; padding: 15px; overflow-y: auto; border-top: 2px solid #1e293b; }
+        .table-dark { --bs-table-bg: transparent; font-size: 0.85rem; }
+        .btn-foto { padding: 2px 8px; font-size: 0.75rem; border-radius: 5px; text-decoration: none; color: white; background: #0d6efd; }
 
         @keyframes alert-pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         
-        .valor-critico { color: #f87171; font-weight: bold; }
-        .valor-ok { color: #4ade80; font-weight: bold; }
-        .small-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
+        .valor-critico { color: #f87171 !important; font-weight: bold; }
+        .valor-ok { color: #4ade80 !important; font-weight: bold; }
+        .small-label { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -37,8 +34,8 @@
     <div class="d-flex align-items-center">
         <img src="logo-icono.png" alt="Logo" class="logo-small me-3">
         <div>
-            <h4 class="mb-0 fw-bold">CENTRAL DE FRÍO</h4>
-            <span class="text-info small">MONITOREO VIVO - CÁMARAS 2-12</span>
+            <h4 class="mb-0 fw-bold">CONTROL FRIGORÍFICO</h4>
+            <span class="text-info small text-uppercase">Monitoreo Vivo de Cámaras</span>
         </div>
     </div>
     <div id="reloj" class="fs-3 fw-bold text-white">00:00:00</div>
@@ -48,18 +45,18 @@
     </div>
 
 <div class="log-section">
-    <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-clock-history me-2"></i>Historial de Controles del Día</h6>
-    <table class="table table-dark table-hover border-secondary">
+    <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-clock-history me-2"></i>Historial de Controles Recientes</h6>
+    <table class="table table-dark table-hover">
         <thead>
-            <tr>
-                <th>Hora</th>
-                <th>Operador</th>
-                <th>Cámara</th>
-                <th>Variedad</th>
-                <th>T. Amb</th>
-                <th>T. Pulpa</th>
-                <th>Hum %</th>
-                <th>Evidencia</th>
+            <tr class="text-muted">
+                <th>HORA</th>
+                <th>OPERADOR</th>
+                <th>CÁMARA</th>
+                <th>VARIEDAD</th>
+                <th>T. AMB</th>
+                <th>T. PULPA</th>
+                <th>HUM %</th>
+                <th>FOTO</th>
             </tr>
         </thead>
         <tbody id="log-body">
@@ -68,92 +65,96 @@
 </div>
 
 <script>
-    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec?pestana=frigo";
+    // URL PROPORCIONADA CON PARÁMETRO DE PESTAÑA
+    const BASE_URL = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec";
+    const URL_CON_FILTRO = BASE_URL + "?pestana=frigo";
     
     const RANGOS = {
-        "Galas": { tA: [-1,0], tP: [-0.5, 0.5] },
-        "Granny": { tA: [0,1], tP: [1, 2] },
-        "Fuji": { tA: [-1,0], tP: [-0.5, 0.5] },
-        "Red Delicius": { tA: [-1,0], tP: [-0.5, 0.5] },
-        "Cripps Pink": { tA: [0,1], tP: [1, 2] }
+        "Galas": { tA: [-1, 0.5], tP: [-0.5, 0.5] },
+        "Granny": { tA: [0, 1.5], tP: [1, 2] },
+        "Fuji": { tA: [-1, 0.5], tP: [-0.5, 0.5] },
+        "Red Delicius": { tA: [-1, 0.5], tP: [-0.5, 0.5] },
+        "Cripps Pink": { tA: [0, 1.5], tP: [1, 2] }
     };
 
     let datosGlobales = [];
-    let grupoActual = 0; // 0: Cam 2-5, 1: Cam 6-9, 2: Cam 10-12
+    let grupoActual = 0; 
 
     async function fetchData() {
         try {
-            const res = await fetch(URL_APPS_SCRIPT);
+            const res = await fetch(URL_CON_FILTRO);
             const data = await res.json();
-            datosGlobales = data.slice(1); // Quitar encabezados
+            // Invertimos para tener lo más reciente primero
+            datosGlobales = data.slice(1).reverse(); 
             renderLog();
-            renderRotativo();
-        } catch (e) { console.error("Error al obtener datos"); }
+            if (datosGlobales.length > 0) renderRotativo();
+        } catch (e) { 
+            console.error("Error al obtener datos. Revisa la pestaña 'Frigorifico' en tu Excel."); 
+        }
     }
 
     function validar(valor, min, max) {
-        return (valor >= min && valor <= max);
+        let v = parseFloat(valor);
+        return (v >= min && v <= max);
     }
 
     function renderRotativo() {
         const contenedor = document.getElementById('display-rotativo');
         contenedor.innerHTML = "";
         
-        // Mapa de últimos registros
         const ultimos = {};
-        datosGlobales.forEach(f => { ultimos[f[3]] = f; });
+        datosGlobales.forEach(f => { if(!ultimos[f[3]]) ultimos[f[3]] = f; });
 
-        // Definir qué cámaras mostrar en este turno
         const grupos = [
-            ["Cámara 2", "Cámara 3", "Cámara 4", "Cámara 5"],
-            ["Cámara 6", "Cámara 7", "Cámara 8", "Cámara 9"],
-            ["Cámara 10", "Cámara 11", "Cámara 12"]
+            ["2", "3", "4", "5"],
+            ["6", "7", "8", "9"],
+            ["10", "11", "12"]
         ];
 
-        const camarasAMostrar = grupos[grupoActual];
+        const seleccion = grupos[grupoActual];
 
-        camarasAMostrar.forEach(nombreCam => {
+        seleccion.forEach(num => {
+            const nombreCam = "Cámara " + num;
             const reg = ultimos[nombreCam];
-            const card = document.createElement('div');
-            card.className = 'col-md-3';
+            const col = document.createElement('div');
+            col.className = 'col-md-3';
             
             if (!reg) {
-                card.innerHTML = `<div class="cam-card text-muted"><h4>${nombreCam}</h4><p>Sin datos</p></div>`;
+                col.innerHTML = `<div class="cam-card text-muted"><h3>Cámara ${num}</h3><p>Sin datos</p></div>`;
             } else {
-                const [fecha, op, variedad, cam, tAmb, tPulpa, hum, foto] = reg;
-                const r = RANGOS[variedad] || { tA: [-1,1], tP: [-1,2] };
+                const [fecha, op, variedad, cam, tAmb, tPulpa, hum] = reg;
+                const r = RANGOS[variedad] || { tA: [-1,2], tP: [-1,2] };
                 
                 const ambOk = validar(tAmb, r.tA[0], r.tA[1]);
                 const pulpaOk = validar(tPulpa, r.tP[0], r.tP[1]);
                 const humOk = validar(hum, 85, 95);
 
-                if (!ambOk || !pulpaOk || !humOk) card.firstChild.classList?.add('fuera-rango');
-                
-                card.innerHTML = `
+                col.innerHTML = `
                     <div class="cam-card ${(!ambOk || !pulpaOk || !humOk) ? 'fuera-rango' : ''}">
-                        <div class="cam-id">${nombreCam.split(' ')[1]}</div>
-                        <h3 class="fw-bold mb-1">${nombreCam}</h3>
-                        <span class="badge bg-info mb-3">${variedad}</span>
+                        <div class="cam-id">${num}</div>
+                        <h3 class="fw-bold mb-1">Cámara ${num}</h3>
+                        <span class="badge bg-primary mb-3">${variedad}</span>
                         
-                        <div class="mb-2">
-                            <div class="small-label">Ambiente</div>
-                            <div class="fs-4 ${ambOk ? 'valor-ok' : 'valor-critico'}">${tAmb}°C</div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="small-label">Pulpa</div>
-                            <div class="fs-4 ${pulpaOk ? 'valor-ok' : 'valor-critico'}">${tPulpa}°C</div>
-                        </div>
-                        <div>
-                            <div class="small-label">Humedad</div>
-                            <div class="fs-4 ${humOk ? 'valor-ok' : 'valor-critico'}">${hum}%</div>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <div class="small-label">Ambiente</div>
+                                <div class="fs-4 ${ambOk ? 'valor-ok' : 'valor-critico'}">${tAmb}°</div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <div class="small-label">Pulpa</div>
+                                <div class="fs-4 ${pulpaOk ? 'valor-ok' : 'valor-critico'}">${tPulpa}°</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="small-label">Humedad Relativa</div>
+                                <div class="fs-4 ${humOk ? 'valor-ok' : 'valor-critico'}">${hum}%</div>
+                            </div>
                         </div>
                     </div>
                 `;
             }
-            contenedor.appendChild(card);
+            contenedor.appendChild(col);
         });
 
-        // Cambiar al siguiente grupo para la próxima vez
         grupoActual = (grupoActual + 1) % grupos.length;
     }
 
@@ -161,41 +162,34 @@
         const body = document.getElementById('log-body');
         body.innerHTML = "";
         
-        // Mostrar solo registros de hoy
-        const hoy = new Date().toLocaleDateString();
-        
-        datosGlobales.reverse().slice(0, 15).forEach(f => {
+        datosGlobales.slice(0, 15).forEach(f => {
             const [fecha, op, variedad, cam, tAmb, tPulpa, hum, foto] = f;
             const r = RANGOS[variedad] || { tA: [-1,1], tP: [-1,2] };
             
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
-                <td>${op}</td>
-                <td>${cam}</td>
-                <td><span class="badge bg-outline-info border">${variedad}</span></td>
+                <td class="text-uppercase">${op}</td>
+                <td class="fw-bold">${cam}</td>
+                <td><span class="badge border text-info">${variedad}</span></td>
                 <td class="${validar(tAmb, r.tA[0], r.tA[1]) ? '' : 'valor-critico'}">${tAmb}°</td>
                 <td class="${validar(tPulpa, r.tP[0], r.tP[1]) ? '' : 'valor-critico'}">${tPulpa}°</td>
                 <td class="${validar(hum, 85, 95) ? '' : 'valor-critico'}">${hum}%</td>
                 <td>
-                    <a href="${foto}" target="_blank" class="btn btn-primary btn-foto">
-                        <i class="bi bi-eye"></i> Foto
-                    </a>
+                    ${foto ? `<a href="${foto}" target="_blank" class="btn-foto"><i class="bi bi-camera"></i> Ver</a>` : '---'}
                 </td>
             `;
             body.appendChild(tr);
         });
     }
 
-    // Reloj
     setInterval(() => {
         document.getElementById('reloj').innerText = new Date().toLocaleTimeString();
     }, 1000);
 
-    // Ciclo de actualización y rotación
-    fetchData(); // Carga inicial
-    setInterval(fetchData, 60000); // Refresca datos cada minuto
-    setInterval(renderRotativo, 8000); // Rota el carrusel de cámaras cada 8 segundos
+    fetchData();
+    setInterval(fetchData, 60000); 
+    setInterval(renderRotativo, 8000); 
 </script>
 </body>
 </html>
