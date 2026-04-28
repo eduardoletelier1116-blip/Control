@@ -7,35 +7,122 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
+        /* Estilos Base y Corrección de Recorte Superior */
+        body { 
+            background-color: #0f172a; 
+            color: #e2e8f0; 
+            font-family: 'Segoe UI', sans-serif; 
+            overflow: hidden; /* Evita scroll en pantalla completa */
+            height: 100vh; 
+            margin: 0; 
+            display: flex;
+            flex-direction: column; /* Estructura vertical */
+        }
         
-        .header-monitor { background: #1e293b; padding: 15px 30px; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10; }
-        .logo-small { height: 50px; }
+        /* Cabecera (Header) - Ajuste de altura */
+        .header-monitor { 
+            background: #1e293b; 
+            padding: 10px 20px; /* Menos padding para ahorrar espacio */
+            border-bottom: 2px solid #334155; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: relative; 
+            z-index: 10;
+            height: auto; /* Altura automática basada en contenido */
+            flex-shrink: 0; /* No se encoge */
+        }
+        .logo-small { height: 45px; } /* Logo un poco más pequeño */
 
-        /* Contenedor Principal con Flechas */
-        .main-display-container { position: relative; height: 55%; display: flex; align-items: center; }
+        /* Contenedor Principal Interactible */
+        .main-display-container { 
+            position: relative; 
+            flex-grow: 1; /* Ocupa el espacio disponible */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden; /* Importante para que no se corte */
+            margin-top: 10px; /* Separación sutil del header */
+        }
         
-        #display-rotativo { width: 100%; display: flex; align-items: center; justify-content: center; padding: 0 60px; transition: opacity 0.4s; }
+        /* Contenedor de Cámaras Rotativas - Altura Flexible */
+        #display-rotativo { 
+            width: 100%; 
+            display: flex; 
+            align-items: stretch; /* Altura igual para todas las cartas */
+            justify-content: center; 
+            padding: 0 50px; 
+            transition: opacity 0.4s;
+            height: 100%; /* Usa todo el alto del contenedor principal */
+        }
         
+        /* Navegación (Flechas) */
         .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; color: white; padding: 15px; cursor: pointer; border-radius: 50%; z-index: 100; transition: 0.3s; }
         .nav-arrow:hover { background: #0d6efd; scale: 1.1; }
-        .arrow-left { left: 20px; }
-        .arrow-right { right: 20px; }
+        .arrow-left { left: 10px; }
+        .arrow-right { right: 10px; }
 
-        .cam-card { background: #1e293b; border-radius: 20px; border: 1px solid #334155; padding: 25px; margin: 10px; position: relative; min-height: 250px; transition: transform 0.3s; }
+        /* Estilo de Tarjeta de Cámara */
+        .cam-card { 
+            background: #1e293b; 
+            border-radius: 20px; 
+            border: 1px solid #334155; 
+            padding: 20px; /* Menos padding interno */
+            margin: 5px; 
+            position: relative; 
+            flex: 1; /* Ancho igualitario */
+            max-width: 280px; /* Ancho máximo para mantener diseño */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Distribución vertical */
+        }
         .cam-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
         .cam-card.fuera-rango { border: 2px solid #ef4444; background: #2d1a1a; animation: alert-pulse 2s infinite; }
-        .cam-id { font-size: 3.5rem; font-weight: 900; opacity: 0.1; position: absolute; right: 20px; top: 10px; }
+        .cam-id { font-size: 3rem; font-weight: 900; opacity: 0.08; position: absolute; right: 15px; top: 10px; z-index: 0; }
         
+        /* Contenedor de Múltiples Variedades (Coherencia de Datos) */
+        .variedad-lista {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px; /* Espacio entre variedades */
+            z-index: 1; /* Sobre el número de cámara */
+        }
+        .badge-variedad {
+            font-size: 0.8rem;
+            white-space: normal; /* Permite saltos de línea si es muy largo */
+            text-align: left;
+            border-radius: 6px;
+        }
+
         /* Indicadores de grupo (puntitos) */
-        .group-indicators { position: absolute; bottom: 10px; width: 100%; display: flex; justify-content: center; gap: 8px; }
+        .group-indicators { position: absolute; bottom: 10px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 50; }
         .dot { width: 30px; height: 4px; background: #334155; border-radius: 2px; transition: 0.3s; }
         .dot.active { background: #0d6efd; width: 50px; }
 
-        .log-section { height: 40%; background: #020617; padding: 15px; overflow-y: auto; border-top: 2px solid #1e293b; }
-        .table-dark { --bs-table-bg: transparent; font-size: 0.85rem; }
+        /* Etiquetas Identificadoras de Datos (Mejora 3) */
+        .label-pequena {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        /* Historial (Log) */
+        .log-section { 
+            height: auto; /* Altura automática */
+            max-height: 30vh; /* Máximo 30% del alto de la pantalla */
+            background: #020617; 
+            padding: 10px 15px; 
+            overflow-y: auto; 
+            border-top: 2px solid #1e293b; 
+            flex-shrink: 0;
+        }
+        .table-dark { --bs-table-bg: transparent; font-size: 0.8rem; }
         
-        @keyframes alert-pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        @keyframes alert-pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .valor-critico { color: #f87171 !important; font-weight: bold; }
         .valor-ok { color: #4ade80 !important; font-weight: bold; }
     </style>
@@ -44,19 +131,19 @@
 
 <div class="header-monitor">
     <div class="d-flex align-items-center">
-        <img src="logo-icono.png" alt="Logo" class="logo-small me-3">
+        <img src="logo-icono.png" alt="Logo" class="logo-small me-2">
         <div>
-            <h4 class="mb-0 fw-bold text-white">CENTRAL FRIGORÍFICO</h4>
-            <span class="text-info small text-uppercase">Monitoreo Vivo e Interactivo</span>
+            <h5 class="mb-0 fw-bold text-white">CENTRAL FRIGORÍFICO</h5>
+            <span class="text-info small text-uppercase" style="font-size: 0.7rem;">Monitoreo Interactivo</span>
         </div>
     </div>
-    <div id="reloj" class="fs-3 fw-bold text-white">00:00:00</div>
+    <div id="reloj" class="fs-4 fw-bold text-white">00:00:00</div>
 </div>
 
 <div class="main-display-container" id="main-container">
     <div class="nav-arrow arrow-left" onclick="cambiarGrupo(-1)"><i class="bi bi-chevron-left"></i></div>
     
-    <div id="display-rotativo" class="row">
+    <div id="display-rotativo" class="row g-0">
         </div>
 
     <div class="nav-arrow arrow-right" onclick="cambiarGrupo(1)"><i class="bi bi-chevron-right"></i></div>
@@ -69,13 +156,14 @@
 </div>
 
 <div class="log-section">
-    <table class="table table-dark table-hover">
+    <table class="table table-dark table-hover mb-0">
         <thead>
-            <tr class="text-muted small">
-                <th>HORA</th><th>OPERADOR</th><th>CÁMARA</th><th>VARIEDAD</th><th>T. AMB</th><th>T. PULPA (PROM)</th><th>HUM %</th><th>FOTO</th>
+            <tr class="text-muted small" style="font-size: 0.75rem;">
+                <th>HORA</th><th>OPERADOR</th><th>CÁMARA</th><th>VARIEDAD</th><th>T. AMB</th><th>PULPA (PROM)</th><th>HUM %</th><th>FOTO</th>
             </tr>
         </thead>
-        <tbody id="log-body"></tbody>
+        <tbody id="log-body">
+            </tbody>
     </table>
 </div>
 
@@ -104,10 +192,11 @@
         try {
             const res = await fetch(URL_CON_FILTRO);
             const data = await res.json();
+            // Invertimos para tener lo más reciente primero
             datosGlobales = data.slice(1).reverse(); 
             renderLog();
             if (!pausaMonitor) renderRotativo(); 
-        } catch (e) { console.error("Error de conexión"); }
+        } catch (e) { console.error("Error de red."); }
     }
 
     function cambiarGrupo(direccion) {
@@ -141,29 +230,62 @@
             seleccion.forEach(num => {
                 const nombreCam = "Cámara " + num;
                 const reg = ultimos[nombreCam];
-                const col = document.createElement('div');
-                col.className = 'col-md-3';
                 
                 if (!reg) {
-                    col.innerHTML = `<div class="cam-card text-muted"><h3>Cámara ${num}</h3><p>Sin datos</p></div>`;
+                    const col = document.createElement('div');
+                    col.className = 'cam-card text-muted justify-content-center align-items-center';
+                    col.innerHTML = `<h3>Cámara ${num}</h3><p class="small">Sin datos hoy</p>`;
+                    contenedor.appendChild(col);
                 } else {
-                    const [fecha, op, variedad, cam, tAmb, tPulpa, hum] = reg;
-                    const r = RANGOS[variedad] || { tA: [-1,2], tP: [-1,2] };
-                    const isOk = validar(tAmb, r.tA[0], r.tA[1]) && validar(tPulpa, r.tP[0], r.tP[1]) && validar(hum, 85, 95);
+                    const [fecha, op, variedadInput, cam, tAmb, tPulpa, hum] = reg;
+                    
+                    // SOLUCIÓN 1: Coherencia de Múltiples Variedades
+                    // Convertimos el string "Galas, Granny" en un array y generamos badges para cada una
+                    const variedadesArray = variedadInput.split(',').map(v => v.trim());
+                    let htmlVariedades = '<div class="variedad-lista">';
+                    variedadesArray.forEach(v => {
+                        htmlVariedades += `<span class="badge bg-primary badge-variedad text-truncate">${v}</span>`;
+                    });
+                    htmlVariedades += '</div>';
 
+                    // Tomamos la primera variedad para validar rangos (o ajusta lógica si prefieres)
+                    const variedadPrincipal = variedadesArray[0];
+                    const r = RANGOS[variedadPrincipal] || { tA: [-1,2], tP: [-1,2] };
+                    const isAmbOk = validar(tAmb, r.tA[0], r.tA[1]);
+                    const isPulpaOk = validar(tPulpa, r.tP[0], r.tP[1]);
+                    const isHumOk = validar(hum, 85, 95);
+
+                    const col = document.createElement('div');
+                    col.className = `cam-card ${(!isAmbOk || !isPulpaOk || !isHumOk) ? 'fuera-rango' : ''}`;
+                    
                     col.innerHTML = `
-                        <div class="cam-card ${!isOk ? 'fuera-rango' : ''}">
-                            <div class="cam-id">${num}</div>
+                        <div class="cam-id">${num}</div>
+                        <div>
                             <h4 class="fw-bold mb-1">Cámara ${num}</h4>
-                            <span class="badge bg-primary mb-3 text-truncate" style="max-width:100%">${variedad}</span>
+                            ${htmlVariedades}
+                        </div>
+                        
+                        <div class="data-section mt-auto">
                             <div class="row g-1">
-                                <div class="col-6"><small class="text-muted d-block" style="font-size:10px">AMBIENTE</small><div class="${validar(tAmb, r.tA[0], r.tA[1]) ? 'valor-ok' : 'valor-critico'} fs-5">${tAmb}°</div></div>
-                                <div class="col-6"><small class="text-muted d-block" style="font-size:10px">PULPA</small><div class="${validar(tPulpa, r.tP[0], r.tP[1]) ? 'valor-ok' : 'valor-critico'} fs-5">${tPulpa}°</div></div>
-                                <div class="col-12 mt-2"><small class="text-muted d-block" style="font-size:10px">HUMEDAD</small><div class="${validar(hum, 85, 95) ? 'valor-ok' : 'valor-critico'} fs-5">${hum}%</div></div>
+                                <div class="col-6">
+                                    <span class="label-pequena">Ambiente</span>
+                                    <div class="${isAmbOk ? 'valor-ok' : 'valor-critico'} fs-5">${tAmb}°</div>
+                                </div>
+                                <div class="col-6">
+                                    <span class="label-pequena">Pulpa (Prom)</span>
+                                    <div class="${isPulpaOk ? 'valor-ok' : 'valor-critico'} fs-5">${tPulpa}°</div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span class="label-pequena">Humedad Relativa</span>
+                                    <div class="${isHumOk ? 'valor-ok' : 'valor-critico'} fs-5">${hum}%</div>
+                                </div>
+                            </div>
+                            <div class="mt-2 text-muted" style="font-size: 0.65rem;">
+                                Última medida: ${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
                             </div>
                         </div>`;
+                    contenedor.appendChild(col);
                 }
-                contenedor.appendChild(col);
             });
             contenedor.style.opacity = 1;
         }, 300);
@@ -174,24 +296,28 @@
         body.innerHTML = "";
         datosGlobales.slice(0, 15).forEach(f => {
             const [fecha, op, variedad, cam, tAmb, tPulpa, hum, foto] = f;
-            const r = RANGOS[variedad] || { tA: [-1,1], tP: [-1,2] };
+            
+            // Usamos la primera variedad del log para rangos de color en tabla
+            const principal = variedad.split(',')[0].trim();
+            const r = RANGOS[principal] || { tA: [-1,1], tP: [-1,2] };
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${new Date(fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
                 <td class="text-uppercase small">${op}</td>
                 <td class="fw-bold text-info">${cam}</td>
-                <td><span class="text-truncate d-inline-block" style="max-width:120px">${variedad}</span></td>
-                <td class="${validar(tAmb, r.tA[0], r.tA[1]) ? '' : 'valor-critico'}">${tAmb}°</td>
-                <td class="${validar(tPulpa, r.tP[0], r.tP[1]) ? '' : 'valor-critico'}">${tPulpa}°</td>
-                <td class="${validar(hum, 85, 95) ? '' : 'valor-critico'}">${hum}%</td>
-                <td>${foto ? `<a href="${foto}" target="_blank" class="btn btn-sm btn-primary py-0"><i class="bi bi-camera"></i></a>` : '-'}</td>`;
+                <td><span class="text-truncate d-inline-block" style="max-width:110px">${variedad}</span></td>
+                <td class="${validar(tAmb, r.tA[0], r.tA[1]) ? '' : 'valor-critico'} text-end">${tAmb}°</td>
+                <td class="${validar(tPulpa, r.tP[0], r.tP[1]) ? '' : 'valor-critico'} text-end">${tPulpa}°</td>
+                <td class="${validar(hum, 85, 95) ? '' : 'valor-critico'} text-end">${hum}%</td>
+                <td>${foto ? `<a href="${foto}" target="_blank" class="btn btn-sm btn-primary py-0 px-1"><i class="bi bi-camera"></i></a>` : '-'}</td>`;
             body.appendChild(tr);
         });
     }
 
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // Ciclo automático: Solo cambia si NO hay pausa (mouse encima)
+    // Ciclo automático de rotación
     setInterval(() => {
         if (!pausaMonitor) {
             cambiarGrupo(1);
@@ -199,7 +325,7 @@
     }, 8000);
 
     fetchData();
-    setInterval(fetchData, 60000); 
+    setInterval(fetchData, 60000); // Actualiza datos de red cada minuto
 </script>
 </body>
 </html>
