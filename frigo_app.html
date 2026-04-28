@@ -10,7 +10,6 @@
         body { background-color: #f0f2f5; padding: 15px; font-family: 'Segoe UI', sans-serif; }
         .card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: none; max-width: 480px; margin: auto; overflow: hidden; }
         .header-accent { background: #ffffff; padding: 25px; text-align: center; border-bottom: 4px solid #0d6efd; }
-        .logo-img { height: 50px; margin-bottom: 10px; }
         .form-label { font-size: 0.75rem; color: #555; font-weight: 800; text-transform: uppercase; }
         .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; }
         .form-control, .form-select { border-left: none; padding: 12px; font-size: 1rem; }
@@ -18,7 +17,7 @@
         .btn-save { padding: 15px; font-weight: 800; border-radius: 12px; background-color: #0d6efd; border: none; transition: 0.3s; }
         .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); }
         .file-label { display: block; background: #e9ecef; border: 2px dashed #ced4da; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; }
-        .text-unit { font-size: 0.8rem; color: #999; margin-left: 5px; }
+        .icon-small { font-size: 1.2rem; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -36,7 +35,7 @@
                     <label class="form-label">OPERADOR RESPONSABLE</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" id="operador" class="form-control" placeholder="Nombre" required>
+                        <input type="text" id="operador" class="form-control" placeholder="Su nombre" required>
                     </div>
                 </div>
 
@@ -71,23 +70,22 @@
                     </div>
                 </div>
 
-                <div class="row g-2 mb-4">
-                    <div class="col-4 text-center">
-                        <label class="form-label">T. AMB (°C)</label>
-                        <input type="number" id="tAmbiente" class="form-control text-center" step="0.1" placeholder="0.0" required>
+                <div class="row g-2 mb-4 text-center">
+                    <div class="col-4">
+                        <label class="form-label"><i class="bi bi-thermometer-snow icon-small"></i>T. AMB</label>
+                        <input type="number" id="tAmbiente" class="form-control text-center bg-light" step="0.1" placeholder="0.0" required>
                     </div>
-                    <div class="col-4 text-center">
-                        <label class="form-label">T. PULPA (°C)</label>
-                        <input type="number" id="tPulpa" class="form-control text-center" step="0.1" placeholder="0.0" required>
+                    <div class="col-4">
+                        <label class="form-label"><i class="bi bi-thermometer-half icon-small"></i>T. PULPA</label>
+                        <input type="number" id="tPulpa" class="form-control text-center bg-light" step="0.1" placeholder="0.0" required>
                     </div>
-                    <div class="col-4 text-center">
-                        <label class="form-label">HUM. (%)</label>
-                        <input type="number" id="humedad" class="form-control text-center" placeholder="90" required>
+                    <div class="col-4">
+                        <label class="form-label"><i class="bi bi-droplets icon-small"></i>HUM %</label>
+                        <input type="number" id="humedad" class="form-control text-center bg-light" placeholder="90" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">EVIDENCIA FOTOGRÁFICA</label>
                     <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
                     <label for="fotoInput" class="file-label" id="fileLabel">
                         <i class="bi bi-camera-fill fs-3 d-block text-primary"></i>
@@ -108,7 +106,15 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_gL3X4Fvd--qgF-vUJAUpRQkmLDeDfLgHEsD9vCYP9b_wV7lRHexe-vvsF4mxFHVObA/exec";
+    const WEB_APP_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+
+    // CARGAR NOMBRE GUARDADO AL INICIAR
+    window.onload = () => {
+        const nombreGuardado = localStorage.getItem('nombreOperador');
+        if (nombreGuardado) {
+            document.getElementById('operador').value = nombreGuardado;
+        }
+    };
 
     document.getElementById('fotoInput').addEventListener('change', function(e) {
         if(e.target.files[0]) {
@@ -119,6 +125,11 @@
 
     document.getElementById('formFrigo').addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // GUARDAR NOMBRE PARA LA PRÓXIMA VEZ
+        const nombreActual = document.getElementById('operador').value;
+        localStorage.setItem('nombreOperador', nombreActual);
+
         const btn = document.getElementById('btnEnviar');
         const fotoFile = document.getElementById('fotoInput').files[0];
         
@@ -149,9 +160,13 @@
         fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
         .then(() => {
             document.getElementById('mensaje').classList.remove('d-none');
+            // Reseteamos todo excepto el nombre del operador
+            const nombre = document.getElementById('operador').value;
             document.getElementById('formFrigo').reset();
+            document.getElementById('operador').value = nombre;
+            
             document.getElementById('fileName').innerText = "Tocar para tomar foto";
-            setTimeout(() => { location.reload(); }, 2500);
+            setTimeout(() => { location.reload(); }, 2000);
         })
         .catch(() => {
             alert("Error al enviar. Revisa tu conexión.");
