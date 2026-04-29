@@ -3,115 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Industrial Pro - Vaciado</title>
+    <title>Dashboard Industrial | Vaciado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root {
-            --bg-dark: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-main: #c9d1d9;
-            --text-dim: #8b949e;
+            --bg-body: #020617;
+            --card-bg: #0f172a;
+            --card-border: #1e293b;
+            --accent-blue: #38bdf8;
+            --accent-orange: #fb923c;
+            --accent-green: #4ade80;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
         }
 
         body { 
-            background-color: var(--bg-dark); 
-            color: var(--text-main); 
-            padding: 5px; 
-            height: 100vh; 
-            overflow: hidden; 
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-body); 
+            color: var(--text-primary); 
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
         }
 
-        .header-bar {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 15px;
-            margin-bottom: 10px;
+        /* Header Estilo Premium */
+        .top-nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px 20px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        /* Estilo para tu logo */
-        .brand-zone { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 30px; width: auto; }
-
-        .chart-card { 
-            background: var(--card-bg); 
-            border-radius: 10px; 
-            padding: 10px; 
-            border: 1px solid var(--border-color); 
-            height: 29vh; 
-            margin-bottom: 1vh; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        .logo-box { display: flex; align-items: center; gap: 15px; }
+        .logo-img { height: 32px; filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.3)); }
+        
+        .sync-badge {
+            font-size: 0.7rem;
+            background: #1e293b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            border: 1px solid var(--card-border);
         }
 
-        .chart-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
+        /* Tarjetas de Gráficos */
+        .chart-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 15px;
+            height: 29vh;
+            margin-bottom: 1vh;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
 
-        .status-pill { 
-            padding: 3px 10px; 
-            border-radius: 4px; 
-            font-size: 0.7rem; 
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .chart-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Status Pills */
+        .status-indicator {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.65rem;
             font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .status-ok { background: rgba(74, 222, 128, 0.1); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.2); }
+        .status-alert { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.2); animation: pulse-border 2s infinite; }
+
+        @keyframes pulse-border { 
+            0% { border-color: rgba(248, 81, 73, 0.2); }
+            50% { border-color: rgba(248, 81, 73, 0.8); }
+            100% { border-color: rgba(248, 81, 73, 0.2); }
         }
 
-        .bg-danger-live { background-color: #f85149; color: #fff; animation: blink 1.2s infinite; }
-        .bg-success-live { background-color: #238636; color: #fff; }
+        /* Modales */
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; }
+        .modal-header { border-bottom: 1px solid var(--card-border); }
 
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); }
+        #sync-icon { animation: spin 4s linear infinite; display: inline-block; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="container-fluid">
-    <div class="header-bar">
-        <div class="brand-zone">
+    <nav class="top-nav">
+        <div class="logo-box">
             <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-            <h6 class="mb-0 fw-bold text-white">MONITOR DE VACIADO</h6>
+            <div>
+                <h6 class="mb-0 fw-bold" style="letter-spacing: -0.5px;">SYSTEM <span style="color: var(--accent-blue);">VACIADO</span></h6>
+                <div style="font-size: 0.6rem; color: var(--accent-blue); font-weight: 600;">CONTROL INDUSTRIAL TIEMPO REAL</div>
+            </div>
         </div>
-        <div id="syncTime" style="color: var(--text-dim); font-size: 0.75rem; font-family: monospace;">SINCRONIZANDO...</div>
-    </div>
+        <div class="sync-badge">
+            <i class="bi bi-arrow-repeat me-1" id="sync-icon"></i> <span id="syncTime">INICIANDO...</span>
+        </div>
+    </nav>
 
-    <div class="chart-card">
-        <div class="d-flex justify-content-between align-items-center mb-0">
-            <span class="chart-title" style="color: #58a6ff;">PPM (30-60)</span>
+    <div class="chart-container">
+        <div class="chart-header">
+            <span class="chart-title"><i class="bi bi-water me-2"></i>Concentración PPM (30-60)</span>
             <div id="status_ppm"></div>
         </div>
-        <div id="chart_ppm" style="height: 90%; width: 100%;"></div>
+        <div id="chart_ppm" style="height: 85%; width: 100%;"></div>
     </div>
 
-    <div class="chart-card">
-        <div class="d-flex justify-content-between align-items-center mb-0">
-            <span class="chart-title" style="color: #ffa657;">ORP (750-850)</span>
+    <div class="chart-container">
+        <div class="chart-header">
+            <span class="chart-title"><i class="bi bi-lightning-charge me-2"></i>Potencial ORP (750-850)</span>
             <div id="status_orp"></div>
         </div>
-        <div id="chart_orp" style="height: 90%; width: 100%;"></div>
+        <div id="chart_orp" style="height: 85%; width: 100%;"></div>
     </div>
 
-    <div class="chart-card">
-        <div class="d-flex justify-content-between align-items-center mb-0">
-            <span class="chart-title" style="color: #3fb950;">PH (6.5-7.5)</span>
+    <div class="chart-container">
+        <div class="chart-header">
+            <span class="chart-title"><i class="bi bi-droplet me-2"></i>Nivel de PH (6.5-7.5)</span>
             <div id="status_ph"></div>
         </div>
-        <div id="chart_ph" style="height: 90%; width: 100%;"></div>
+        <div id="chart_ph" style="height: 85%; width: 100%;"></div>
     </div>
 </div>
 
 <div class="modal fade" id="fotoModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content shadow-lg">
       <div class="modal-header border-0">
-        <h6 class="modal-title" id="modalTitulo">Registro Detallado</h6>
+        <h6 class="modal-title fw-bold">Detalle de Registro</h6>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body text-center">
-        <img id="imgRegistro" src="" class="img-fluid rounded shadow mb-3">
-        <div id="infoRegistro" class="p-2 rounded bg-dark small text-info font-monospace"></div>
+      <div class="modal-body text-center p-4">
+        <img id="imgRegistro" src="" class="img-fluid rounded-4 mb-4 shadow-sm" style="border: 1px solid var(--card-border);">
+        <div id="infoRegistro" class="p-3 rounded-3 small" style="background: var(--bg-body); border: 1px solid var(--card-border); color: var(--accent-blue);"></div>
       </div>
     </div>
   </div>
@@ -126,7 +172,6 @@
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(refresh);
-    
     setInterval(refresh, 30000);
 
     function refresh() {
@@ -134,7 +179,7 @@
         .then(r => r.json())
         .then(res => {
             if (res.error) {
-                document.getElementById('syncTime').innerText = "ERROR: " + res.error;
+                document.getElementById('syncTime').innerText = "ERROR";
                 return;
             }
 
@@ -146,21 +191,16 @@
             });
 
             if (rawData.length === 0) {
-                document.getElementById('syncTime').innerText = "SIN DATOS PARA HOY (" + new Date().toLocaleTimeString() + ")";
-                document.getElementById('status_ppm').innerHTML = '';
-                document.getElementById('status_orp').innerHTML = '';
-                document.getElementById('status_ph').innerHTML = '';
+                document.getElementById('syncTime').innerText = "SIN DATOS HOY";
             } else {
-                document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
-                
-                drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2, '#');
-                drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3, '#');
-                drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4, '#.0');
+                document.getElementById('syncTime').innerText = "VIVO: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#38bdf8', 2, '#');
+                drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#fb923c', 3, '#');
+                drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#4ade80', 4, '#.0');
             }
         })
         .catch(err => {
-            console.error("Error en fetch:", err);
-            document.getElementById('syncTime').innerText = "ERROR DE CONEXIÓN";
+            document.getElementById('syncTime').innerText = "RECONECTANDO...";
         });
     }
 
@@ -178,31 +218,26 @@
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
-            
             if(val < minVal) minVal = val;
             if(val > maxVal) maxVal = val;
-            
             let fuera = (val < range[0] || val > range[1]);
-            let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; }' : 'point { size: 5; fill-color: ' + baseColor + '; }';
-            
-            dt.addRow([h + "\n" + (f[5]||"") + "k", val, estilo, f[6] === "SI" ? "CORRECCIÓN" : null, range[0], range[1]]);
+            let estilo = fuera ? 'point { size: 7; fill-color: #f85149; }' : 'point { size: 4; fill-color: ' + baseColor + '; }';
+            dt.addRow([h, val, estilo, f[6] === "SI" ? "MOD" : null, range[0], range[1]]);
         });
 
-        const padding = (range[1] - range[0]) * 0.4; 
+        const padding = (range[1] - range[0]) * 0.4;
         const vMin = Math.min(range[0], minVal) - padding;
         const vMax = Math.max(range[1], maxVal) + padding;
 
         if (!charts[divId]) {
             charts[divId] = new google.visualization.ComboChart(document.getElementById(divId));
-            
             google.visualization.events.addListener(charts[divId], 'select', function() {
                 let sel = charts[divId].getSelection()[0];
                 if (sel && sel.row !== null) {
                     let registro = data[sel.row];
                     if (registro[7] && registro[7] !== "Sin foto") {
                         document.getElementById('imgRegistro').src = registro[7];
-                        document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
-                        document.getElementById('infoRegistro').innerText = `OPERADOR: ${registro[1]} | ${registro[5]} KG`;
+                        document.getElementById('infoRegistro').innerText = `OP: ${registro[1]} | ${registro[5]} KG | ${new Date(registro[0]).toLocaleTimeString()}`;
                         new bootstrap.Modal(document.getElementById('fotoModal')).show();
                     }
                 }
@@ -212,27 +247,29 @@
         charts[divId].draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
-            chartArea: { width: '92%', height: '70%', top: 15, left: 50, right: 15, bottom: 50 },
-            animation: { duration: 1000, easing: 'out', startup: true },
-            hAxis: { textStyle: { color: '#8b949e', fontSize: 8 }, gridlines: { color: 'transparent' } },
+            chartArea: { width: '90%', height: '75%', top: 10, left: 45, right: 10, bottom: 40 },
+            animation: { duration: 800, easing: 'out', startup: true },
+            hAxis: { textStyle: { color: '#64748b', fontSize: 9 }, gridlines: { color: 'transparent' } },
             vAxis: { 
-                textStyle: { color: '#ffffff', fontSize: 9, bold: true }, 
-                gridlines: { color: '#21262d' },
+                textStyle: { color: '#f8fafc', fontSize: 10, bold: true }, 
+                gridlines: { color: '#1e293b' },
                 viewWindow: { min: vMin, max: vMax },
-                ticks: [range[0], (range[0] + range[1])/2, range[1]],
+                ticks: [range[0], range[1]],
                 format: format
             },
             series: { 
-                0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
-                1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 }, 
-                2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 } 
+                0: { color: baseColor, lineWidth: 2.5, pointsVisible: true, areaOpacity: 0.1, type: 'area' }, 
+                1: { color: '#334155', lineDashStyle: [4, 4], lineWidth: 1, pointSize: 0 }, 
+                2: { color: '#334155', lineDashStyle: [4, 4], lineWidth: 1, pointSize: 0 } 
             },
-            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' }, alwaysOutside: true }
+            annotations: { textStyle: { fontSize: 9, color: '#f85149', bold: true }, alwaysOutside: true }
         });
 
         const ultimoVal = Number(data[data.length-1][colIdx]);
-        document.getElementById(statusId).innerHTML = (ultimoVal < range[0] || ultimoVal > range[1]) ? 
-            '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">OK</span>';
+        const isOk = !(ultimoVal < range[0] || ultimoVal > range[1]);
+        document.getElementById(statusId).innerHTML = isOk ? 
+            '<span class="status-indicator status-ok"><i class="bi bi-check-circle-fill me-1"></i>SISTEMA OK</span>' : 
+            '<span class="status-indicator status-alert"><i class="bi bi-exclamation-triangle-fill me-1"></i>ALERTA RANGO</span>';
     }
 </script>
 </body>
