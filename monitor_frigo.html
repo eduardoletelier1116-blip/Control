@@ -3,125 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Frigorífico - Control Central</title>
+    <title>Monitor de Cámaras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <style>
         :root {
             --bg-app: #0f172a;
             --card-bg: #1e293b;
-            --accent: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-soft: #38bdf8;
+            --green-soft: #4ade80;
+            --red-soft: #f87171;
         }
+
         body { 
             background-color: var(--bg-app); 
-            color: #e2e8f0; 
-            font-family: 'Segoe UI', sans-serif; 
+            color: var(--text-main); 
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             margin: 0;
+            padding: 10px;
             display: flex;
             flex-direction: column;
         }
-        .header-monitor { 
-            background: var(--card-bg); 
-            padding: 10px 20px; 
-            border-bottom: 2px solid #334155; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
         }
+
         .logo-section { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 35px; width: auto; filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5)); }
+        .logo-img { height: 30px; width: auto; }
+        .app-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
+
+        .sync-info {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px;
+            border-radius: 50px;
+        }
 
         /* Sección de Tarjetas */
         .cams-section { 
-            padding: 20px 10px;
-            background: rgba(30, 41, 59, 0.2);
-            position: relative;
+            padding: 10px 5px;
+            margin-bottom: 20px;
         }
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 12px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .cam-card { 
-            background: var(--card-bg); 
-            border: 1px solid #475569; 
-            border-radius: 16px; 
-            padding: 15px; 
-            position: relative;
-            transition: all 0.2s ease;
+
+        .group-nav {
             display: flex;
-            flex-direction: column;
-            min-height: 190px;
-        }
-        .cam-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .cam-card.alert { 
-            border: 2px solid #ef4444; 
-            background: #2d1a1a; 
-            animation: pulse 2s infinite; 
-        }
-        /* Tabla */
-        .list-section { 
-            flex-grow: 1; 
-            padding: 15px; 
-            background: #020617;
-        }
-        .table { font-size: 0.8rem; }
-        .table thead th { 
-            background: #1e293b; 
-            color: var(--accent);
-            border: none;
-            white-space: nowrap;
-        }
-        .label-text { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0; font-weight: 600; }
-        .value-text { font-size: 1.1rem; font-weight: bold; }
-        
-        .time-badge {
-            font-size: 0.6rem;
-            color: #64748b;
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            font-family: monospace;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 15px;
         }
 
         .nav-btn { 
             background: var(--card-bg); 
-            border: 1px solid var(--accent); 
+            border: 1px solid rgba(255,255,255,0.1); 
             color: white; 
             border-radius: 50%; 
-            width: 35px; height: 35px;
+            width: 38px; height: 38px;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
         }
-        .nav-btn:hover { background: rgba(59, 130, 246, 0.2); }
+        .nav-btn:hover { background: var(--accent-soft); color: var(--bg-app); }
 
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cam-card { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 24px; 
+            padding: 18px; 
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cam-card.alert { 
+            border: 1.5px solid var(--red-soft); 
+            background: rgba(248, 113, 113, 0.05);
+            box-shadow: 0 0 15px rgba(248, 113, 113, 0.1);
+        }
+
+        .label-text { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
+        .value-text { font-size: 1.2rem; font-weight: 700; }
+        
+        .time-tag {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-top: auto;
+            text-align: right;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 8px;
+        }
+
+        /* Tabla Estilo Vaciado */
+        .list-section { 
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .table { color: var(--text-main); margin-bottom: 0; }
+        .table thead th { 
+            border: none;
+            color: var(--accent-soft);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding-bottom: 15px;
+        }
+        .table tbody td { border-color: rgba(255,255,255,0.05); padding: 12px 8px; font-size: 0.85rem; vertical-align: middle; }
+
+        .badge-variety {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-soft);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+        }
     </style>
 </head>
 <body>
 
-<div class="header-monitor">
+<header class="app-header">
     <div class="logo-section">
         <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.visibility='hidden'">
-        <h6 class="mb-0 fw-bold">SYSTEM <span class="text-info">FRIGORÍFICO</span></h6>
+        <h1 class="app-title">Monitor de Cámaras</h1>
     </div>
-    <div id="reloj" class="small fw-bold text-info">00:00:00</div>
-</div>
+    <div class="sync-info">
+        <i class="bi bi-clock me-1"></i> <span id="reloj">00:00:00</span>
+    </div>
+</header>
 
-<div class="cams-section" id="cams-section">
-    <div class="d-flex justify-content-between align-items-center mb-3 max-width-1200 mx-auto px-2">
+<div class="cams-section" id="interactive-area">
+    <div class="group-nav">
         <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-        <span id="group-label" class="badge bg-dark">Cámaras 2 - 5</span>
+        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2">Grupo</span>
         <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
     </div>
     <div id="cards-container" class="cards-grid"></div>
@@ -129,16 +169,16 @@
 
 <div class="list-section">
     <div class="table-responsive">
-        <table class="table table-dark table-hover">
+        <table class="table">
             <thead>
                 <tr>
-                    <th>HORA CONTROL</th>
+                    <th>HORA</th>
                     <th>VARIEDAD</th>
-                    <th>CÁM</th>
-                    <th class="text-center">T. AMB</th>
-                    <th class="text-center">T. PULPA</th>
+                    <th>CÁMARA</th>
+                    <th class="text-center">AMB.</th>
+                    <th class="text-center">PULPA</th>
                     <th class="text-center">HUM %</th>
-                    <th class="text-center">FOTO</th>
+                    <th class="text-center">INFO</th>
                 </tr>
             </thead>
             <tbody id="data-table-body"></tbody>
@@ -152,8 +192,7 @@
     
     let allData = [];
     let currentGroup = 0;
-    let isPaused = false; // Variable para controlar la pausa
-    let rotationInterval;
+    let isPaused = false;
 
     const groups = [
         { label: "Cámaras 2 - 5", ids: ["Cámara 2", "Cámara 3", "Cámara 4", "Cámara 5"] },
@@ -165,12 +204,10 @@
         try {
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
-            // Invertimos para tener lo más reciente arriba
             allData = json.slice(1).reverse();
-            
             drawTable();
             drawCards();
-        } catch (e) { console.error("Error de conexión"); }
+        } catch (e) { console.error("Error sincronizando"); }
     }
 
     function formatTime(dateString) {
@@ -183,12 +220,9 @@
         const label = document.getElementById('group-label');
         const latestByCam = {};
 
-        // Mapeo: [0]Time, [1]Op, [2]Var, [3]Cam, [4]Amb, [5]Pulp, [6]Hum, [7]Foto
         allData.forEach(row => {
             const camName = String(row[3] || ""); 
-            if (camName && !latestByCam[camName]) {
-                latestByCam[camName] = row;
-            }
+            if (camName && !latestByCam[camName]) latestByCam[camName] = row;
         });
 
         const activeGroup = groups[currentGroup];
@@ -201,31 +235,30 @@
             div.className = "cam-card";
             
             if(!r) {
-                div.innerHTML = `<p class="label-text" style="color:var(--accent)">${id}</p><div class="text-muted small mt-2">Sin datos recientes</div>`;
+                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">${id}</span><div class="text-muted small mt-2">Sin datos</div>`;
             } else {
                 const [time, op, variedad, cam, tAmb, tPulp, hum] = r;
-                // Parámetros técnicos corregidos: Hum 85-95%
                 const isAlert = (tAmb > 1.5 || tPulp > 2 || hum < 85 || hum > 95);
                 if(isAlert) div.classList.add('alert');
 
                 div.innerHTML = `
-                    <p class="label-text" style="color:var(--accent)">${cam}</p>
-                    <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${variedad}</div>
-                    <div class="row g-1 mb-auto">
+                    <span class="label-text" style="color:var(--accent-soft)">${cam}</span>
+                    <div class="fw-bold text-truncate mb-3" style="font-size:0.8rem;">${variedad}</div>
+                    <div class="row g-2 mb-2">
                         <div class="col-6">
                             <p class="label-text">Ambiente</p>
-                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
+                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${Number(tAmb).toFixed(1)}°</div>
                         </div>
                         <div class="col-6">
                             <p class="label-text">Pulpa</p>
-                            <div class="value-text ${tPulp > 2 ? 'text-danger' : 'text-success'}">${tPulp.toFixed(1)}°</div>
+                            <div class="value-text ${tPulp > 2 ? 'text-danger' : 'text-success'}">${Number(tPulp).toFixed(1)}°</div>
                         </div>
-                        <div class="col-12 mt-1">
+                        <div class="col-12 mt-2">
                             <p class="label-text">Humedad</p>
-                            <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</div>
+                            <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${Number(hum).toFixed(0)}%</div>
                         </div>
                     </div>
-                    <div class="time-badge">Act: ${formatTime(time)}</div>
+                    <div class="time-tag">Actualizado: ${formatTime(time)}</div>
                 `;
             }
             container.appendChild(div);
@@ -235,19 +268,17 @@
     function drawTable() {
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
-            // r[0]:Time, r[1]:Op, r[2]:Var, r[3]:Cam, r[4]:Amb, r[5]:Pulp, r[6]:Hum, r[7]:Foto
             const hora = formatTime(r[0]);
-            
             return `
                 <tr>
-                    <td class="text-info">${hora}</td>
-                    <td class="text-truncate" style="max-width: 110px;">${r[2]}</td>
-                    <td class="fw-bold">${r[3]}</td>
-                    <td class="text-center ${r[4]>1.5?'text-danger':'text-success'}">${Number(r[4]).toFixed(1)}°</td>
-                    <td class="text-center ${r[5]>2?'text-danger':'text-success'}">${Number(r[5]).toFixed(1)}°</td>
-                    <td class="text-center ${r[6]<85?'text-danger':'text-success'}">${Number(r[6]).toFixed(0)}%</td>
+                    <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
+                    <td><span class="badge-variety">${r[2]}</span></td>
+                    <td class="fw-medium">${r[3]}</td>
+                    <td class="text-center fw-bold ${r[4]>1.5?'text-danger':'text-success'}">${Number(r[4]).toFixed(1)}°</td>
+                    <td class="text-center fw-bold ${r[5]>2?'text-danger':'text-success'}">${Number(r[5]).toFixed(1)}°</td>
+                    <td class="text-center fw-bold ${r[6]<85?'text-danger':'text-success'}">${Number(r[6]).toFixed(0)}%</td>
                     <td class="text-center">
-                        ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" class="text-primary"><i class="bi bi-camera"></i></a>` : '-'}
+                        ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" class="text-accent-soft"><i class="bi bi-camera-fill"></i></a>` : '-'}
                     </td>
                 </tr>
             `;
@@ -259,21 +290,15 @@
         drawCards();
     }
 
-    // Lógica de pausa al posar el mouse corregida
-    const camsSection = document.getElementById('cams-section');
-    camsSection.onmouseenter = () => isPaused = true;
-    camsSection.onmouseleave = () => isPaused = false;
+    // Funcionalidad de pausa
+    const interactiveArea = document.getElementById('interactive-area');
+    interactiveArea.onmouseenter = () => isPaused = true;
+    interactiveArea.onmouseleave = () => isPaused = false;
 
-    // Reloj
+    // Intervalos
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    
-    // Sincronización de datos (cada 1 minuto)
     setInterval(syncData, 60000); 
-
-    // Rotación automática (cada 10 seg) solo si no está en pausa
-    setInterval(() => { 
-        if(!isPaused) changeGroup(1); 
-    }, 10000);
+    setInterval(() => { if(!isPaused) changeGroup(1); }, 10000);
 
     syncData();
 </script>
