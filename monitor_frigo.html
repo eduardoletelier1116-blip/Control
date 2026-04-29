@@ -265,11 +265,12 @@
     function drawTable() {
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
+            const hora = formatTime(r[0]);
             return `
                 <tr>
-                    <td class="fw-bold" style="color: var(--accent-soft)">${formatTime(r[0])}</td>
+                    <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
                     <td><span class="badge-variety">${r[2]}</span></td>
-                    <td class="fw-medium">${r[3]}</td>
+                    <td class="fw-bold" style="color: var(--text-main)">${r[3]}</td>
                     <td class="text-center fw-bold ${r[4]>1.5?'text-danger':'text-success'}">${Number(r[4]).toFixed(1)}°</td>
                     <td class="text-center fw-bold ${r[5]>2?'text-danger':'text-success'}">${Number(r[5]).toFixed(1)}°</td>
                     <td class="text-center fw-bold ${r[6]<85?'text-danger':'text-success'}">${Number(r[6]).toFixed(0)}%</td>
