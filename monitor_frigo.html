@@ -29,7 +29,6 @@
             flex-direction: column;
         }
 
-        /* HEADER ESTILO VACIADO */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -52,7 +51,6 @@
             border-radius: 50px;
         }
 
-        /* NAVEGACIÓN */
         .group-nav {
             display: flex;
             justify-content: space-between;
@@ -72,7 +70,6 @@
         }
         .nav-btn:hover { background: var(--accent-soft); color: var(--bg-app); }
 
-        /* TARJETAS */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -111,42 +108,17 @@
             padding-top: 8px;
         }
 
-        /* LISTA CORREGIDA (SIN CUADRO BLANCO) */
         .list-section { 
             background: var(--card-bg);
             border-radius: 24px;
             padding: 20px;
             margin-top: 20px;
             border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
 
-        .table-responsive { border: none; }
-        
-        .table { 
-            color: var(--text-main); 
-            margin-bottom: 0;
-            background-color: transparent !important; /* Forzar transparencia */
-        }
-
-        .table thead th { 
-            border: none;
-            color: var(--accent-soft);
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding-bottom: 15px;
-            background-color: transparent !important;
-        }
-
-        .table tbody td { 
-            border-color: rgba(255,255,255,0.05); 
-            padding: 12px 8px; 
-            font-size: 0.85rem; 
-            vertical-align: middle;
-            background-color: transparent !important;
-            color: var(--text-main);
-        }
+        .table { color: var(--text-main); margin-bottom: 0; background-color: transparent !important; }
+        .table thead th { border: none; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; background-color: transparent !important; }
+        .table tbody td { border-color: rgba(255,255,255,0.05); padding: 12px 8px; font-size: 0.85rem; vertical-align: middle; background-color: transparent !important; }
 
         .badge-variety {
             background: rgba(56, 189, 248, 0.1);
@@ -174,7 +146,7 @@
 <div class="cams-section" id="interactive-area">
     <div class="group-nav">
         <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2" style="font-weight: 500; letter-spacing: 0.5px;">Cámaras</span>
+        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2" style="font-weight: 500;">Cámaras</span>
         <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
     </div>
     <div id="cards-container" class="cards-grid"></div>
@@ -217,10 +189,22 @@
         try {
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
-            allData = json.slice(1).reverse();
-            drawTable();
+            
+            // --- FILTRO SOLO HOY ---
+            const hoyStr = new Date().toLocaleDateString();
+
+            allData = json.slice(1).filter(row => {
+                if (!row[0]) return false;
+                return new Date(row[0]).toLocaleDateString() === hoyStr;
+            }).reverse();
+            
+            if (allData.length === 0) {
+                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4 small">Sin controles registrados hoy</td></tr>';
+            } else {
+                drawTable();
+            }
             drawCards();
-        } catch (e) { console.error("Error en sincronización"); }
+        } catch (e) { console.error("Error"); }
     }
 
     function formatTime(dateString) {
@@ -248,7 +232,7 @@
             div.className = "cam-card";
             
             if(!r) {
-                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">${id}</span><div class="text-muted small mt-2">Sin registros</div>`;
+                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
             } else {
                 const [time, op, variedad, cam, tAmb, tPulp, hum] = r;
                 const isAlert = (tAmb > 1.5 || tPulp > 2 || hum < 85 || hum > 95);
@@ -281,10 +265,9 @@
     function drawTable() {
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
-            const hora = formatTime(r[0]);
             return `
                 <tr>
-                    <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
+                    <td class="fw-bold" style="color: var(--accent-soft)">${formatTime(r[0])}</td>
                     <td><span class="badge-variety">${r[2]}</span></td>
                     <td class="fw-medium">${r[3]}</td>
                     <td class="text-center fw-bold ${r[4]>1.5?'text-danger':'text-success'}">${Number(r[4]).toFixed(1)}°</td>
@@ -298,10 +281,7 @@
         }).join('');
     }
 
-    function changeGroup(n) {
-        currentGroup = (currentGroup + n + groups.length) % groups.length;
-        drawCards();
-    }
+    function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawCards(); }
 
     const interactiveArea = document.getElementById('interactive-area');
     interactiveArea.onmouseenter = () => isPaused = true;
