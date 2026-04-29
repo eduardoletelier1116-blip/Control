@@ -29,6 +29,7 @@
             flex-direction: column;
         }
 
+        /* HEADER ESTILO VACIADO */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -51,12 +52,7 @@
             border-radius: 50px;
         }
 
-        /* Sección de Tarjetas */
-        .cams-section { 
-            padding: 10px 5px;
-            margin-bottom: 20px;
-        }
-
+        /* NAVEGACIÓN */
         .group-nav {
             display: flex;
             justify-content: space-between;
@@ -76,6 +72,7 @@
         }
         .nav-btn:hover { background: var(--accent-soft); color: var(--bg-app); }
 
+        /* TARJETAS */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -100,7 +97,6 @@
         .cam-card.alert { 
             border: 1.5px solid var(--red-soft); 
             background: rgba(248, 113, 113, 0.05);
-            box-shadow: 0 0 15px rgba(248, 113, 113, 0.1);
         }
 
         .label-text { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
@@ -115,30 +111,47 @@
             padding-top: 8px;
         }
 
-        /* Tabla Estilo Vaciado */
+        /* LISTA CORREGIDA (SIN CUADRO BLANCO) */
         .list-section { 
             background: var(--card-bg);
             border-radius: 24px;
             padding: 20px;
-            margin-top: 10px;
+            margin-top: 20px;
             border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
 
-        .table { color: var(--text-main); margin-bottom: 0; }
+        .table-responsive { border: none; }
+        
+        .table { 
+            color: var(--text-main); 
+            margin-bottom: 0;
+            background-color: transparent !important; /* Forzar transparencia */
+        }
+
         .table thead th { 
             border: none;
             color: var(--accent-soft);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
             padding-bottom: 15px;
+            background-color: transparent !important;
         }
-        .table tbody td { border-color: rgba(255,255,255,0.05); padding: 12px 8px; font-size: 0.85rem; vertical-align: middle; }
+
+        .table tbody td { 
+            border-color: rgba(255,255,255,0.05); 
+            padding: 12px 8px; 
+            font-size: 0.85rem; 
+            vertical-align: middle;
+            background-color: transparent !important;
+            color: var(--text-main);
+        }
 
         .badge-variety {
             background: rgba(56, 189, 248, 0.1);
             color: var(--accent-soft);
-            border: 1px solid rgba(56, 189, 248, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.1);
             font-weight: 500;
             padding: 4px 10px;
             border-radius: 50px;
@@ -161,7 +174,7 @@
 <div class="cams-section" id="interactive-area">
     <div class="group-nav">
         <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2">Grupo</span>
+        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2" style="font-weight: 500; letter-spacing: 0.5px;">Cámaras</span>
         <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
     </div>
     <div id="cards-container" class="cards-grid"></div>
@@ -207,7 +220,7 @@
             allData = json.slice(1).reverse();
             drawTable();
             drawCards();
-        } catch (e) { console.error("Error sincronizando"); }
+        } catch (e) { console.error("Error en sincronización"); }
     }
 
     function formatTime(dateString) {
@@ -235,7 +248,7 @@
             div.className = "cam-card";
             
             if(!r) {
-                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">${id}</span><div class="text-muted small mt-2">Sin datos</div>`;
+                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">${id}</span><div class="text-muted small mt-2">Sin registros</div>`;
             } else {
                 const [time, op, variedad, cam, tAmb, tPulp, hum] = r;
                 const isAlert = (tAmb > 1.5 || tPulp > 2 || hum < 85 || hum > 95);
@@ -258,7 +271,7 @@
                             <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${Number(hum).toFixed(0)}%</div>
                         </div>
                     </div>
-                    <div class="time-tag">Actualizado: ${formatTime(time)}</div>
+                    <div class="time-tag">Act: ${formatTime(time)}</div>
                 `;
             }
             container.appendChild(div);
@@ -278,7 +291,7 @@
                     <td class="text-center fw-bold ${r[5]>2?'text-danger':'text-success'}">${Number(r[5]).toFixed(1)}°</td>
                     <td class="text-center fw-bold ${r[6]<85?'text-danger':'text-success'}">${Number(r[6]).toFixed(0)}%</td>
                     <td class="text-center">
-                        ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" class="text-accent-soft"><i class="bi bi-camera-fill"></i></a>` : '-'}
+                        ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
                     </td>
                 </tr>
             `;
@@ -290,12 +303,10 @@
         drawCards();
     }
 
-    // Funcionalidad de pausa
     const interactiveArea = document.getElementById('interactive-area');
     interactiveArea.onmouseenter = () => isPaused = true;
     interactiveArea.onmouseleave = () => isPaused = false;
 
-    // Intervalos
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
     setInterval(syncData, 60000); 
     setInterval(() => { if(!isPaused) changeGroup(1); }, 10000);
