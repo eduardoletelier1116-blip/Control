@@ -295,30 +295,61 @@
 
     function drawTable() {
         const body = document.getElementById('data-table-body');
-        body.innerHTML = allData.slice(0, 15).map(r => {
-            const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(val => Number(val || 0));
-            const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6);
+        let htmlBus = "";
+
+        allData.slice(0, 10).forEach(r => { // Tomamos los últimos 10 registros de cámara
+            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const variedad = r[2] || 'S/V';
+            const cam = r[3];
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
-            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const obsGral = r[13] || '';
+            const fotoUrl = r[12];
 
-            return `
-                <tr>
-                    <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
-                    <td><span class="badge-variety">${r[2] || 'S/V'}</span></td>
-                    <td class="fw-bold">${r[3]}</td>
-                    <td class="text-center fw-bold ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</td>
-                    <td class="text-center fw-bold ${pulpas.some(p => p > 2) ? 'text-danger' : 'text-success'}">${tPulpProm.toFixed(1)}°</td>
-                    <td class="text-center fw-bold ${(hum < 85 || hum > 95) ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</td>
-                    <td class="small text-muted">${r[13] || '-'}</td>
-                    <td class="text-center">
-                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
-                    </td>
-                </tr>
-            `;
-        }).join('');
+            // Creamos 6 filas por cada registro (una por cada pulpa)
+            for (let i = 1; i <= 6; i++) {
+                // Las columnas de pulpa están en el índice 5, 6, 7, 8, 9, 10
+                // Pero el detalle de observaciones (si lo guardaste con el formato "P1: 2.0 (obs)") 
+                // lo extraeremos del campo pulpasDetalle (Columna O / índice 14 si existe)
+                
+                const tPulp = Number(r[4 + i] || 0);
+                const colorPulp = tPulp > 2 ? 'text-danger' : 'text-success';
+                
+                // Intentamos extraer la observación específica del fruto desde el detalle (índice 14)
+                let obsFruto = "";
+                if (r[14]) {
+                    const detalles = r[14].split(' | ');
+                    const detalleEspecifico = detalles[i-1] || "";
+                    // Extraemos lo que está entre paréntesis
+                    const match = detalleEspecifico.match(/\(([^)]+)\)/);
+                    obsFruto = match ? match[1] : "";
+                }
+
+                htmlBus += `
+                    <tr style="${i === 1 ? 'border-top: 2px solid var(--accent-soft)' : ''}">
+                        <td class="small ${i > 1 ? 'text-muted' : 'fw-bold'}" style="color: ${i === 1 ? 'var(--accent-soft)' : ''}">
+                            ${i === 1 ? hora : ''}
+                        </td>
+                        <td>${i === 1 ? `<span class="badge-variety">${variedad}</span>` : ''}</td>
+                        <td class="fw-bold">${i === 1 ? cam : ''}</td>
+                        <td class="text-center ${tAmb > 1.5 ? 'text-danger' : ''}">${i === 1 ? tAmb.toFixed(1) + '°' : ''}</td>
+                        <td class="text-center">
+                            <span class="fw-bold ${colorPulp}">P${i}: ${tPulp.toFixed(1)}°</span>
+                        </td>
+                        <td class="text-center">${i === 1 ? hum + '%' : ''}</td>
+                        <td style="font-size: 0.75rem;">
+                            ${obsFruto ? `<b class="text-warning">P${i}:</b> ${obsFruto}` : ''}
+                            ${(i === 1 && obsGral) ? `<div class="text-muted"><b>Gral:</b> ${obsGral}</div>` : ''}
+                        </td>
+                        <td class="text-center">
+                            ${(i === 1 && fotoUrl && fotoUrl.startsWith('http')) ? `<a href="${fotoUrl}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : ''}
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+        body.innerHTML = htmlBus;
     }
-
     function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawCards(); }
     
     const interactiveArea = document.getElementById('interactive-area');
