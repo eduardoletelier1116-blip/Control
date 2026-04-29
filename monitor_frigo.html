@@ -251,24 +251,6 @@
         }).join('');
     }
 
-            return `
-                <tr style="background-color: transparent !important;">
-                    <td class="fw-bold" style="color:var(--accent-soft) !important; font-size:1rem; background-color: transparent !important;">CÁMARA ${r[3]}</td>
-                    <td class="text-muted small" style="background-color: transparent !important;">${hora}</td>
-                    <td style="background-color: transparent !important;"><span class="badge-variety">${r[2] || 'S/V'}</span></td>
-                    <td class="text-center ${ambClass}" style="background-color: transparent !important;">${tAmb.toFixed(1)}°</td>
-                    <td style="background-color: transparent !important;">
-                        <div class="pulp-container">${pulpasHtml}</div>
-                        ${obsGral ? `<div class="obs-general-row"><i class="bi bi-chat-left-dots-fill me-2"></i>${obsGral}</div>` : ''}
-                    </td>
-                    <td class="text-center ${humClass}" style="font-size:1.1rem; background-color: transparent !important;">${hum}%</td>
-                    <td class="text-center" style="background-color: transparent !important;">
-                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
-                    </td>
-                </tr>`;
-        }).join('');
-    }
-
     function drawCards() {
         const container = document.getElementById('cards-container');
         const latestByCam = {};
