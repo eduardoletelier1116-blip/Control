@@ -12,17 +12,14 @@
         .header-blue { background: #ffffff; padding: 15px; text-align: center; border-bottom: 4px solid #0d6efd; }
         .logo-img { height: 60px; margin-bottom: 5px; object-fit: contain; }
         .form-label { font-size: 0.75rem; font-weight: bold; color: #444; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        
         .input-group-text { background-color: #fff; color: #0d6efd; border-right: none; padding: 0.5rem; }
         .form-control, .form-select { border-left: none; font-size: 0.9rem; }
-        
-        /* Estilo para múltiples variedades */
         .variedad-badge { background: #e7f1ff; color: #0d6efd; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-block; margin: 2px; border: 1px solid #0d6efd; }
         
-        /* Grid de 6 Temperaturas */
-        .pulpa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 12px; border: 1px solid #dee2e6; }
-        .pulpa-grid input { text-align: center; font-weight: bold; border-radius: 8px !important; border-left: 1px solid #dee2e6 !important; }
-
+        /* Estilo para nuevas filas de pulpa */
+        .pulp-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 8px; margin-bottom: 8px; }
+        .obs-input { display: none; margin-top: 5px; font-size: 0.8rem; border-left: 3px solid #0d6efd !important; border-radius: 0 8px 8px 0; }
+        
         .btn-add { font-size: 0.8rem; padding: 2px 10px; }
         .btn-save { padding: 15px; font-weight: bold; border-radius: 12px; background: #0d6efd; border: none; margin-top: 20px; }
     </style>
@@ -63,8 +60,7 @@
                             <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     </div>
-                    <div id="lista-variedades" class="mb-2">
-                        </div>
+                    <div id="lista-variedades" class="mb-2"></div>
                     <select id="selector-variedad" class="form-select" style="border-left: 1px solid #dee2e6">
                         <option value="">Seleccionar variedad...</option>
                         <option value="Galas">Galas</option>
@@ -81,20 +77,35 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-danger"><i class="bi bi-thermometer-half"></i> T° PULPA (6 CONTROLES)</label>
-                    <div class="pulpa-grid">
-                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P1" required>
-                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P2" required>
-                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P3" required>
-                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P4" required>
-                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P5" required>
-                        <input type="number" class="form-control t-pulpa" step="0.1" placeholder="P6" required>
+                    <label class="form-label text-danger"><i class="bi bi-thermometer-half"></i> T° PULPA INDIVIDUAL (6 FRUTOS)</label>
+                    <div id="pulpas-contenedor">
+                        <script>
+                            for(let i=1; i<=6; i++) {
+                                document.write(`
+                                    <div class="pulp-item">
+                                        <div class="input-group">
+                                            <span class="input-group-text fw-bold" style="font-size:0.7rem; min-width:40px">P${i}</span>
+                                            <input type="number" class="form-control t-pulpa text-center fw-bold" step="0.1" placeholder="0.0" id="p${i}" required>
+                                            <button type="button" class="btn btn-outline-secondary" onclick="toggleObs(${i})">
+                                                <i class="bi bi-plus"></i> <i class="bi bi-chat-text"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" id="obs-p${i}" class="form-control obs-input" placeholder="Observación del fruto ${i}...">
+                                    </div>
+                                `);
+                            }
+                        </script>
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="form-label text-info"><i class="bi bi-droplets-fill"></i> HUMEDAD (%)</label>
                     <input type="number" id="humedad" class="form-control text-center fw-bold" style="border-left: 1px solid #dee2e6" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-journal-text"></i> OBSERVACIÓN GENERAL</label>
+                    <textarea id="obsGeneral" class="form-control" rows="2" style="border-left: 1px solid #dee2e6" placeholder="Detalles de la cámara..."></textarea>
                 </div>
 
                 <div class="mb-4">
@@ -115,6 +126,11 @@
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxWr-OYFzfjzwGOZzYkMAfyI-yShxOrd6qtpK_PGgSr5teU7AgeVL1pOEkH5F9zRhlUdw/exec";
     let variedadesSeleccionadas = [];
+
+    function toggleObs(id) {
+        const el = document.getElementById(`obs-p${id}`);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
 
     function agregarVariedad() {
         const sel = document.getElementById('selector-variedad');
@@ -147,9 +163,13 @@
         const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
 
-        // Obtener promedio de las 6 pulpas
-        const pulpas = Array.from(document.querySelectorAll('.t-pulpa')).map(i => parseFloat(i.value));
-        const promedioPulpa = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(2);
+        // Construir el detalle de notas de pulpas
+        let detalleNotas = [];
+        for(let i=1; i<=6; i++){
+            const val = document.getElementById(`p${i}`).value;
+            const obs = document.getElementById(`obs-p${i}`).value;
+            detalleNotas.push(`P${i}: ${val}°${obs ? ' ('+obs+')' : ''}`);
+        }
 
         const enviar = (base64) => {
             const datos = {
@@ -158,9 +178,16 @@
                 variedad: variedadesSeleccionadas.join(', '),
                 camara: document.getElementById('camara').value,
                 tAmbiente: document.getElementById('tAmbiente').value,
-                tPulpa: promedioPulpa, // Enviamos el promedio al Excel
-                pulpasDetalle: pulpas.join('|'), // Opcional: enviamos el detalle de las 6
+                // Enviamos las 6 pulpas individuales
+                p1: document.getElementById('p1').value,
+                p2: document.getElementById('p2').value,
+                p3: document.getElementById('p3').value,
+                p4: document.getElementById('p4').value,
+                p5: document.getElementById('p5').value,
+                p6: document.getElementById('p6').value,
                 humedad: document.getElementById('humedad').value,
+                obsGeneral: document.getElementById('obsGeneral').value,
+                pulpasDetalle: detalleNotas.join(' | '),
                 foto: base64
             };
 
@@ -178,6 +205,10 @@
             reader.readAsDataURL(file);
         } else { enviar(null); }
     });
+
+    document.getElementById('fotoInput').onchange = function() {
+        if(this.files[0]) document.getElementById('fileName').innerText = "FOTO: " + this.files[0].name;
+    };
 </script>
 </body>
 </html>
