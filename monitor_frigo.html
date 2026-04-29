@@ -266,14 +266,26 @@
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
             const hora = formatTime(r[0]);
+            
+            // Lógica de rangos (igual que en las tarjetas)
+            const tAmb = Number(r[4]);
+            const tPulp = Number(r[5]);
+            const hum = Number(r[6]);
+
+            // Colores basados en reglas técnicas
+            const colorAmb = tAmb > 1.5 ? 'text-danger' : 'text-success';
+            const colorPulp = tPulp > 2 ? 'text-danger' : 'text-success';
+            // Humedad ideal: 85% a 95%. Fuera de eso es alerta.
+            const colorHum = (hum < 85 || hum > 95) ? 'text-danger' : 'text-success';
+
             return `
                 <tr>
                     <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
                     <td><span class="badge-variety">${r[2]}</span></td>
                     <td class="fw-bold" style="color: var(--text-main)">${r[3]}</td>
-                    <td class="text-center fw-bold ${r[4]>1.5?'text-danger':'text-success'}">${Number(r[4]).toFixed(1)}°</td>
-                    <td class="text-center fw-bold ${r[5]>2?'text-danger':'text-success'}">${Number(r[5]).toFixed(1)}°</td>
-                    <td class="text-center fw-bold ${r[6]<85?'text-danger':'text-success'}">${Number(r[6]).toFixed(0)}%</td>
+                    <td class="text-center fw-bold ${colorAmb}">${tAmb.toFixed(1)}°</td>
+                    <td class="text-center fw-bold ${colorPulp}">${tPulp.toFixed(1)}°</td>
+                    <td class="text-center fw-bold ${colorHum}">${hum.toFixed(0)}%</td>
                     <td class="text-center">
                         ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
                     </td>
