@@ -156,7 +156,7 @@
                 origen: "frigorifico",
                 operador: document.getElementById('operador').value,
                 variedad: variedadesSeleccionadas.join(', '),
-                camara: "Cámara " + document.getElementById('camara').value,
+                camara: document.getElementById('camara').value,
                 tAmbiente: document.getElementById('tAmbiente').value,
                 tPulpa: promedioPulpa, // Enviamos el promedio al Excel
                 pulpasDetalle: pulpas.join('|'), // Opcional: enviamos el detalle de las 6
