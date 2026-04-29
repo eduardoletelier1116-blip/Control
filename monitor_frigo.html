@@ -30,7 +30,7 @@
             flex-direction: column;
         }
 
-        /* --- DISEÑO ORIGINAL DE HEADER Y CARDS --- */
+        /* --- HEADER --- */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -51,6 +51,7 @@
             border-radius: 50px;
         }
 
+        /* --- NAVEGACIÓN Y CARDS (DISEÑO ORIGINAL) --- */
         .group-nav {
             display: flex;
             justify-content: space-between;
@@ -114,7 +115,7 @@
             padding-top: 8px;
         }
 
-        /* --- TABLA COMPACTA Y SIN ESPACIOS --- */
+        /* --- TABLA OPTIMIZADA --- */
         .list-section { 
             background: var(--card-bg);
             border-radius: 24px;
@@ -125,7 +126,7 @@
 
         .table { color: var(--text-main) !important; margin-bottom: 0; background-color: transparent !important; }
         .table thead th { border: none; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; padding: 8px !important; }
-        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 4px 8px !important; font-size: 0.8rem; vertical-align: middle; background-color: transparent !important; }
+        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 6px 8px !important; font-size: 0.8rem; vertical-align: middle; background-color: transparent !important; }
 
         .pulp-container { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
         .pulp-box {
@@ -144,7 +145,23 @@
             margin-top: 1px;
             font-weight: 500;
         }
-        .hum-highlight { color: #ffffff; font-weight: 700; }
+        
+        /* Fila de Observación General */
+        .obs-general-row { 
+            font-size: 0.7rem; 
+            color: #cbd5e1; 
+            background: rgba(0,0,0,0.15); 
+            border-radius: 6px; 
+            padding: 4px 10px; 
+            margin-top: 6px; 
+            border-left: 3px solid var(--accent-soft);
+            text-align: left;
+        }
+
+        /* Colores de Alerta en Tabla */
+        .val-danger { color: var(--red-soft) !important; font-weight: 800; }
+        .val-success { color: var(--green-soft) !important; font-weight: 700; }
+        
         .badge-variety {
             background: rgba(56, 189, 248, 0.1);
             color: var(--accent-soft);
@@ -177,7 +194,7 @@
 
 <div class="list-section">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table align-middle">
             <thead>
                 <tr>
                     <th>CAM</th>
@@ -190,7 +207,7 @@
                 </tr>
             </thead>
             <tbody id="data-table-body">
-                <tr><td colspan="7" class="text-center py-4">Cargando datos...</td></tr>
+                <tr><td colspan="7" class="text-center py-4">Sincronizando datos...</td></tr>
             </tbody>
         </table>
     </div>
@@ -224,16 +241,69 @@
 
             drawTable();
             drawCards();
-        } catch (e) { console.error("Error:", e); }
+        } catch (e) { console.error("Error de conexión:", e); }
+    }
+
+    function drawTable() {
+        const body = document.getElementById('data-table-body');
+        
+        // Agrupar por el último registro único de cada cámara
+        const uniqueCams = {};
+        allData.forEach(row => { uniqueCams[row[3]] = row; });
+        
+        // Ordenar numéricamente por número de cámara
+        const sortedRows = Object.values(uniqueCams).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
+
+        body.innerHTML = sortedRows.map(r => {
+            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const tAmb = Number(r[4] || 0);
+            const hum = Number(r[11] || 0);
+            const obsGral = r[13] || '';
+            const detalles = r[14] ? r[14].split(' | ') : [];
+
+            // Clases de Alerta
+            const ambClass = (tAmb > 1.5) ? 'val-danger' : 'val-success';
+            const humClass = (hum < 85 || hum > 95) ? 'val-danger' : 'val-success';
+
+            let pulpasHtml = "";
+            for (let i = 1; i <= 6; i++) {
+                const val = Number(r[4 + i] || 0);
+                const pClass = (val > 2.0) ? 'text-danger fw-bold' : 'text-success';
+                let obsFruto = "";
+                if (detalles[i-1]) {
+                    const match = detalles[i-1].match(/\(([^)]+)\)/);
+                    obsFruto = match ? match[1] : "";
+                }
+                pulpasHtml += `
+                    <div class="pulp-box">
+                        <span style="font-size:0.5rem; color:var(--text-muted); display:block;">P${i}</span>
+                        <span class="${pClass}">${val.toFixed(1)}°</span>
+                        ${obsFruto ? `<span class="obs-tag">${obsFruto}</span>` : ''}
+                    </div>`;
+            }
+
+            return `
+                <tr>
+                    <td class="fw-bold" style="color:var(--accent-soft); font-size:1.15rem;">${r[3]}</td>
+                    <td class="text-muted small">${hora}</td>
+                    <td><span class="badge-variety">${r[2] || 'S/V'}</span></td>
+                    <td class="text-center ${ambClass}">${tAmb.toFixed(1)}°</td>
+                    <td>
+                        <div class="pulp-container">${pulpasHtml}</div>
+                        ${obsGral ? `<div class="obs-general-row"><i class="bi bi-chat-left-dots me-1"></i>${obsGral}</div>` : ''}
+                    </td>
+                    <td class="text-center ${humClass}" style="font-size:1.1rem;">${hum}%</td>
+                    <td class="text-center">
+                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
+                    </td>
+                </tr>`;
+        }).join('');
     }
 
     function drawCards() {
         const container = document.getElementById('cards-container');
         const latestByCam = {};
-        allData.forEach(row => {
-            const camId = String(row[3] || "").trim(); 
-            latestByCam[camId] = row; // Mantiene el último registro
-        });
+        allData.forEach(row => { latestByCam[row[3]] = row; });
 
         const activeGroup = groups[currentGroup];
         document.getElementById('group-label').innerText = activeGroup.label;
@@ -250,8 +320,9 @@
                 const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(v => Number(v || 0));
                 const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
                 const hum = Number(r[11] || 0);
-                const hayAlerta = (tAmb > 1.5 || pulpas.some(p => p > 2) || hum < 85 || hum > 95);
                 
+                // Alerta si algo está fuera de rango
+                const hayAlerta = (tAmb > 1.5 || pulpas.some(p => p > 2) || hum < 85 || hum > 95);
                 if(hayAlerta) div.classList.add('alert');
 
                 div.innerHTML = `
@@ -282,57 +353,6 @@
         });
     }
 
-    function drawTable() {
-        const body = document.getElementById('data-table-body');
-        
-        // Agrupar por el último registro único de cada cámara para que no se repitan
-        const uniqueCams = {};
-        allData.forEach(row => { uniqueCams[row[3]] = row; });
-        
-        // Ordenar numéricamente por número de cámara
-        const sortedRows = Object.values(uniqueCams).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
-
-        body.innerHTML = sortedRows.map(r => {
-            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const tAmb = Number(r[4] || 0);
-            const hum = Number(r[11] || 0);
-            const obsGral = r[13] || '';
-            const detalles = r[14] ? r[14].split(' | ') : [];
-
-            let pulpasHtml = "";
-            for (let i = 1; i <= 6; i++) {
-                const val = Number(r[4 + i] || 0);
-                let obsFruto = "";
-                if (detalles[i-1]) {
-                    const match = detalles[i-1].match(/\(([^)]+)\)/);
-                    obsFruto = match ? match[1] : "";
-                }
-                pulpasHtml += `
-                    <div class="pulp-box">
-                        <span style="font-size:0.5rem; color:var(--text-muted); display:block;">P${i}</span>
-                        <span class="fw-bold ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span>
-                        ${obsFruto ? `<span class="obs-tag">${obsFruto}</span>` : ''}
-                    </div>`;
-            }
-
-            return `
-                <tr>
-                    <td class="fw-bold" style="color:var(--accent-soft); font-size:1.1rem;">${r[3]}</td>
-                    <td class="text-muted small">${hora}</td>
-                    <td><span class="badge-variety">${r[2] || 'S/V'}</span></td>
-                    <td class="text-center fw-bold ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</td>
-                    <td>
-                        <div class="pulp-container">${pulpasHtml}</div>
-                        ${obsGral ? `<div class="text-muted small mt-1 text-center" style="font-size:0.65rem"><i>Nota: ${obsGral}</i></div>` : ''}
-                    </td>
-                    <td class="text-center"><span class="hum-highlight">${hum}%</span></td>
-                    <td class="text-center">
-                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
-                    </td>
-                </tr>`;
-        }).join('');
-    }
-
     function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawCards(); }
     
     const interactiveArea = document.getElementById('interactive-area');
@@ -342,6 +362,7 @@
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
     setInterval(syncData, 60000);
     setInterval(() => { if(!isPaused) changeGroup(1); }, 10000);
+
     syncData();
 </script>
 </body>
