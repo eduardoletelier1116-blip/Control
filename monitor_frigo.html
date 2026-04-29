@@ -121,9 +121,9 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .table { color: var(--text-main) !important; margin-bottom: 0; }
+        .table { color: var(--text-main) !important; margin-bottom: 0; background-color: transparent !important; }
         .table thead th { border: none; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; padding: 8px !important; }
-        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 6px 8px !important; font-size: 0.8rem; vertical-align: middle; }
+        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 6px 8px !important; font-size: 0.8rem; vertical-align: middle; background-color: transparent !important; }
 
         .pulp-container { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
         .pulp-box {
@@ -135,19 +135,29 @@
             text-align: center;
         }
         
+        .obs-tag { 
+            display: block; 
+            font-size: 0.55rem; 
+            color: var(--warning-amber); 
+            line-height: 1.1; 
+            margin-top: 1px; 
+            font-weight: 500; 
+        }
+
         .obs-general-row { 
             font-size: 0.7rem; 
             color: #cbd5e1; 
-            background: rgba(0,0,0,0.15); 
+            background: rgba(56, 189, 248, 0.08); 
             border-radius: 6px; 
-            padding: 4px 10px; 
-            margin-top: 6px; 
+            padding: 6px 10px; 
+            margin-top: 8px; 
             border-left: 3px solid var(--accent-soft);
             text-align: left;
         }
 
         .val-danger { color: var(--red-soft) !important; font-weight: 800; }
         .val-success { color: var(--green-soft) !important; font-weight: 700; }
+        .val-white { color: #ffffff !important; font-weight: 700; }
         
         .badge-variety {
             background: rgba(56, 189, 248, 0.1);
@@ -233,13 +243,26 @@
             const detalles = r[14] ? r[14].split(' | ') : [];
 
             const ambClass = (tAmb > 1.5) ? 'val-danger' : 'val-success';
-            const humClass = (hum < 85 || hum > 95) ? 'val-danger' : 'val-success';
+            const humClass = (hum < 85 || hum > 95) ? 'val-danger' : 'val-white';
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
                 const pClass = (val > 2.0) ? 'text-danger fw-bold' : 'text-success';
-                pulpasHtml += `<div class="pulp-box"><span style="font-size:0.5rem; color:var(--text-muted); display:block;">P${i}</span><span class="${pClass}">${val.toFixed(1)}°</span></div>`;
+                
+                // Lógica para mostrar observaciones de pulpa (texto entre paréntesis)
+                let obsFruto = "";
+                if (detalles[i-1]) {
+                    const match = detalles[i-1].match(/\(([^)]+)\)/);
+                    obsFruto = match ? match[1] : "";
+                }
+
+                pulpasHtml += `
+                    <div class="pulp-box">
+                        <span style="font-size:0.5rem; color:var(--text-muted); display:block;">P${i}</span>
+                        <span class="${pClass}">${val.toFixed(1)}°</span>
+                        ${obsFruto ? `<span class="obs-tag">${obsFruto}</span>` : ''}
+                    </div>`;
             }
 
             return `
@@ -250,7 +273,7 @@
                     <td class="text-center ${ambClass}">${tAmb.toFixed(1)}°</td>
                     <td>
                         <div class="pulp-container">${pulpasHtml}</div>
-                        ${obsGral ? `<div class="obs-general-row"><i class="bi bi-chat-left-dots me-1"></i>${obsGral}</div>` : ''}
+                        ${obsGral ? `<div class="obs-general-row"><i class="bi bi-chat-left-dots-fill me-2"></i>${obsGral}</div>` : ''}
                     </td>
                     <td class="text-center ${humClass}" style="font-size:1.1rem;">${hum}%</td>
                     <td class="text-center">${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}</td>
@@ -287,7 +310,7 @@
                         <div class="col-6"><p class="label-text">Prom. Pulpa</p><div class="value-text">${tPulpProm}°</div></div>
                     </div>
                     <div class="pulp-detail">P1:${pulpas[0]} P2:${pulpas[1]} P3:${pulpas[2]}...</div>
-                    <div class="mt-2"><p class="label-text">Humedad</p><div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</div></div>
+                    <div class="mt-2"><p class="label-text">Humedad</p><div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'val-white'}">${hum.toFixed(0)}%</div></div>
                     <div class="time-tag">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                 `;
             }
