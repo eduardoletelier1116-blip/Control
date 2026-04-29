@@ -32,6 +32,9 @@
             top: 0;
             z-index: 1000;
         }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-img { height: 35px; width: auto; filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5)); }
+
         /* Sección de Tarjetas */
         .cams-section { 
             padding: 20px 10px;
@@ -40,7 +43,7 @@
         }
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
             gap: 12px;
             max-width: 1200px;
             margin: 0 auto;
@@ -51,7 +54,15 @@
             border-radius: 16px; 
             padding: 15px; 
             position: relative;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 190px;
+        }
+        .cam-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .cam-card.alert { 
             border: 2px solid #ef4444; 
@@ -71,9 +82,18 @@
             border: none;
             white-space: nowrap;
         }
-        .label-text { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0; }
+        .label-text { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0; font-weight: 600; }
         .value-text { font-size: 1.1rem; font-weight: bold; }
         
+        .time-badge {
+            font-size: 0.6rem;
+            color: #64748b;
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-family: monospace;
+        }
+
         .nav-btn { 
             background: var(--card-bg); 
             border: 1px solid var(--accent); 
@@ -81,7 +101,9 @@
             border-radius: 50%; 
             width: 35px; height: 35px;
             display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
         }
+        .nav-btn:hover { background: rgba(59, 130, 246, 0.2); }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
@@ -89,11 +111,14 @@
 <body>
 
 <div class="header-monitor">
-    <h6 class="mb-0 fw-bold">CONTROL <span class="text-info">FRIGORÍFICO</span></h6>
+    <div class="logo-section">
+        <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.visibility='hidden'">
+        <h6 class="mb-0 fw-bold">SYSTEM <span class="text-info">FRIGORÍFICO</span></h6>
+    </div>
     <div id="reloj" class="small fw-bold text-info">00:00:00</div>
 </div>
 
-<div class="cams-section">
+<div class="cams-section" id="cams-section">
     <div class="d-flex justify-content-between align-items-center mb-3 max-width-1200 mx-auto px-2">
         <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
         <span id="group-label" class="badge bg-dark">Cámaras 2 - 5</span>
@@ -107,11 +132,11 @@
         <table class="table table-dark table-hover">
             <thead>
                 <tr>
-                    <th>HORA</th>
+                    <th>HORA CONTROL</th>
                     <th>VARIEDAD</th>
                     <th>CÁM</th>
-                    <th class="text-center">AMB</th>
-                    <th class="text-center">PULPA</th>
+                    <th class="text-center">T. AMB</th>
+                    <th class="text-center">T. PULPA</th>
                     <th class="text-center">HUM %</th>
                     <th class="text-center">FOTO</th>
                 </tr>
@@ -121,11 +146,15 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const BASE_URL = "https://script.google.com/macros/s/AKfycbx5EOR_Tc7oKxQ2vox98DKAUuhqpz-S_q3X47bDDhWBBsL-2RYFdWrjLiC8ptFmTQsZhg/exec?pestana=Frigorifico";
     
     let allData = [];
     let currentGroup = 0;
+    let isPaused = false; // Variable para controlar la pausa
+    let rotationInterval;
+
     const groups = [
         { label: "Cámaras 2 - 5", ids: ["Cámara 2", "Cámara 3", "Cámara 4", "Cámara 5"] },
         { label: "Cámaras 6 - 9", ids: ["Cámara 6", "Cámara 7", "Cámara 8", "Cámara 9"] },
@@ -144,12 +173,17 @@
         } catch (e) { console.error("Error de conexión"); }
     }
 
+    function formatTime(dateString) {
+        const fecha = new Date(dateString);
+        return isNaN(fecha) ? "--:--" : fecha.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+
     function drawCards() {
         const container = document.getElementById('cards-container');
         const label = document.getElementById('group-label');
         const latestByCam = {};
 
-        // Mapeo basado en tus columnas: [0]Time, [1]Op, [2]Var, [3]Cam, [4]Amb, [5]Pulp, [6]Hum, [7]Foto
+        // Mapeo: [0]Time, [1]Op, [2]Var, [3]Cam, [4]Amb, [5]Pulp, [6]Hum, [7]Foto
         allData.forEach(row => {
             const camName = String(row[3] || ""); 
             if (camName && !latestByCam[camName]) {
@@ -167,29 +201,31 @@
             div.className = "cam-card";
             
             if(!r) {
-                div.innerHTML = `<p class="label-text">${id}</p><div class="text-muted small">Sin datos</div>`;
+                div.innerHTML = `<p class="label-text" style="color:var(--accent)">${id}</p><div class="text-muted small mt-2">Sin datos recientes</div>`;
             } else {
                 const [time, op, variedad, cam, tAmb, tPulp, hum] = r;
+                // Parámetros técnicos corregidos: Hum 85-95%
                 const isAlert = (tAmb > 1.5 || tPulp > 2 || hum < 85 || hum > 95);
                 if(isAlert) div.classList.add('alert');
 
                 div.innerHTML = `
                     <p class="label-text" style="color:var(--accent)">${cam}</p>
                     <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${variedad}</div>
-                    <div class="row g-1">
+                    <div class="row g-1 mb-auto">
                         <div class="col-6">
-                            <p class="label-text">Amb</p>
-                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb}°</div>
+                            <p class="label-text">Ambiente</p>
+                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
                         </div>
                         <div class="col-6">
-                            <p class="label-text">Pulp</p>
-                            <div class="value-text ${tPulp > 2 ? 'text-danger' : 'text-success'}">${tPulp}°</div>
+                            <p class="label-text">Pulpa</p>
+                            <div class="value-text ${tPulp > 2 ? 'text-danger' : 'text-success'}">${tPulp.toFixed(1)}°</div>
                         </div>
                         <div class="col-12 mt-1">
-                            <p class="label-text">Hum</p>
-                            <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${hum}%</div>
+                            <p class="label-text">Humedad</p>
+                            <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</div>
                         </div>
                     </div>
+                    <div class="time-badge">Act: ${formatTime(time)}</div>
                 `;
             }
             container.appendChild(div);
@@ -200,17 +236,16 @@
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
             // r[0]:Time, r[1]:Op, r[2]:Var, r[3]:Cam, r[4]:Amb, r[5]:Pulp, r[6]:Hum, r[7]:Foto
-            const fecha = new Date(r[0]);
-            const hora = isNaN(fecha) ? "---" : fecha.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const hora = formatTime(r[0]);
             
             return `
                 <tr>
                     <td class="text-info">${hora}</td>
-                    <td class="text-truncate" style="max-width: 100px;">${r[2]}</td>
-                    <td>${r[3]}</td>
-                    <td class="text-center ${r[4]>1.5?'text-danger':'text-success'}">${r[4]}°</td>
-                    <td class="text-center ${r[5]>2?'text-danger':'text-success'}">${r[5]}°</td>
-                    <td class="text-center ${r[6]<85?'text-danger':'text-success'}">${r[6]}%</td>
+                    <td class="text-truncate" style="max-width: 110px;">${r[2]}</td>
+                    <td class="fw-bold">${r[3]}</td>
+                    <td class="text-center ${r[4]>1.5?'text-danger':'text-success'}">${Number(r[4]).toFixed(1)}°</td>
+                    <td class="text-center ${r[5]>2?'text-danger':'text-success'}">${Number(r[5]).toFixed(1)}°</td>
+                    <td class="text-center ${r[6]<85?'text-danger':'text-success'}">${Number(r[6]).toFixed(0)}%</td>
                     <td class="text-center">
                         ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" class="text-primary"><i class="bi bi-camera"></i></a>` : '-'}
                     </td>
@@ -224,10 +259,21 @@
         drawCards();
     }
 
-    // Reloj y Sincronización
+    // Lógica de pausa al posar el mouse corregida
+    const camsSection = document.getElementById('cams-section');
+    camsSection.onmouseenter = () => isPaused = true;
+    camsSection.onmouseleave = () => isPaused = false;
+
+    // Reloj
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(syncData, 60000); // Sincroniza cada 1 minuto
-    setInterval(() => { changeGroup(1); }, 10000); // Rota tarjetas cada 10 seg
+    
+    // Sincronización de datos (cada 1 minuto)
+    setInterval(syncData, 60000); 
+
+    // Rotación automática (cada 10 seg) solo si no está en pausa
+    setInterval(() => { 
+        if(!isPaused) changeGroup(1); 
+    }, 10000);
 
     syncData();
 </script>
