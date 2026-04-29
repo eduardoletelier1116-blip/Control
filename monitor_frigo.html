@@ -16,6 +16,7 @@
             --accent-soft: #38bdf8;
             --green-soft: #4ade80;
             --red-soft: #f87171;
+            --warning-amber: #fbbf24;
         }
 
         body { 
@@ -29,6 +30,7 @@
             flex-direction: column;
         }
 
+        /* Header */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -38,11 +40,9 @@
             background: rgba(30, 41, 59, 0.5);
             border-radius: 20px;
         }
-
         .logo-section { display: flex; align-items: center; gap: 12px; }
         .logo-img { height: 30px; width: auto; }
         .app-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
-
         .sync-info {
             font-size: 0.65rem;
             color: var(--text-muted);
@@ -51,6 +51,7 @@
             border-radius: 50px;
         }
 
+        /* Navegación de Grupos */
         .group-nav {
             display: flex;
             justify-content: space-between;
@@ -58,7 +59,6 @@
             max-width: 1200px;
             margin: 0 auto 15px;
         }
-
         .nav-btn { 
             background: var(--card-bg); 
             border: 1px solid rgba(255,255,255,0.1); 
@@ -70,6 +70,7 @@
         }
         .nav-btn:hover { background: var(--accent-soft); color: var(--bg-app); }
 
+        /* Tarjetas Superiores */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -77,26 +78,22 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .cam-card { 
             background: var(--card-bg); 
             border: 1px solid rgba(255,255,255,0.05); 
             border-radius: 24px; 
             padding: 18px; 
             position: relative;
-            transition: all 0.3s ease;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             min-height: 220px;
             display: flex;
             flex-direction: column;
         }
-        
         .cam-card.alert { 
             border: 1.5px solid var(--red-soft); 
             background: rgba(248, 113, 113, 0.05);
             animation: pulse-alert 2s infinite;
         }
-
         @keyframes pulse-alert {
             0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
@@ -105,18 +102,10 @@
 
         .label-text { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
         .value-text { font-size: 1.2rem; font-weight: 700; }
-        
         .pulp-detail { font-size: 0.6rem; color: var(--text-muted); margin-top: 5px; line-height: 1.2; }
+        .time-tag { font-size: 0.6rem; color: var(--text-muted); margin-top: auto; text-align: right; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
 
-        .time-tag {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            margin-top: auto;
-            text-align: right;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 8px;
-        }
-
+        /* Tabla Horizontal Compacta */
         .list-section { 
             background: var(--card-bg);
             border-radius: 24px;
@@ -124,16 +113,31 @@
             margin-top: 20px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .table { color: var(--text-main); margin-bottom: 0; background-color: transparent !important; }
+        .table { color: var(--text-main) !important; margin-bottom: 0; background-color: transparent !important; }
         .table thead th { border: none; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
-        .table tbody td { border-color: rgba(255,255,255,0.05); padding: 12px 8px; font-size: 0.8rem; vertical-align: middle; }
+        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 12px 8px; font-size: 0.8rem; vertical-align: middle; background-color: transparent !important; }
 
+        .pulp-container { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        .pulp-box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 10px;
+            min-width: 70px;
+            text-align: center;
+        }
+        .obs-tag {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--warning-amber);
+            line-height: 1.1;
+            margin-top: 2px;
+            max-width: 90px;
+            font-weight: 500;
+        }
         .badge-variety {
             background: rgba(56, 189, 248, 0.1);
             color: var(--accent-soft);
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            font-weight: 500;
             padding: 4px 10px;
             border-radius: 50px;
             font-size: 0.65rem;
@@ -167,24 +171,22 @@
             <thead>
                 <tr>
                     <th>HORA</th>
-                    <th>VARIEDAD</th>
                     <th>CAM</th>
+                    <th>VARIEDAD</th>
                     <th class="text-center">AMB.</th>
-                    <th class="text-center">PROM. PULPA</th>
-                    <th class="text-center">HUM %</th>
-                    <th>OBSERVACIÓN</th>
+                    <th class="text-center">PULPAS (P1 - P6)</th>
+                    <th class="text-center">HUM%</th>
                     <th class="text-center">FOTO</th>
                 </tr>
             </thead>
             <tbody id="data-table-body">
-                <tr><td colspan="8" class="text-center py-4">Cargando datos...</td></tr>
+                <tr><td colspan="7" class="text-center py-4">Cargando datos...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // REVISA QUE ESTA URL SEA LA CORRECTA
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwPxKSx5D9v7GZI-Vc3Z_-8mlLlRwqa6Plw3pLc6E0iy3rdtWnSkd2XdkyJ3tU3SO0/exec";
     const BASE_URL = WEB_APP_URL + "?pestana=Frigorifico";
     
@@ -200,92 +202,57 @@
 
     async function syncData() {
         try {
-            console.log("Sincronizando...");
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
-            
-            if (!json || json.length < 2) {
-                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No hay datos en la hoja</td></tr>';
-                return;
-            }
+            if (!json || json.length < 2) return;
 
-            // --- FILTRADO DE DATOS (Acepta fechas de Google Sheets) ---
-            const hoy = new Date();
-            const hoyStr = hoy.toLocaleDateString();
-
+            const hoyStr = new Date().toLocaleDateString();
             allData = json.slice(1).filter(row => {
                 if (!row[0]) return false;
-                const fechaFila = new Date(row[0]).toLocaleDateString();
-                return fechaFila === hoyStr;
+                return new Date(row[0]).toLocaleDateString() === hoyStr;
             }).reverse();
-            
-            console.log("Datos filtrados de hoy:", allData.length);
 
-            if (allData.length === 0) {
-                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Sin registros para el día de hoy</td></tr>';
-            } else {
+            if (allData.length > 0) {
                 drawTable();
+                drawCards();
             }
-            drawCards();
-        } catch (e) { 
-            console.error("Error de sincronización:", e);
-            document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-danger py-4">Error al conectar con los datos</td></tr>';
-        }
+        } catch (e) { console.error("Error:", e); }
     }
 
     function drawCards() {
         const container = document.getElementById('cards-container');
-        const label = document.getElementById('group-label');
         const latestByCam = {};
-
         allData.forEach(row => {
             const camId = String(row[3] || "").trim(); 
             if (camId && !latestByCam[camId]) latestByCam[camId] = row;
         });
 
         const activeGroup = groups[currentGroup];
-        label.innerText = activeGroup.label;
+        document.getElementById('group-label').innerText = activeGroup.label;
         container.innerHTML = "";
 
         activeGroup.ids.forEach(id => {
             const r = latestByCam[id];
             const div = document.createElement('div');
             div.className = "cam-card";
-            
             if(!r) {
                 div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
             } else {
                 const tAmb = Number(r[4] || 0);
-                const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(val => Number(val || 0));
+                const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(v => Number(v || 0));
                 const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
                 const hum = Number(r[11] || 0);
-                
-                const hayAlertaPulpas = pulpas.some(p => p > 2);
-                const isAlert = (tAmb > 1.5 || hayAlertaPulpas || hum < 85 || hum > 95);
-                
-                if(isAlert) div.classList.add('alert');
+                if (tAmb > 1.5 || pulpas.some(p => p > 2) || hum < 85 || hum > 95) div.classList.add('alert');
 
                 div.innerHTML = `
                     <span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span>
                     <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${r[2] || 'S/V'}</div>
                     <div class="row g-2 mb-2">
-                        <div class="col-6">
-                            <p class="label-text">Ambiente</p>
-                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
-                        </div>
-                        <div class="col-6">
-                            <p class="label-text">Prom. Pulpa</p>
-                            <div class="value-text ${hayAlertaPulpas ? 'text-danger' : 'text-success'}">${tPulpProm}°</div>
-                        </div>
+                        <div class="col-6"><p class="label-text">Ambiente</p><div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
+                        <div class="col-6"><p class="label-text">Prom. Pulpa</p><div class="value-text">${tPulpProm}°</div></div>
                     </div>
-                    <div class="pulp-detail">
-                        P1:${pulpas[0]} P2:${pulpas[1]} P3:${pulpas[2]}<br>
-                        P4:${pulpas[3]} P5:${pulpas[4]} P6:${pulpas[5]}
-                    </div>
-                    <div class="mt-2">
-                        <p class="label-text">Humedad</p>
-                        <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</div>
-                    </div>
+                    <div class="pulp-detail">P1:${pulpas[0]} P2:${pulpas[1]} P3:${pulpas[2]} | P4:${pulpas[3]} P5:${pulpas[4]} P6:${pulpas[5]}</div>
+                    <div class="mt-2"><p class="label-text">Humedad</p><div class="value-text">${hum}%</div></div>
                     <div class="time-tag">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                 `;
             }
@@ -295,71 +262,51 @@
 
     function drawTable() {
         const body = document.getElementById('data-table-body');
-        let htmlBus = "";
-
-        allData.slice(0, 10).forEach(r => { // Tomamos los últimos 10 registros de cámara
+        body.innerHTML = allData.slice(0, 12).map(r => {
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const variedad = r[2] || 'S/V';
-            const cam = r[3];
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             const obsGral = r[13] || '';
-            const fotoUrl = r[12];
+            const detalles = r[14] ? r[14].split(' | ') : [];
 
-            // Creamos 6 filas por cada registro (una por cada pulpa)
+            let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
-                // Las columnas de pulpa están en el índice 5, 6, 7, 8, 9, 10
-                // Pero el detalle de observaciones (si lo guardaste con el formato "P1: 2.0 (obs)") 
-                // lo extraeremos del campo pulpasDetalle (Columna O / índice 14 si existe)
-                
-                const tPulp = Number(r[4 + i] || 0);
-                const colorPulp = tPulp > 2 ? 'text-danger' : 'text-success';
-                
-                // Intentamos extraer la observación específica del fruto desde el detalle (índice 14)
+                const val = Number(r[4 + i] || 0);
                 let obsFruto = "";
-                if (r[14]) {
-                    const detalles = r[14].split(' | ');
-                    const detalleEspecifico = detalles[i-1] || "";
-                    // Extraemos lo que está entre paréntesis
-                    const match = detalleEspecifico.match(/\(([^)]+)\)/);
+                if (detalles[i-1]) {
+                    const match = detalles[i-1].match(/\(([^)]+)\)/);
                     obsFruto = match ? match[1] : "";
                 }
-
-                htmlBus += `
-                    <tr style="${i === 1 ? 'border-top: 2px solid var(--accent-soft)' : ''}">
-                        <td class="small ${i > 1 ? 'text-muted' : 'fw-bold'}" style="color: ${i === 1 ? 'var(--accent-soft)' : ''}">
-                            ${i === 1 ? hora : ''}
-                        </td>
-                        <td>${i === 1 ? `<span class="badge-variety">${variedad}</span>` : ''}</td>
-                        <td class="fw-bold">${i === 1 ? cam : ''}</td>
-                        <td class="text-center ${tAmb > 1.5 ? 'text-danger' : ''}">${i === 1 ? tAmb.toFixed(1) + '°' : ''}</td>
-                        <td class="text-center">
-                            <span class="fw-bold ${colorPulp}">P${i}: ${tPulp.toFixed(1)}°</span>
-                        </td>
-                        <td class="text-center">${i === 1 ? hum + '%' : ''}</td>
-                        <td style="font-size: 0.75rem;">
-                            ${obsFruto ? `<b class="text-warning">P${i}:</b> ${obsFruto}` : ''}
-                            ${(i === 1 && obsGral) ? `<div class="text-muted"><b>Gral:</b> ${obsGral}</div>` : ''}
-                        </td>
-                        <td class="text-center">
-                            ${(i === 1 && fotoUrl && fotoUrl.startsWith('http')) ? `<a href="${fotoUrl}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : ''}
-                        </td>
-                    </tr>
-                `;
+                pulpasHtml += `
+                    <div class="pulp-box">
+                        <span style="font-size:0.55rem; color:var(--text-muted); display:block;">P${i}</span>
+                        <span class="fw-bold ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span>
+                        ${obsFruto ? `<span class="obs-tag">${obsFruto}</span>` : ''}
+                    </div>`;
             }
-        });
-        body.innerHTML = htmlBus;
+
+            return `
+                <tr>
+                    <td class="fw-bold" style="color:var(--accent-soft)">${hora}</td>
+                    <td class="fw-bold text-center">${r[3]}</td>
+                    <td><span class="badge-variety">${r[2] || 'S/V'}</span></td>
+                    <td class="text-center fw-bold ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</td>
+                    <td>
+                        <div class="pulp-container">${pulpasHtml}</div>
+                        ${obsGral ? `<div class="text-muted small mt-1 text-center" style="font-size:0.65rem"><i>Nota: ${obsGral}</i></div>` : ''}
+                    </td>
+                    <td class="text-center fw-bold">${hum}%</td>
+                    <td class="text-center">
+                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
+                    </td>
+                </tr>`;
+        }).join('');
     }
+
     function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawCards(); }
-    
-    const interactiveArea = document.getElementById('interactive-area');
-    interactiveArea.onmouseenter = () => isPaused = true;
-    interactiveArea.onmouseleave = () => isPaused = false;
-
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(syncData, 60000); 
+    setInterval(syncData, 60000);
     setInterval(() => { if(!isPaused) changeGroup(1); }, 10000);
-
     syncData();
 </script>
 </body>
