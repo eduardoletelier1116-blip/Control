@@ -230,15 +230,15 @@
             hAxis: { textStyle: { color: '#64748b', fontSize: 10 }, gridlines: { color: 'transparent' } },
             vAxis: { 
                 textStyle: { color: '#94a3b8', fontSize: 10 }, 
-                gridlines: { color: 'rgba(255,255,255,0.03)' },
+                gridlines: { color: '#334155' }, // Cambiado a HEX compatible
                 viewWindow: { min: vMin, max: vMax },
                 ticks: [range[0], range[1]],
                 format: format
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true, type: 'line' }, 
-                1: { color: 'rgba(255,255,255,0.1)', lineDashStyle: [4, 4], lineWidth: 1, pointSize: 0 }, 
-                2: { color: 'rgba(255,255,255,0.1)', lineDashStyle: [4, 4], lineWidth: 1, pointSize: 0 } 
+                1: { color: '#475569', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }, // Cambiado a HEX compatible
+                2: { color: '#475569', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }  // Cambiado a HEX compatible
             },
             annotations: { textStyle: { fontSize: 10, color: '#f87171', bold: true }, alwaysOutside: true }
         });
