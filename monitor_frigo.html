@@ -25,127 +25,116 @@
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER: LOGO MÁS GRANDE --- */
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
-            margin-bottom: 20px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.05);
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
         }
-        .logo-section { display: flex; align-items: center; gap: 18px; }
-        .logo-img { width: 50px; height: 50px; object-fit: contain; }
-        .app-title { font-size: 1.4rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo-img { width: 45px; height: 45px; object-fit: contain; } /* Logo ajustado */
+        .app-title { font-size: 1.2rem; font-weight: 700; margin: 0; }
+        
         .sync-info {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
-            background: rgba(0,0,0,0.3);
-            padding: 6px 16px;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px;
             border-radius: 50px;
-            font-variant-numeric: tabular-nums;
         }
 
-        /* --- CARDS --- */
+        /* --- NAVEGACIÓN Y CARDS --- */
         .group-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             max-width: 1200px;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
         .nav-btn { 
             background: var(--card-bg); 
             border: 1px solid rgba(255,255,255,0.1); 
             color: white; 
-            border-radius: 14px; 
-            width: 42px; height: 42px;
+            border-radius: 50%; 
+            width: 38px; height: 38px;
             display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease;
         }
-        .nav-btn:hover { background: var(--accent-soft); color: var(--bg-app); }
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
         .cam-card { 
             background: var(--card-bg); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            border-radius: 28px; 
-            padding: 22px; 
-            transition: transform 0.2s ease;
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.3);
-            min-height: 250px;
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 24px; 
+            padding: 18px; 
+            min-height: 220px;
             display: flex;
             flex-direction: column;
         }
         
         .cam-card.alert { 
-            border: 2px solid var(--red-soft); 
-            background: rgba(248, 113, 113, 0.03);
+            border: 1.5px solid var(--red-soft); 
             animation: pulse-alert 2s infinite;
         }
 
-        .label-text { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .value-text { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
-        .pulp-detail { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
-        
-        /* --- TABLA --- */
-        .list-section { 
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
-        }
-
-        .table { color: var(--text-main) !important; background-color: transparent !important; }
-        .table thead th { border: none !important; color: var(--accent-soft); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px 10px !important; }
-        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 12px 10px !important; font-size: 0.85rem; background-color: transparent !important; }
-
-        .pulp-box {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 8px;
-            border-radius: 10px;
-            min-width: 75px;
-            text-align: center;
-        }
-        .pulp-val { font-size: 1rem; font-weight: 700; display: block; }
-        
-        .obs-tag { color: var(--warning-amber); font-size: 0.6rem; font-weight: 600; }
-        .obs-general-row { 
-            font-size: 0.75rem; 
-            background: rgba(56, 189, 248, 0.1); 
-            padding: 8px 12px; 
-            border-radius: 10px; 
-            margin-top: 10px;
-            border-left: 4px solid var(--accent-soft);
-        }
-
-        .val-white { color: #ffffff !important; font-weight: 700; }
-        .val-danger { color: var(--red-soft) !important; font-weight: 800; }
-        .val-success { color: var(--green-soft) !important; font-weight: 700; }
-
         @keyframes pulse-alert {
-            0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.3); }
-            70% { box-shadow: 0 0 0 12px rgba(248, 113, 113, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
             100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
         }
+
+        .label-text { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
+        .value-text { font-size: 1.2rem; font-weight: 700; }
+        .time-tag { font-size: 0.6rem; color: var(--text-muted); margin-top: auto; text-align: right; }
+
+        /* --- TABLA TRANSPARENTE --- */
+        .list-section { 
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .table { color: var(--text-main) !important; margin-bottom: 0; background-color: transparent !important; }
+        .table thead th { border: none !important; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; padding: 8px !important; background-color: transparent !important; }
+        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 10px 8px !important; font-size: 0.8rem; vertical-align: middle; background-color: transparent !important; }
+
+        .pulp-container { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+        
+        /* PULPAS MÁS GRANDES Y ARMÓNICAS */
+        .pulp-box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 6px;
+            border-radius: 10px;
+            min-width: 70px;
+            text-align: center;
+        }
+        .pulp-num { font-size: 0.95rem; font-weight: 700; } /* Números más grandes */
+        
+        .obs-tag { display: block; font-size: 0.55rem; color: var(--warning-amber); line-height: 1.1; margin-top: 1px; font-weight: 500; }
+        .obs-general-row { font-size: 0.7rem; color: #cbd5e1; background: rgba(56, 189, 248, 0.08); border-radius: 6px; padding: 6px 10px; margin-top: 8px; border-left: 3px solid var(--accent-soft); text-align: left; }
+
+        .val-danger { color: var(--red-soft) !important; font-weight: 800; }
+        .val-success { color: var(--green-soft) !important; font-weight: 700; }
+        .val-white { color: #ffffff !important; font-weight: 700; }
+        .badge-variety { background: rgba(56, 189, 248, 0.1); color: var(--accent-soft); padding: 2px 8px; border-radius: 50px; font-size: 0.65rem; }
     </style>
 </head>
 <body>
@@ -161,7 +150,7 @@
 <div class="cams-section" id="interactive-area">
     <div class="group-nav">
         <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-        <span id="group-label" class="badge rounded-pill bg-dark px-4 py-2 fs-6">Cámaras</span>
+        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2">Cámaras</span>
         <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
     </div>
     <div id="cards-container" class="cards-grid"></div>
@@ -224,7 +213,6 @@
             const hum = Number(r[11] || 0);
             const obsGral = r[13] || '';
             const detalles = r[14] ? r[14].split(' | ') : [];
-
             const ambClass = (tAmb > 1.5) ? 'val-danger' : 'val-success';
             const humClass = (hum < 85 || hum > 95) ? 'val-danger' : 'val-white';
 
@@ -232,36 +220,32 @@
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
                 const pClass = (val > 2.0) ? 'text-danger' : 'text-success';
-                
                 let obsFruto = "";
                 if (detalles[i-1]) {
                     const match = detalles[i-1].match(/\(([^)]+)\)/);
                     obsFruto = match ? match[1] : "";
                 }
-
                 pulpasHtml += `
                     <div class="pulp-box">
-                        <span style="font-size:0.55rem; color:var(--text-muted); display:block; margin-bottom:2px;">P${i}</span>
-                        <span class="pulp-val ${pClass}">${val.toFixed(1)}°</span>
+                        <span style="font-size:0.5rem; color:var(--text-muted); display:block;">P${i}</span>
+                        <span class="pulp-num ${pClass}">${val.toFixed(1)}°</span>
                         ${obsFruto ? `<span class="obs-tag">${obsFruto}</span>` : ''}
                     </div>`;
             }
 
             return `
                 <tr style="background-color: transparent !important;">
-                    <td class="fw-bold" style="color:var(--accent-soft) !important; font-size:1.1rem; background-color: transparent !important;">
-                        CÁMARA ${r[3]}
-                    </td>
-                    <td class="text-muted" style="font-size:0.8rem; background-color: transparent !important;">${hora}</td>
+                    <td class="fw-bold" style="color:var(--accent-soft) !important; font-size:1rem; background-color: transparent !important;">CÁMARA ${r[3]}</td>
+                    <td class="text-muted small" style="background-color: transparent !important;">${hora}</td>
                     <td style="background-color: transparent !important;"><span class="badge-variety">${r[2] || 'S/V'}</span></td>
-                    <td class="text-center ${ambClass}" style="font-size:1.1rem; background-color: transparent !important;">${tAmb.toFixed(1)}°</td>
+                    <td class="text-center ${ambClass}" style="background-color: transparent !important;">${tAmb.toFixed(1)}°</td>
                     <td style="background-color: transparent !important;">
-                        <div class="pulp-container" style="gap: 6px;">${pulpasHtml}</div>
+                        <div class="pulp-container">${pulpasHtml}</div>
                         ${obsGral ? `<div class="obs-general-row"><i class="bi bi-chat-left-dots-fill me-2"></i>${obsGral}</div>` : ''}
                     </td>
-                    <td class="text-center ${humClass}" style="font-size:1.3rem; background-color: transparent !important;">${hum}%</td>
+                    <td class="text-center ${humClass}" style="font-size:1.1rem; background-color: transparent !important;">${hum}%</td>
                     <td class="text-center" style="background-color: transparent !important;">
-                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft); font-size:1.2rem;"><i class="bi bi-camera-fill"></i></a>` : '-'}
+                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
                     </td>
                 </tr>`;
         }).join('');
@@ -280,33 +264,22 @@
             const div = document.createElement('div');
             div.className = "cam-card";
             if(!r) {
-                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
+                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos</div>`;
             } else {
                 const tAmb = Number(r[4] || 0);
                 const hum = Number(r[11] || 0);
                 const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(v => Number(v || 0));
                 const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
                 if (tAmb > 1.5 || pulpas.some(p => p > 2) || hum < 85 || hum > 95) div.classList.add('alert');
-
                 div.innerHTML = `
                     <span class="label-text" style="color:var(--accent-soft)">CÁMARA ${id}</span>
-                    <div class="fw-bold text-truncate mb-3" style="font-size:0.9rem;">${r[2] || 'SIN VARIEDAD'}</div>
-                    <div class="row g-3 mb-2">
-                        <div class="col-6">
-                            <p class="label-text">Ambiente</p>
-                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
-                        </div>
-                        <div class="col-6">
-                            <p class="label-text">Prom. Pulpa</p>
-                            <div class="value-text" style="color:var(--text-main)">${tPulpProm}°</div>
-                        </div>
+                    <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${r[2] || 'S/V'}</div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6"><p class="label-text">Ambiente</p><div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
+                        <div class="col-6"><p class="label-text">Prom. Pulpa</p><div class="value-text">${tPulpProm}°</div></div>
                     </div>
-                    <div class="pulp-detail">P1:${pulpas[0]} P2:${pulpas[1]} P3:${pulpas[2]}...</div>
-                    <div class="mt-3">
-                        <p class="label-text">Humedad Relativa</p>
-                        <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'val-white'}" style="font-size:1.8rem;">${hum.toFixed(0)}%</div>
-                    </div>
-                    <div class="time-tag"><i class="bi bi-clock-history me-1"></i>${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                    <div class="mt-2"><p class="label-text">Humedad</p><div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'val-white'}">${hum.toFixed(0)}%</div></div>
+                    <div class="time-tag">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                 `;
             }
             container.appendChild(div);
