@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Cámaras</title>
+    <title>Monitor de Cámaras Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
@@ -72,7 +72,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             max-width: 1200px;
             margin: 0 auto;
@@ -86,7 +86,7 @@
             position: relative;
             transition: all 0.3s ease;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            min-height: 200px;
+            min-height: 220px;
             display: flex;
             flex-direction: column;
         }
@@ -94,11 +94,20 @@
         .cam-card.alert { 
             border: 1.5px solid var(--red-soft); 
             background: rgba(248, 113, 113, 0.05);
+            animation: pulse-alert 2s infinite;
+        }
+
+        @keyframes pulse-alert {
+            0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
         }
 
         .label-text { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
         .value-text { font-size: 1.2rem; font-weight: 700; }
         
+        .pulp-detail { font-size: 0.6rem; color: var(--text-muted); margin-top: 5px; line-height: 1.2; }
+
         .time-tag {
             font-size: 0.6rem;
             color: var(--text-muted);
@@ -117,8 +126,8 @@
         }
 
         .table { color: var(--text-main); margin-bottom: 0; background-color: transparent !important; }
-        .table thead th { border: none; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; background-color: transparent !important; }
-        .table tbody td { border-color: rgba(255,255,255,0.05); padding: 12px 8px; font-size: 0.85rem; vertical-align: middle; background-color: transparent !important; }
+        .table thead th { border: none; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .table tbody td { border-color: rgba(255,255,255,0.05); padding: 12px 8px; font-size: 0.8rem; vertical-align: middle; }
 
         .badge-variety {
             background: rgba(56, 189, 248, 0.1);
@@ -127,7 +136,7 @@
             font-weight: 500;
             padding: 4px 10px;
             border-radius: 50px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
     </style>
 </head>
@@ -159,11 +168,12 @@
                 <tr>
                     <th>HORA</th>
                     <th>VARIEDAD</th>
-                    <th>CÁMARA</th>
+                    <th>CAM</th>
                     <th class="text-center">AMB.</th>
-                    <th class="text-center">PULPA</th>
+                    <th class="text-center">PROM. PULPA</th>
                     <th class="text-center">HUM %</th>
-                    <th class="text-center">INFO</th>
+                    <th>OBSERVACIÓN</th>
+                    <th class="text-center">FOTO</th>
                 </tr>
             </thead>
             <tbody id="data-table-body"></tbody>
@@ -171,7 +181,6 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const BASE_URL = "https://script.google.com/macros/s/AKfycbxWr-OYFzfjzwGOZzYkMAfyI-yShxOrd6qtpK_PGgSr5teU7AgeVL1pOEkH5F9zRhlUdw/exec?pestana=Frigorifico";
     
@@ -180,17 +189,15 @@
     let isPaused = false;
 
     const groups = [
-        { label: "Cámaras 2 - 5", ids: ["Cámara 2", "Cámara 3", "Cámara 4", "Cámara 5"] },
-        { label: "Cámaras 6 - 9", ids: ["Cámara 6", "Cámara 7", "Cámara 8", "Cámara 9"] },
-        { label: "Cámaras 10 - 12", ids: ["Cámara 10", "Cámara 11", "Cámara 12"] }
+        { label: "Cámaras 2 - 5", ids: ["2", "3", "4", "5"] },
+        { label: "Cámaras 6 - 9", ids: ["6", "7", "8", "9"] },
+        { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
     async function syncData() {
         try {
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
-            
-            // --- FILTRO SOLO HOY ---
             const hoyStr = new Date().toLocaleDateString();
 
             allData = json.slice(1).filter(row => {
@@ -199,17 +206,12 @@
             }).reverse();
             
             if (allData.length === 0) {
-                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4 small">Sin controles registrados hoy</td></tr>';
+                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4 small">Sin controles registrados hoy</td></tr>';
             } else {
                 drawTable();
             }
             drawCards();
-        } catch (e) { console.error("Error"); }
-    }
-
-    function formatTime(dateString) {
-        const fecha = new Date(dateString);
-        return isNaN(fecha) ? "--:--" : fecha.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        } catch (e) { console.error("Error de sincronización"); }
     }
 
     function drawCards() {
@@ -218,8 +220,8 @@
         const latestByCam = {};
 
         allData.forEach(row => {
-            const camName = String(row[3] || ""); 
-            if (camName && !latestByCam[camName]) latestByCam[camName] = row;
+            const camId = String(row[3] || ""); 
+            if (camId && !latestByCam[camId]) latestByCam[camId] = row;
         });
 
         const activeGroup = groups[currentGroup];
@@ -232,30 +234,41 @@
             div.className = "cam-card";
             
             if(!r) {
-                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
+                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
             } else {
-                const [time, op, variedad, cam, tAmb, tPulp, hum] = r;
-                const isAlert = (tAmb > 1.5 || tPulp > 2 || hum < 85 || hum > 95);
+                const tAmb = Number(r[4]);
+                const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(Number);
+                const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
+                const hum = Number(r[11]);
+                
+                // Alerta si el ambiente es alto O si CUALQUIERA de las pulpas es alta
+                const hayAlertaPulpas = pulpas.some(p => p > 2);
+                const isAlert = (tAmb > 1.5 || hayAlertaPulpas || hum < 85 || hum > 95);
+                
                 if(isAlert) div.classList.add('alert');
 
                 div.innerHTML = `
-                    <span class="label-text" style="color:var(--accent-soft)">${cam}</span>
-                    <div class="fw-bold text-truncate mb-3" style="font-size:0.8rem;">${variedad}</div>
+                    <span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span>
+                    <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${r[2]}</div>
                     <div class="row g-2 mb-2">
                         <div class="col-6">
                             <p class="label-text">Ambiente</p>
-                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${Number(tAmb).toFixed(1)}°</div>
+                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
                         </div>
                         <div class="col-6">
-                            <p class="label-text">Pulpa</p>
-                            <div class="value-text ${tPulp > 2 ? 'text-danger' : 'text-success'}">${Number(tPulp).toFixed(1)}°</div>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <p class="label-text">Humedad</p>
-                            <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${Number(hum).toFixed(0)}%</div>
+                            <p class="label-text">Prom. Pulpa</p>
+                            <div class="value-text ${hayAlertaPulpas ? 'text-danger' : 'text-success'}">${tPulpProm}°</div>
                         </div>
                     </div>
-                    <div class="time-tag">Act: ${formatTime(time)}</div>
+                    <div class="pulp-detail">
+                        P1:${pulpas[0]}° P2:${pulpas[1]}° P3:${pulpas[2]}°<br>
+                        P4:${pulpas[3]}° P5:${pulpas[4]}° P6:${pulpas[5]}°
+                    </div>
+                    <div class="mt-2">
+                        <p class="label-text">Humedad</p>
+                        <div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</div>
+                    </div>
+                    <div class="time-tag">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                 `;
             }
             container.appendChild(div);
@@ -265,29 +278,22 @@
     function drawTable() {
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
-            const hora = formatTime(r[0]);
-            
-            // Lógica de rangos (igual que en las tarjetas)
+            const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(Number);
+            const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6);
             const tAmb = Number(r[4]);
-            const tPulp = Number(r[5]);
-            const hum = Number(r[6]);
-
-            // Colores basados en reglas técnicas
-            const colorAmb = tAmb > 1.5 ? 'text-danger' : 'text-success';
-            const colorPulp = tPulp > 2 ? 'text-danger' : 'text-success';
-            // Humedad ideal: 85% a 95%. Fuera de eso es alerta.
-            const colorHum = (hum < 85 || hum > 95) ? 'text-danger' : 'text-success';
+            const hum = Number(r[11]);
 
             return `
                 <tr>
-                    <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
+                    <td class="fw-bold" style="color: var(--accent-soft)">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
                     <td><span class="badge-variety">${r[2]}</span></td>
-                    <td class="fw-bold" style="color: var(--text-main)">${r[3]}</td>
-                    <td class="text-center fw-bold ${colorAmb}">${tAmb.toFixed(1)}°</td>
-                    <td class="text-center fw-bold ${colorPulp}">${tPulp.toFixed(1)}°</td>
-                    <td class="text-center fw-bold ${colorHum}">${hum.toFixed(0)}%</td>
+                    <td class="fw-bold">${r[3]}</td>
+                    <td class="text-center fw-bold ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</td>
+                    <td class="text-center fw-bold ${pulpas.some(p => p > 2) ? 'text-danger' : 'text-success'}">${tPulpProm.toFixed(1)}°</td>
+                    <td class="text-center fw-bold ${(hum < 85 || hum > 95) ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</td>
+                    <td class="small text-muted">${r[13] || '-'}</td>
                     <td class="text-center">
-                        ${r[7] && r[7] !== "Sin foto" ? `<a href="${r[7]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
+                        ${r[12] && r[12] !== "Sin foto" ? `<a href="${r[12]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
                     </td>
                 </tr>
             `;
@@ -295,7 +301,7 @@
     }
 
     function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawCards(); }
-
+    
     const interactiveArea = document.getElementById('interactive-area');
     interactiveArea.onmouseenter = () => isPaused = true;
     interactiveArea.onmouseleave = () => isPaused = false;
