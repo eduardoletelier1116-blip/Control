@@ -196,11 +196,16 @@
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
+            let kilos = f[5] ? f[5] + "k" : ""; // Columna 5 del Excel para los Kilos
+            
             if(val < minVal) minVal = val;
             if(val > maxVal) maxVal = val;
+            
             let fuera = (val < range[0] || val > range[1]);
             let estilo = fuera ? 'point { size: 7; fill-color: #f87171; }' : 'point { size: 5; fill-color: ' + baseColor + '; }';
-            dt.addRow([h, val, estilo, f[6] === "SI" ? "MOD" : null, range[0], range[1]]);
+            
+            // Se agrega el salto de línea y los kilos a la etiqueta del eje X
+            dt.addRow([h + "\n" + kilos, val, estilo, f[6] === "SI" ? "MOD" : null, range[0], range[1]]);
         });
 
         const padding = (range[1] - range[0]) * 0.5;
@@ -225,22 +230,22 @@
         charts[divId].draw(dt, {
             backgroundColor: 'transparent', 
             legend: 'none',
-            chartArea: { width: '90%', height: '75%', top: 10, left: 45, right: 10, bottom: 35 },
+            chartArea: { width: '90%', height: '70%', top: 10, left: 45, right: 10, bottom: 50 },
             animation: { duration: 500, easing: 'out', startup: true },
-            hAxis: { textStyle: { color: '#64748b', fontSize: 10 }, gridlines: { color: 'transparent' } },
+            hAxis: { textStyle: { color: '#64748b', fontSize: 9 }, gridlines: { color: 'transparent' } },
             vAxis: { 
                 textStyle: { color: '#94a3b8', fontSize: 10 }, 
-                gridlines: { color: '#334155' }, // Cambiado a HEX compatible
+                gridlines: { color: '#334155' },
                 viewWindow: { min: vMin, max: vMax },
                 ticks: [range[0], range[1]],
                 format: format
             },
             series: { 
                 0: { color: baseColor, lineWidth: 3, pointsVisible: true, type: 'line' }, 
-                1: { color: '#475569', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }, // Cambiado a HEX compatible
-                2: { color: '#475569', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }  // Cambiado a HEX compatible
+                1: { color: '#475569', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 }, 
+                2: { color: '#475569', lineDashStyle: [4, 4], lineWidth: 2, pointSize: 0 } 
             },
-            annotations: { textStyle: { fontSize: 10, color: '#f87171', bold: true }, alwaysOutside: true }
+            annotations: { textStyle: { fontSize: 9, color: '#f87171', bold: true }, alwaysOutside: true }
         });
 
         const ultimoVal = Number(data[data.length-1][colIdx]);
