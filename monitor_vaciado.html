@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Industrial Pro</title>
+    <title>Monitor Industrial Pro - Vaciado</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root {
@@ -34,9 +35,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .brand-zone { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 35px; width: auto; }
 
         .chart-card { 
             background: var(--card-bg); 
@@ -68,9 +66,8 @@
 
 <div class="container-fluid">
     <div class="header-bar">
-        <div class="brand-zone">
-            <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-            <h6 class="mb-0 fw-bold text-white">SISTEMA DE MONITOREO</h6>
+        <div class="brand-zone d-flex align-items-center gap-2">
+            <h6 class="mb-0 fw-bold text-white"><i class="bi bi-droplet-half text-info"></i> MONITOR DE VACIADO</h6>
         </div>
         <div id="syncTime" style="color: var(--text-dim); font-size: 0.75rem; font-family: monospace;">SINCRONIZANDO...</div>
     </div>
@@ -117,30 +114,58 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-yUjvbrg_XxbnkfDrn7jR9EwQaoB5LSov-PovhPrhxumg0OdLGV7rxnZFtbSQZy1u9g/exec";
+    // URL con parámetro de pestaña y forzado de datos frescos
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-yUjvbrg_XxbnkfDrn7jR9EwQaoB5LSov-PovhPrhxumg0OdLGV7rxnZFtbSQZy1u9g/exec?pestana=Vaciado";
     const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
 
-    // Guardamos los objetos de los gráficos para que la animación funcione al actualizar
     let charts = {};
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(refresh);
+    
+    // Intervalo de actualización (cada 30 segundos)
     setInterval(refresh, 30000);
 
     function refresh() {
-        fetch(WEB_APP_URL).then(r => r.json()).then(res => {
-            const hoy = new Date().setHours(0,0,0,0);
-            const rawData = res.slice(1).filter(f => f[0] && new Date(f[0]).setHours(0,0,0,0) === hoy);
-            document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
+        // Añadimos timestamp para evitar caché del navegador
+        fetch(WEB_APP_URL + "&t=" + new Date().getTime())
+        .then(r => r.json())
+        .then(res => {
+            if (res.error) {
+                document.getElementById('syncTime').innerText = "ERROR: " + res.error;
+                return;
+            }
 
-            drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2, '#');
-            drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3, '#');
-            drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4, '#.0');
+            // Filtrado por fecha de HOY
+            const hoy = new Date().setHours(0,0,0,0);
+            const rawData = res.slice(1).filter(f => {
+                if(!f[0]) return false;
+                const fechaFila = new Date(f[0]).setHours(0,0,0,0);
+                return fechaFila === hoy;
+            });
+
+            if (rawData.length === 0) {
+                document.getElementById('syncTime').innerText = "SIN DATOS PARA HOY (" + new Date().toLocaleTimeString() + ")";
+                // Limpia los estados si no hay datos
+                document.getElementById('status_ppm').innerHTML = '';
+                document.getElementById('status_orp').innerHTML = '';
+                document.getElementById('status_ph').innerHTML = '';
+            } else {
+                document.getElementById('syncTime').innerText = "ÚLTIMA SINCRONIZACIÓN: " + new Date().toLocaleTimeString();
+                
+                // Dibujar gráficos: colIdx según tu Excel (2:ppm, 3:orp, 4:ph)
+                drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2, '#');
+                drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3, '#');
+                drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4, '#.0');
+            }
+        })
+        .catch(err => {
+            console.error("Error en fetch:", err);
+            document.getElementById('syncTime').innerText = "ERROR DE CONEXIÓN";
         });
     }
 
     function drawChart(data, divId, statusId, range, baseColor, colIdx, format) {
-        if (data.length === 0) return;
         let dt = new google.visualization.DataTable();
         dt.addColumn('string', 'X');
         dt.addColumn('number', 'Valor');
@@ -154,21 +179,24 @@
         data.forEach(f => {
             let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             let val = Number(f[colIdx]);
+            
             if(val < minVal) minVal = val;
             if(val > maxVal) maxVal = val;
+            
             let fuera = (val < range[0] || val > range[1]);
             let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; }' : 'point { size: 5; fill-color: ' + baseColor + '; }';
+            
+            // Etiqueta: Hora + KG (columna 5)
             dt.addRow([h + "\n" + (f[5]||"") + "k", val, estilo, f[6] === "SI" ? "CORRECCIÓN" : null, range[0], range[1]]);
         });
 
-        const padding = (range[1] - range[0]) * 0.5; 
+        const padding = (range[1] - range[0]) * 0.4; 
         const vMin = Math.min(range[0], minVal) - padding;
         const vMax = Math.max(range[1], maxVal) + padding;
 
-        // Inicializar gráfico si no existe para permitir animación
         if (!charts[divId]) {
             charts[divId] = new google.visualization.ComboChart(document.getElementById(divId));
-
+            
             google.visualization.events.addListener(charts[divId], 'select', function() {
                 let sel = charts[divId].getSelection()[0];
                 if (sel && sel.row !== null) {
@@ -187,12 +215,7 @@
             backgroundColor: 'transparent', 
             legend: 'none',
             chartArea: { width: '92%', height: '70%', top: 15, left: 50, right: 15, bottom: 50 },
-            // CONFIGURACIÓN DE ANIMACIÓN
-            animation: {
-                duration: 1000,
-                easing: 'out',
-                startup: true
-            },
+            animation: { duration: 1000, easing: 'out', startup: true },
             hAxis: { textStyle: { color: '#8b949e', fontSize: 8 }, gridlines: { color: 'transparent' } },
             vAxis: { 
                 textStyle: { color: '#ffffff', fontSize: 9, bold: true }, 
