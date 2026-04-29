@@ -36,6 +36,10 @@
             align-items: center;
         }
 
+        /* Estilo para tu logo */
+        .brand-zone { display: flex; align-items: center; gap: 12px; }
+        .logo-img { height: 30px; width: auto; }
+
         .chart-card { 
             background: var(--card-bg); 
             border-radius: 10px; 
@@ -66,8 +70,9 @@
 
 <div class="container-fluid">
     <div class="header-bar">
-        <div class="brand-zone d-flex align-items-center gap-2">
-            <h6 class="mb-0 fw-bold text-white"><i class="bi bi-droplet-half text-info"></i> MONITOR DE VACIADO</h6>
+        <div class="brand-zone">
+            <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            <h6 class="mb-0 fw-bold text-white">MONITOR DE VACIADO</h6>
         </div>
         <div id="syncTime" style="color: var(--text-dim); font-size: 0.75rem; font-family: monospace;">SINCRONIZANDO...</div>
     </div>
@@ -114,7 +119,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // URL con parámetro de pestaña y forzado de datos frescos
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-yUjvbrg_XxbnkfDrn7jR9EwQaoB5LSov-PovhPrhxumg0OdLGV7rxnZFtbSQZy1u9g/exec?pestana=Vaciado";
     const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
 
@@ -123,11 +127,9 @@
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(refresh);
     
-    // Intervalo de actualización (cada 30 segundos)
     setInterval(refresh, 30000);
 
     function refresh() {
-        // Añadimos timestamp para evitar caché del navegador
         fetch(WEB_APP_URL + "&t=" + new Date().getTime())
         .then(r => r.json())
         .then(res => {
@@ -136,7 +138,6 @@
                 return;
             }
 
-            // Filtrado por fecha de HOY
             const hoy = new Date().setHours(0,0,0,0);
             const rawData = res.slice(1).filter(f => {
                 if(!f[0]) return false;
@@ -146,14 +147,12 @@
 
             if (rawData.length === 0) {
                 document.getElementById('syncTime').innerText = "SIN DATOS PARA HOY (" + new Date().toLocaleTimeString() + ")";
-                // Limpia los estados si no hay datos
                 document.getElementById('status_ppm').innerHTML = '';
                 document.getElementById('status_orp').innerHTML = '';
                 document.getElementById('status_ph').innerHTML = '';
             } else {
-                document.getElementById('syncTime').innerText = "ÚLTIMA SINCRONIZACIÓN: " + new Date().toLocaleTimeString();
+                document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
                 
-                // Dibujar gráficos: colIdx según tu Excel (2:ppm, 3:orp, 4:ph)
                 drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2, '#');
                 drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3, '#');
                 drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4, '#.0');
@@ -186,7 +185,6 @@
             let fuera = (val < range[0] || val > range[1]);
             let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; }' : 'point { size: 5; fill-color: ' + baseColor + '; }';
             
-            // Etiqueta: Hora + KG (columna 5)
             dt.addRow([h + "\n" + (f[5]||"") + "k", val, estilo, f[6] === "SI" ? "CORRECCIÓN" : null, range[0], range[1]]);
         });
 
