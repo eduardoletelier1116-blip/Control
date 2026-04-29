@@ -16,7 +16,6 @@
         .form-control, .form-select { border-left: none; font-size: 0.9rem; }
         .variedad-badge { background: #e7f1ff; color: #0d6efd; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-block; margin: 2px; border: 1px solid #0d6efd; }
         
-        /* Estilo para nuevas filas de pulpa */
         .pulp-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 8px; margin-bottom: 8px; }
         .obs-input { display: none; margin-top: 5px; font-size: 0.8rem; border-left: 3px solid #0d6efd !important; border-radius: 0 8px 8px 0; }
         
@@ -41,7 +40,7 @@
                         <label class="form-label">OPERADOR</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                            <input type="text" id="operador" class="form-control" required>
+                            <input type="text" id="operador" class="form-control" required oninput="guardarOperador()">
                         </div>
                     </div>
                     <div class="col-4">
@@ -127,6 +126,20 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxWr-OYFzfjzwGOZzYkMAfyI-yShxOrd6qtpK_PGgSr5teU7AgeVL1pOEkH5F9zRhlUdw/exec";
     let variedadesSeleccionadas = [];
 
+    // --- NUEVAS FUNCIONES PARA EL OPERADOR ---
+    window.onload = function() {
+        const nombreGuardado = localStorage.getItem('nombreOperador');
+        if (nombreGuardado) {
+            document.getElementById('operador').value = nombreGuardado;
+        }
+    };
+
+    function guardarOperador() {
+        const nombre = document.getElementById('operador').value;
+        localStorage.setItem('nombreOperador', nombre);
+    }
+    // ----------------------------------------
+
     function toggleObs(id) {
         const el = document.getElementById(`obs-p${id}`);
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
@@ -163,7 +176,6 @@
         const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
 
-        // Construir el detalle de notas de pulpas
         let detalleNotas = [];
         for(let i=1; i<=6; i++){
             const val = document.getElementById(`p${i}`).value;
@@ -178,7 +190,6 @@
                 variedad: variedadesSeleccionadas.join(', '),
                 camara: document.getElementById('camara').value,
                 tAmbiente: document.getElementById('tAmbiente').value,
-                // Enviamos las 6 pulpas individuales
                 p1: document.getElementById('p1').value,
                 p2: document.getElementById('p2').value,
                 p3: document.getElementById('p3').value,
