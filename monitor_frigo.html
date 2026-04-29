@@ -176,13 +176,17 @@
                     <th class="text-center">FOTO</th>
                 </tr>
             </thead>
-            <tbody id="data-table-body"></tbody>
+            <tbody id="data-table-body">
+                <tr><td colspan="8" class="text-center py-4">Cargando datos...</td></tr>
+            </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const BASE_URL = "https://script.google.com/macros/s/AKfycbxWr-OYFzfjzwGOZzYkMAfyI-yShxOrd6qtpK_PGgSr5teU7AgeVL1pOEkH5F9zRhlUdw/exec?pestana=Frigorifico";
+    // REVISA QUE ESTA URL SEA LA CORRECTA
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxWr-OYFzfjzwGOZzYkMAfyI-yShxOrd6qtpK_PGgSr5teU7AgeVL1pOEkH5F9zRhlUdw/exec";
+    const BASE_URL = WEB_APP_URL + "?pestana=Frigorifico";
     
     let allData = [];
     let currentGroup = 0;
@@ -196,22 +200,37 @@
 
     async function syncData() {
         try {
+            console.log("Sincronizando...");
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
-            const hoyStr = new Date().toLocaleDateString();
+            
+            if (!json || json.length < 2) {
+                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No hay datos en la hoja</td></tr>';
+                return;
+            }
+
+            // --- FILTRADO DE DATOS (Acepta fechas de Google Sheets) ---
+            const hoy = new Date();
+            const hoyStr = hoy.toLocaleDateString();
 
             allData = json.slice(1).filter(row => {
                 if (!row[0]) return false;
-                return new Date(row[0]).toLocaleDateString() === hoyStr;
+                const fechaFila = new Date(row[0]).toLocaleDateString();
+                return fechaFila === hoyStr;
             }).reverse();
             
+            console.log("Datos filtrados de hoy:", allData.length);
+
             if (allData.length === 0) {
-                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4 small">Sin controles registrados hoy</td></tr>';
+                document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Sin registros para el día de hoy</td></tr>';
             } else {
                 drawTable();
             }
             drawCards();
-        } catch (e) { console.error("Error de sincronización"); }
+        } catch (e) { 
+            console.error("Error de sincronización:", e);
+            document.getElementById('data-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-danger py-4">Error al conectar con los datos</td></tr>';
+        }
     }
 
     function drawCards() {
@@ -220,7 +239,7 @@
         const latestByCam = {};
 
         allData.forEach(row => {
-            const camId = String(row[3] || ""); 
+            const camId = String(row[3] || "").trim(); 
             if (camId && !latestByCam[camId]) latestByCam[camId] = row;
         });
 
@@ -236,12 +255,11 @@
             if(!r) {
                 div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
             } else {
-                const tAmb = Number(r[4]);
-                const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(Number);
+                const tAmb = Number(r[4] || 0);
+                const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(val => Number(val || 0));
                 const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
-                const hum = Number(r[11]);
+                const hum = Number(r[11] || 0);
                 
-                // Alerta si el ambiente es alto O si CUALQUIERA de las pulpas es alta
                 const hayAlertaPulpas = pulpas.some(p => p > 2);
                 const isAlert = (tAmb > 1.5 || hayAlertaPulpas || hum < 85 || hum > 95);
                 
@@ -249,7 +267,7 @@
 
                 div.innerHTML = `
                     <span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span>
-                    <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${r[2]}</div>
+                    <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${r[2] || 'S/V'}</div>
                     <div class="row g-2 mb-2">
                         <div class="col-6">
                             <p class="label-text">Ambiente</p>
@@ -261,8 +279,8 @@
                         </div>
                     </div>
                     <div class="pulp-detail">
-                        P1:${pulpas[0]}° P2:${pulpas[1]}° P3:${pulpas[2]}°<br>
-                        P4:${pulpas[3]}° P5:${pulpas[4]}° P6:${pulpas[5]}°
+                        P1:${pulpas[0]} P2:${pulpas[1]} P3:${pulpas[2]}<br>
+                        P4:${pulpas[3]} P5:${pulpas[4]} P6:${pulpas[5]}
                     </div>
                     <div class="mt-2">
                         <p class="label-text">Humedad</p>
@@ -278,22 +296,23 @@
     function drawTable() {
         const body = document.getElementById('data-table-body');
         body.innerHTML = allData.slice(0, 15).map(r => {
-            const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(Number);
+            const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(val => Number(val || 0));
             const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6);
-            const tAmb = Number(r[4]);
-            const hum = Number(r[11]);
+            const tAmb = Number(r[4] || 0);
+            const hum = Number(r[11] || 0);
+            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
             return `
                 <tr>
-                    <td class="fw-bold" style="color: var(--accent-soft)">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
-                    <td><span class="badge-variety">${r[2]}</span></td>
+                    <td class="fw-bold" style="color: var(--accent-soft)">${hora}</td>
+                    <td><span class="badge-variety">${r[2] || 'S/V'}</span></td>
                     <td class="fw-bold">${r[3]}</td>
                     <td class="text-center fw-bold ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</td>
                     <td class="text-center fw-bold ${pulpas.some(p => p > 2) ? 'text-danger' : 'text-success'}">${tPulpProm.toFixed(1)}°</td>
                     <td class="text-center fw-bold ${(hum < 85 || hum > 95) ? 'text-danger' : 'text-success'}">${hum.toFixed(0)}%</td>
                     <td class="small text-muted">${r[13] || '-'}</td>
                     <td class="text-center">
-                        ${r[12] && r[12] !== "Sin foto" ? `<a href="${r[12]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
+                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color: var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
                     </td>
                 </tr>
             `;
