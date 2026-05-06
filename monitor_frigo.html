@@ -19,32 +19,19 @@
             --warning-amber: #fbbf24;
         }
 
-        body { 
-            background-color: var(--bg-app); 
-            color: var(--text-main); 
-            font-family: 'Poppins', sans-serif;
-            margin: 0; padding: 10px;
-        }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding: 10px; }
 
         /* --- HEADER --- */
-        .app-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 15px; margin-bottom: 12px;
-            background: rgba(30, 41, 59, 0.5); border-radius: 15px;
-        }
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; margin-bottom: 12px; background: rgba(30, 41, 59, 0.5); border-radius: 15px; }
         .logo-wrapper { display: flex; align-items: center; gap: 10px; }
         .logo-img { height: 35px; width: auto; object-fit: contain; }
         .app-title { font-size: 1rem; font-weight: 700; margin: 0; text-transform: uppercase; }
 
-        /* --- CUADROS SUPERIORES (ÚLTIMO ESTADO) --- */
+        /* --- CUADROS SUPERIORES --- */
         .interactive-zone { max-width: 1200px; margin: 0 auto; }
         .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; }
-
-        .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-            gap: 12px; margin-bottom: 15px;
-        }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 12px; margin-bottom: 15px; }
         .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
         .cam-card.alert-active { border: 2px solid var(--red-soft); animation: pulse-border 1.5s infinite; }
 
@@ -61,16 +48,11 @@
         .p-dot-idx { font-size: 0.45rem; color: var(--text-muted); }
         .p-dot-val { font-weight: 700; }
 
-        /* --- LISTADO (HISTORIAL COMPLETO) --- */
+        /* --- LISTADO --- */
         .list-container { display: flex; flex-direction: column; gap: 10px; }
-        .row-item {
-            background: var(--card-bg); border-radius: 16px; padding: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; gap: 10px; position: relative;
-        }
+        .row-item { background: var(--card-bg); border-radius: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px; position: relative; }
         .row-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
         .row-stats { display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 8px; }
-        
         .pulp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .p-box { background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .p-info { display: flex; flex-direction: column; }
@@ -78,14 +60,7 @@
         .p-val { font-size: 0.9rem; font-weight: 700; }
         .p-obs { font-size: 0.55rem; color: var(--warning-amber); text-align: right; max-width: 60%; line-height: 1; }
         .obs-general { font-size: 0.7rem; background: rgba(56, 189, 248, 0.05); padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent-soft); }
-
-        /* Botón de Foto */
-        .btn-photo {
-            background: var(--accent-soft); color: var(--bg-app);
-            border: none; border-radius: 8px; padding: 8px 12px;
-            font-size: 1.1rem; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .btn-photo { background: var(--accent-soft); color: var(--bg-app); border: none; border-radius: 8px; padding: 8px 12px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .btn-photo:hover { background: #fff; transform: scale(1.05); }
         .btn-photo.disabled { background: #334155; color: #64748b; cursor: not-allowed; }
 
@@ -98,7 +73,6 @@
             .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
             .photo-col { min-width: 50px; text-align: right; }
         }
-
         .badge-v { font-size: 0.7rem; color: var(--accent-soft); background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 5px; }
         .v-amb { font-size: 1.1rem; font-weight: 700; }
     </style>
@@ -138,6 +112,26 @@
         { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
+    // --- FUNCIÓN DE RANGOS INTELIGENTES ---
+    function getLimits(variedad) {
+        const v = variedad ? variedad.toLowerCase() : "";
+        
+        // Grupo Galas, Fuji, Red Delicius
+        if (v.includes("gala") || v.includes("fuji") || v.includes("red delicius") || v.includes("red del")) {
+            return { ambMin: -1, ambMax: 0, pulpMin: -0.5, pulpMax: 0.5 };
+        }
+        // Grupo Granny Smith y Cripps Pink
+        if (v.includes("granny") || v.includes("cripps") || v.includes("pink")) {
+            return { ambMin: 0, ambMax: 1, pulpMin: 1, pulpMax: 2 };
+        }
+        // Rango por defecto (Seguridad)
+        return { ambMin: -1, ambMax: 1.5, pulpMin: -0.5, pulpMax: 2.0 };
+    }
+
+    function checkAlert(val, min, max) {
+        return val < min || val > max;
+    }
+
     document.getElementById('main-carousel').onmouseenter = () => isPaused = true;
     document.getElementById('main-carousel').onmouseleave = () => isPaused = false;
 
@@ -147,10 +141,7 @@
             const json = await response.json();
             if (!json || json.length < 2) return;
             const hoyStr = new Date().toLocaleDateString();
-            
-            // Filtramos por hoy, pero guardamos TODO el historial sin agrupar por cámara
             allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
-            
             drawUI();
         } catch (e) { console.error(e); }
     }
@@ -158,48 +149,48 @@
     function drawUI() {
         const listContainer = document.getElementById('data-list');
         const latest = {};
-        
-        // 1. GENERAR LISTA COMPLETA (Orden descendente por hora)
         const historySorted = [...allData].sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
         listContainer.innerHTML = historySorted.map(r => {
+            const variedad = r[2];
+            const limits = getLimits(variedad);
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             const detalles = r[14] ? r[14].split(' | ') : [];
-            const obsGral = r[13] || '';
-            const linkFoto = r[15]; // Asumiendo que el link de la foto está en la columna 15
+            const linkFoto = r[15];
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
+                const isPulpAlert = checkAlert(val, limits.pulpMin, limits.pulpMax);
                 let obsFruto = "";
                 if (detalles[i-1]) {
                     const match = detalles[i-1].match(/\(([^)]+)\)/);
                     obsFruto = match ? match[1] : "";
                 }
-                pulpasHtml += `<div class="p-box"><div class="p-info"><span class="p-idx">P${i}</span><span class="p-val ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span></div>${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}</div>`;
+                pulpasHtml += `<div class="p-box"><div class="p-info"><span class="p-idx">P${i}</span><span class="p-val ${isPulpAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span></div>${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}</div>`;
             }
+
+            const isAmbAlert = checkAlert(tAmb, limits.ambMin, limits.ambMax);
+            const isHumAlert = hum < 85 || hum > 95;
 
             return `
                 <div class="row-item">
                     <div class="row-header"><span class="fw-bold text-primary">CÁMARA ${r[3]}</span><span class="text-muted" style="font-size:0.7rem">${hora}</span></div>
                     <div class="row-stats">
-                        <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
-                        <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${hum < 85 ? 'text-danger' : 'text-main'}">${hum}%</span></div>
-                        <div class="text-center d-none d-lg-block"><span class="p-idx d-block">VARIEDAD</span><span class="badge-v">${r[2] || 'S/V'}</span></div>
+                        <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
+                        <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span></div>
+                        <div class="text-center d-none d-lg-block"><span class="p-idx d-block">VARIEDAD</span><span class="badge-v">${variedad || 'S/V'}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
                     <div class="d-flex align-items-center gap-2">
-                        <div class="flex-grow-1"><span class="badge-v d-lg-none text-center">${r[2] || 'S/V'}</span>${obsGral ? `<div class="obs-general mt-1"><i class="bi bi-info-circle me-1"></i>${obsGral}</div>` : ''}</div>
-                        <div class="photo-col">
-                            ${linkFoto ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}
-                        </div>
+                        <div class="flex-grow-1"><span class="badge-v d-lg-none text-center">${variedad || 'S/V'}</span>${r[13] ? `<div class="obs-general mt-1"><i class="bi bi-info-circle me-1"></i>${r[13]}</div>` : ''}</div>
+                        <div class="photo-col">${linkFoto ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}</div>
                     </div>
                 </div>`;
         }).join('');
 
-        // 2. GENERAR LATEST (Para los cuadros superiores)
         allData.forEach(row => { latest[row[3]] = row; });
         renderCards(latest);
     }
@@ -212,16 +203,24 @@
         container.innerHTML = activeGroup.ids.map(id => {
             const r = latest[id];
             if(!r) return `<div class="cam-card text-muted small text-center">CÁMARA ${id}<br>OFFLINE</div>`;
+            
+            const limits = getLimits(r[2]);
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             let pulpasHtml = "";
-            let pulseRed = false;
+            let anyPulpAlert = false;
+            
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
-                if(val > 2.0) pulseRed = true;
-                pulpasHtml += `<div class="p-dot"><span class="p-dot-idx">P${i}</span><span class="p-dot-val ${val > 2.0 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span></div>`;
+                const isAlert = checkAlert(val, limits.pulpMin, limits.pulpMax);
+                if(isAlert) anyPulpAlert = true;
+                pulpasHtml += `<div class="p-dot"><span class="p-dot-idx">P${i}</span><span class="p-dot-val ${isAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span></div>`;
             }
-            const hasAlert = (tAmb > 1.5 || hum < 85 || pulseRed);
+
+            const isAmbAlert = checkAlert(tAmb, limits.ambMin, limits.ambMax);
+            const isHumAlert = hum < 85 || hum > 95;
+            const hasAlert = isAmbAlert || isHumAlert || anyPulpAlert;
+
             return `
                 <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
@@ -229,8 +228,8 @@
                         <span class="p-idx" style="font-size:0.5rem">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-end">
-                        <div><div class="card-stat-label">Ambiente</div><div class="card-stat-val ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
-                        <div class="text-end"><div class="card-stat-label">Humedad</div><div class="card-stat-val ${hum < 85 ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
+                        <div><div class="card-stat-label">Ambiente</div><div class="card-stat-val ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
+                        <div class="text-end"><div class="card-stat-label">Humedad</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
                     </div>
                     <div class="card-pulp-grid">${pulpasHtml}</div>
                     <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[2] || 'S/V'}</div>
