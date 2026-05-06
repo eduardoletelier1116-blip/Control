@@ -23,90 +23,83 @@
             background-color: var(--bg-app); 
             color: var(--text-main); 
             font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            padding: 10px;
+            margin: 0; padding: 10px;
         }
 
         /* --- HEADER --- */
         .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 15px; margin-bottom: 12px;
+            background: rgba(30, 41, 59, 0.5); border-radius: 15px;
         }
-        .logo-img { width: 40px; height: 40px; object-fit: contain; }
-        .app-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
-        .sync-info { font-size: 0.75rem; color: var(--accent-soft); font-weight: 600; }
+        .logo-img { width: 35px; height: 35px; object-fit: contain; }
+        .app-title { font-size: 1rem; font-weight: 700; margin: 0; }
 
-        /* --- CARDS RESPONSIVAS --- */
-        .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 35px; height: 35px; }
+        /* --- CARDS SUPERIORES (Más elegantes) --- */
+        .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; font-size: 0.8rem; }
 
         .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        /* Ajuste para teléfonos pequeños */
-        @media (max-width: 480px) {
-            .cards-grid { grid-template-columns: 1fr 1fr; }
-            .cam-card { min-height: 180px !important; padding: 12px !important; }
-            .value-text { font-size: 1rem !important; }
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px; margin-bottom: 15px;
         }
 
         .cam-card { 
-            background: var(--card-bg); 
-            border-radius: 20px; 
-            padding: 15px; 
-            min-height: 200px;
+            background: linear-gradient(145deg, #1e293b, #111827);
+            border-radius: 18px; padding: 12px; 
             border: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
+        .cam-card.alert { border: 1px solid var(--red-soft); background: rgba(248, 113, 113, 0.05); }
+
+        /* --- LISTADO INFERIOR (CORREGIDO Y COMPACTO) --- */
+        .list-container { display: flex; flex-direction: column; gap: 8px; }
         
-        .cam-card.alert { border: 2px solid var(--red-soft); animation: pulse-alert 2s infinite; }
-        @keyframes pulse-alert { 0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); } }
-
-        .label-text { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        .value-text { font-size: 1.1rem; font-weight: 700; }
-
-        /* --- TABLA MODO TELÉFONO --- */
-        .list-section { background: var(--card-bg); border-radius: 20px; padding: 10px; }
+        /* En PC se ve como tabla, en móvil como tarjeta compacta */
+        .row-item {
+            background: var(--card-bg); border-radius: 14px;
+            padding: 10px; border: 1px solid rgba(255,255,255,0.05);
+            display: grid; grid-template-columns: 1fr 1fr 2fr 1fr; /* Estilo Desktop */
+            align-items: center;
+        }
 
         @media (max-width: 768px) {
-            .table thead { display: none; }
-            .table tbody td { display: block; width: 100%; text-align: left !important; border: none !important; padding: 5px 10px !important; }
-            .table tbody tr { display: block; margin-bottom: 20px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 4px solid var(--accent-soft); }
-            
-            /* Crear etiquetas para cada dato en móvil */
-            .table tbody td::before {
-                content: attr(data-label);
-                float: left;
-                font-weight: 600;
-                color: var(--text-muted);
-                text-transform: uppercase;
-                font-size: 0.6rem;
-                width: 100%;
+            .row-item {
+                grid-template-columns: 1fr 1fr; /* 2 columnas en móvil */
+                grid-template-areas: 
+                    "head head"
+                    "info pulpas"
+                    "obs obs";
+                gap: 8px;
             }
-            .pulp-container { justify-content: flex-start !important; margin-top: 5px; }
+            .header-info { grid-area: head; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; display: flex; justify-content: space-between; }
+            .main-stats { grid-area: info; display: flex; flex-direction: column; justify-content: center; }
+            .pulp-grid { grid-area: pulpas; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+            .obs-box { grid-area: obs; }
+            
+            /* Ocultar etiquetas de tabla clásica */
+            .desktop-only { display: none; }
         }
 
-        /* Estilo de Pulpas */
-        .pulp-box {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 4px; border-radius: 8px;
-            min-width: 60px; text-align: center; margin: 2px;
+        @media (min-width: 769px) {
+            .list-container { display: block; }
+            .row-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+            .pulp-grid { display: flex; gap: 5px; }
+            .header-info { min-width: 120px; }
         }
-        .pulp-num { font-size: 0.85rem; font-weight: 700; display: block; }
-        .obs-tag { font-size: 0.5rem; color: var(--warning-amber); display: block; }
 
-        .badge-variety { background: rgba(56, 189, 248, 0.1); color: var(--accent-soft); padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; }
+        /* Mini Cajas de Pulpa */
+        .p-mini {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 6px; padding: 2px 4px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .p-val { font-size: 0.75rem; font-weight: 700; display: block; }
+        .p-idx { font-size: 0.5rem; color: var(--text-muted); display: block; text-transform: uppercase; }
+
+        .badge-variety { font-size: 0.65rem; background: rgba(56, 189, 248, 0.1); color: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
+        .val-big { font-size: 1rem; font-weight: 700; }
+        .text-obs { font-size: 0.65rem; color: var(--warning-amber); font-style: italic; }
     </style>
 </head>
 <body>
@@ -114,34 +107,22 @@
 <header class="app-header">
     <div class="d-flex align-items-center gap-2">
         <img src="logo-icono.png" alt="Logo" class="logo-img">
-        <h1 class="app-title">Monitor Frigo</h1>
+        <h1 class="app-title">MONITOR FRIGO</h1>
     </div>
-    <div class="sync-info"><i class="bi bi-clock"></i> <span id="reloj">00:00:00</span></div>
+    <div id="reloj" class="sync-info">00:00:00</div>
 </header>
 
+<!-- Área de Cards -->
 <div class="group-nav">
     <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-    <span id="group-label" class="badge rounded-pill bg-primary px-3 py-2">Grupo</span>
+    <span id="group-label" class="badge bg-dark">Cámaras</span>
     <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
 </div>
-
 <div id="cards-container" class="cards-grid"></div>
 
-<div class="list-section">
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>Cámara</th>
-                    <th>Variedad</th>
-                    <th class="text-center">Amb.</th>
-                    <th class="text-center">Pulpas (P1-P6)</th>
-                    <th class="text-center">Hum%</th>
-                </tr>
-            </thead>
-            <tbody id="data-table-body"></tbody>
-        </table>
-    </div>
+<!-- Listado Compacto -->
+<div class="list-container" id="data-list">
+    <!-- Las filas se insertan aquí -->
 </div>
 
 <script>
@@ -165,111 +146,77 @@
             const hoyStr = new Date().toLocaleDateString();
             allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
             
-            drawTable();
-            drawCards();
-        } catch (e) { console.error("Error sync:", e); }
+            drawUI();
+        } catch (e) { console.error(e); }
     }
 
-    function drawTable() {
-        const body = document.getElementById('data-table-body');
+    function drawUI() {
+        const listContainer = document.getElementById('data-list');
+        const cardsContainer = document.getElementById('cards-container');
         const latest = {};
         allData.forEach(row => { latest[row[3]] = row; });
         const sorted = Object.values(latest).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
 
-        body.innerHTML = sorted.map(r => {
+        // DIBUJAR LISTADO COMPACTO
+        listContainer.innerHTML = sorted.map(r => {
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
+            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             const detalles = r[14] ? r[14].split(' | ') : [];
+            const obsGral = r[13] || '';
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
-                const pClass = (val > 2.0) ? 'text-danger' : 'text-success';
-                let obs = "";
-                if (detalles[i-1]) {
-                    const match = detalles[i-1].match(/\(([^)]+)\)/);
-                    obs = match ? match[1] : "";
-                }
                 pulpasHtml += `
-                    <div class="pulp-box">
-                        <span class="pulp-num ${pClass}">${val.toFixed(1)}°</span>
-                        ${obs ? `<span class="obs-tag">${obs}</span>` : ''}
+                    <div class="p-mini">
+                        <span class="p-idx">P${i}</span>
+                        <span class="p-val ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span>
                     </div>`;
             }
 
             return `
-                <tr>
-                    <td data-label="Cámara" class="fw-bold text-primary">Cámara ${r[3]} (${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})})</td>
-                    <td data-label="Variedad"><span class="badge-variety">${r[2] || 'S/V'}</span></td>
-                    <td data-label="Ambiente" class="text-center ${tAmb > 1.5 ? 'text-danger fw-bold' : 'text-success'}">${tAmb.toFixed(1)}°</td>
-                    <td data-label="Detalle de Pulpas">
-                        <div class="d-flex flex-wrap justify-content-center pulp-container">${pulpasHtml}</div>
-                    </td>
-                    <td data-label="Humedad %" class="text-center ${hum < 85 ? 'text-danger fw-bold' : ''}">${hum}%</td>
-                </tr>`;
+                <div class="row-item">
+                    <div class="header-info">
+                        <span class="fw-bold text-primary">CAM ${r[3]}</span>
+                        <span class="text-muted small">${hora}</span>
+                    </div>
+                    <div class="main-stats">
+                        <span class="badge-variety mb-1">${r[2] || 'S/V'}</span>
+                        <div>
+                            <span class="val-big ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span>
+                            <span class="ms-2 val-big">${hum}% <i class="bi bi-droplets small"></i></span>
+                        </div>
+                    </div>
+                    <div class="pulp-grid">${pulpasHtml}</div>
+                    ${obsGral ? `<div class="obs-box text-obs"><i class="bi bi-chat-dots me-1"></i>${obsGral}</div>` : ''}
+                </div>`;
+        }).join('');
+
+        // DIBUJAR CARDS SUPERIORES
+        const activeGroup = groups[currentGroup];
+        document.getElementById('group-label').innerText = activeGroup.label;
+        cardsContainer.innerHTML = activeGroup.ids.map(id => {
+            const r = latest[id];
+            if(!r) return `<div class="cam-card text-muted small">CAM ${id}<br>Sin datos</div>`;
+            const tAmb = Number(r[4] || 0);
+            return `
+                <div class="cam-card ${tAmb > 1.5 ? 'alert' : ''}">
+                    <div class="d-flex justify-content-between">
+                        <span class="label-text">CAM ${id}</span>
+                        <span class="label-text">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <div class="val-big mt-1">${tAmb.toFixed(1)}°</div>
+                    <div class="badge-variety mt-1 text-truncate">${r[2] || 'S/V'}</div>
+                </div>`;
         }).join('');
     }
 
-    function drawCards() {
-        const container = document.getElementById('cards-container');
-        const latest = {};
-        allData.forEach(row => { latest[row[3]] = row; });
-        
-        const activeGroup = groups[currentGroup];
-        document.getElementById('group-label').innerText = activeGroup.label;
-        container.innerHTML = "";
-
-        activeGroup.ids.forEach(id => {
-            const r = latest[id];
-            const div = document.createElement('div');
-            div.className = "cam-card";
-            
-            if(!r) {
-                div.innerHTML = `<span class="label-text">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos hoy</div>`;
-            } else {
-                const tAmb = Number(r[4] || 0);
-                const hum = Number(r[11] || 0);
-                const pulpas = [r[5],r[6],r[7],r[8],r[9],r[10]].map(v => Number(v || 0));
-                const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
-                
-                if (tAmb > 1.5 || pulpas.some(p => p > 2) || hum < 85) div.classList.add('alert');
-                
-                div.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-start">
-                        <span class="label-text text-primary">Cámara ${id}</span>
-                        <span class="badge-variety">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    <div class="mt-2 fw-bold small text-truncate">${r[2] || 'S/V'}</div>
-                    <div class="row g-1 mt-auto">
-                        <div class="col-6">
-                            <span class="label-text">Amb.</span>
-                            <div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
-                        </div>
-                        <div class="col-6">
-                            <span class="label-text">Pulpa</span>
-                            <div class="value-text">${tPulpProm}°</div>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <span class="label-text">Humedad</span>
-                            <div class="value-text ${hum < 85 ? 'text-danger' : ''}">${hum}%</div>
-                        </div>
-                    </div>`;
-            }
-            container.appendChild(div);
-        });
-    }
-
-    function changeGroup(n) { 
-        currentGroup = (currentGroup + n + groups.length) % groups.length; 
-        drawCards(); 
-    }
-
-    // Intervalos
+    function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawUI(); }
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(syncData, 60000); // Sincroniza cada 1 min
-    setInterval(() => changeGroup(1), 8000); // Cambia grupo cada 8 seg
-    
-    syncData(); // Ejecución inicial
+    setInterval(syncData, 60000);
+    setInterval(() => changeGroup(1), 10000);
+    syncData();
 </script>
 </body>
 </html>
