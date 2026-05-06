@@ -26,51 +26,64 @@
             margin: 0; padding: 10px;
         }
 
-        /* --- HEADER: LOGO CORREGIDO --- */
+        /* --- HEADER --- */
         .app-header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 8px 15px; margin-bottom: 12px;
             background: rgba(30, 41, 59, 0.5); border-radius: 15px;
         }
         .logo-wrapper { display: flex; align-items: center; gap: 10px; }
-        .logo-img { 
-            height: 35px; /* Altura fija para que no crezca */
-            width: auto; 
-            object-fit: contain; 
-        }
+        .logo-img { height: 35px; width: auto; object-fit: contain; }
         .app-title { font-size: 1rem; font-weight: 700; margin: 0; }
 
-        /* --- CUADROS SUPERIORES Y NAVEGACIÓN --- */
-        .interactive-zone {
-            max-width: 1200px; margin: 0 auto;
-        }
-        
-        .group-nav { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 10px; padding: 0 5px;
-        }
+        /* --- CUADROS SUPERIORES (CON TODAS LAS PULPAS) --- */
+        .interactive-zone { max-width: 1200px; margin: 0 auto; }
+        .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .nav-btn { 
             background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); 
             color: white; border-radius: 50%; width: 32px; height: 32px; 
-            cursor: pointer; transition: 0.3s;
         }
-        .nav-btn:hover { background: var(--accent-soft); }
 
         .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px; margin-bottom: 15px;
-            transition: opacity 0.3s ease;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px; margin-bottom: 15px;
         }
 
         .cam-card { 
             background: var(--card-bg); border-radius: 18px; padding: 12px; 
             border: 1px solid rgba(255,255,255,0.05);
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
         }
-        .cam-card:hover { transform: translateY(-3px); border-color: var(--accent-soft); }
-        .cam-card.alert { border: 1.5px solid var(--red-soft); background: rgba(248, 113, 113, 0.05); }
 
-        /* --- LISTADO (INTACTO SEGÚN TU GUSTO) --- */
+        .cam-card.alert-active { 
+            border: 2px solid var(--red-soft);
+            animation: pulse-border 1.5s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+        }
+
+        .card-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
+        .card-stat-val { font-size: 1.2rem; font-weight: 700; }
+
+        /* Mini Grilla de Pulpas para los Cuadros */
+        .card-pulp-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 4px; margin-top: 8px;
+            background: rgba(0,0,0,0.15); padding: 6px; border-radius: 10px;
+        }
+        .p-dot {
+            display: flex; flex-direction: column; align-items: center;
+            font-size: 0.65rem; border-radius: 4px; padding: 2px;
+            background: rgba(255,255,255,0.03);
+        }
+        .p-dot-idx { font-size: 0.45rem; color: var(--text-muted); }
+        .p-dot-val { font-weight: 700; }
+
+        /* --- LISTADO (MANTENIDO INTACTO) --- */
         .list-container { display: flex; flex-direction: column; gap: 10px; }
         .row-item {
             background: var(--card-bg); border-radius: 16px; padding: 12px;
@@ -114,20 +127,15 @@
     <div id="reloj" class="sync-info small">00:00:00</div>
 </header>
 
-<!-- Zona Interactiva de Cuadros -->
 <div class="interactive-zone" id="main-carousel">
     <div class="group-nav">
         <button class="nav-btn" onclick="manualChange(-1)"><i class="bi bi-chevron-left"></i></button>
-        <span id="group-label" class="badge bg-primary px-3 py-2">Cargando...</span>
+        <span id="group-label" class="badge bg-primary px-3 py-2">Grupo</span>
         <button class="nav-btn" onclick="manualChange(1)"><i class="bi bi-chevron-right"></i></button>
     </div>
-    
-    <div id="cards-container" class="cards-grid">
-        <!-- Cuadros superiores dinámicos -->
-    </div>
+    <div id="cards-container" class="cards-grid"></div>
 </div>
 
-<!-- Listado (Sin cambios de estilo) -->
 <div class="list-container" id="data-list"></div>
 
 <script>
@@ -137,18 +145,15 @@
     let allData = [];
     let currentGroup = 0;
     let isPaused = false;
-    let rotationTimer;
 
     const groups = [
-        { label: "Grupo 1: Cámaras 2 - 5", ids: ["2", "3", "4", "5"] },
-        { label: "Grupo 2: Cámaras 6 - 9", ids: ["6", "7", "8", "9"] },
-        { label: "Grupo 3: Cámaras 10 - 12", ids: ["10", "11", "12"] }
+        { label: "Cámaras 2 - 5", ids: ["2", "3", "4", "5"] },
+        { label: "Cámaras 6 - 9", ids: ["6", "7", "8", "9"] },
+        { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
-    // Control de pausa
-    const carouselEl = document.getElementById('main-carousel');
-    carouselEl.onmouseenter = () => { isPaused = true; };
-    carouselEl.onmouseleave = () => { isPaused = false; };
+    document.getElementById('main-carousel').onmouseenter = () => isPaused = true;
+    document.getElementById('main-carousel').onmouseleave = () => isPaused = false;
 
     async function syncData() {
         try {
@@ -158,17 +163,16 @@
             const hoyStr = new Date().toLocaleDateString();
             allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
             drawUI();
-        } catch (e) { console.error("Error de conexión:", e); }
+        } catch (e) { console.error(e); }
     }
 
     function drawUI() {
         const listContainer = document.getElementById('data-list');
-        const cardsContainer = document.getElementById('cards-container');
         const latest = {};
         allData.forEach(row => { latest[row[3]] = row; });
         const sorted = Object.values(latest).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
 
-        // --- 1. DIBUJAR LISTA (TU CÓDIGO PERFECTO) ---
+        // LISTADO PRINCIPAL (INTACTO)
         listContainer.innerHTML = sorted.map(r => {
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
@@ -222,35 +226,60 @@
                 </div>`;
         }).join('');
 
-        // --- 2. DIBUJAR CUADROS SUPERIORES ---
         renderCards(latest);
     }
 
     function renderCards(latest) {
-        const cardsContainer = document.getElementById('cards-container');
+        const container = document.getElementById('cards-container');
         const activeGroup = groups[currentGroup];
         document.getElementById('group-label').innerText = activeGroup.label;
 
-        cardsContainer.innerHTML = activeGroup.ids.map(id => {
+        container.innerHTML = activeGroup.ids.map(id => {
             const r = latest[id];
-            if(!r) return `<div class="cam-card text-muted small text-center">CAM ${id}<br>Desconectada</div>`;
+            if(!r) return `<div class="cam-card text-muted small text-center">CAM ${id}<br>OFFLINE</div>`;
             
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
-            const isAlert = (tAmb > 1.5 || hum < 85);
+            
+            let pulpasHtml = "";
+            let pulseRed = false;
+            for (let i = 1; i <= 6; i++) {
+                const val = Number(r[4 + i] || 0);
+                if(val > 2.0) pulseRed = true;
+                pulpasHtml += `
+                    <div class="p-dot">
+                        <span class="p-dot-idx">P${i}</span>
+                        <span class="p-dot-val ${val > 2.0 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span>
+                    </div>`;
+            }
+            
+            const hasAlert = (tAmb > 1.5 || hum < 85 || pulseRed);
 
             return `
-                <div class="cam-card ${isAlert ? 'alert' : ''}">
+                <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="p-idx text-primary">CAM ${id}</span>
+                        <span class="badge bg-primary" style="font-size:0.6rem">CAM ${id}</span>
                         <span class="p-idx" style="font-size:0.5rem">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                     </div>
-                    <div class="v-amb ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="p-idx">${hum}% HR</span>
-                        <i class="bi bi-circle-fill ${isAlert ? 'text-danger' : 'text-success'}" style="font-size:0.5rem"></i>
+                    
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="card-stat-label">Ambiente</div>
+                            <div class="card-stat-val ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="card-stat-label">Humedad</div>
+                            <div class="card-stat-val ${hum < 85 ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div>
+                        </div>
                     </div>
-                    <div class="p-idx text-truncate mt-1" style="color:var(--accent-soft)">${r[2] || 'Sin Variedad'}</div>
+
+                    <div class="card-pulp-grid">
+                        ${pulpasHtml}
+                    </div>
+                    
+                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">
+                        ${r[2] || 'S/V'}
+                    </div>
                 </div>`;
         }).join('');
     }
@@ -262,17 +291,9 @@
         renderCards(latest);
     }
 
-    // Reloj e Intervalos
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
     setInterval(syncData, 60000);
-    
-    // Rotación automática con pausa
-    setInterval(() => {
-        if(!isPaused && allData.length > 0) {
-            manualChange(1);
-        }
-    }, 8000);
-
+    setInterval(() => { if(!isPaused && allData.length > 0) manualChange(1); }, 8000);
     syncData();
 </script>
 </body>
