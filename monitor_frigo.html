@@ -36,29 +36,17 @@
         .logo-img { height: 35px; width: auto; object-fit: contain; }
         .app-title { font-size: 1rem; font-weight: 700; margin: 0; text-transform: uppercase; }
 
-        /* --- CUADROS SUPERIORES --- */
+        /* --- CUADROS SUPERIORES (ÚLTIMO ESTADO) --- */
         .interactive-zone { max-width: 1200px; margin: 0 auto; }
         .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .nav-btn { 
-            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); 
-            color: white; border-radius: 50%; width: 32px; height: 32px; 
-        }
+        .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; }
 
         .cards-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
             gap: 12px; margin-bottom: 15px;
         }
-
-        .cam-card { 
-            background: var(--card-bg); border-radius: 18px; padding: 12px; 
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
-        }
-
-        .cam-card.alert-active { 
-            border: 2px solid var(--red-soft);
-            animation: pulse-border 1.5s infinite;
-        }
+        .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
+        .cam-card.alert-active { border: 2px solid var(--red-soft); animation: pulse-border 1.5s infinite; }
 
         @keyframes pulse-border {
             0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
@@ -68,56 +56,47 @@
 
         .card-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
         .card-stat-val { font-size: 1.2rem; font-weight: 700; }
-
-        .card-pulp-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 4px; margin-top: 8px;
-            background: rgba(0,0,0,0.15); padding: 6px; border-radius: 10px;
-        }
-        .p-dot {
-            display: flex; flex-direction: column; align-items: center;
-            font-size: 0.65rem; border-radius: 4px; padding: 2px;
-            background: rgba(255,255,255,0.03);
-        }
+        .card-pulp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; background: rgba(0,0,0,0.15); padding: 6px; border-radius: 10px; }
+        .p-dot { display: flex; flex-direction: column; align-items: center; font-size: 0.65rem; border-radius: 4px; padding: 2px; background: rgba(255,255,255,0.03); }
         .p-dot-idx { font-size: 0.45rem; color: var(--text-muted); }
         .p-dot-val { font-weight: 700; }
 
-        /* --- LISTADO --- */
+        /* --- LISTADO (HISTORIAL COMPLETO) --- */
         .list-container { display: flex; flex-direction: column; gap: 10px; }
         .row-item {
             background: var(--card-bg); border-radius: 16px; padding: 12px;
             border: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; gap: 10px;
+            display: flex; flex-direction: column; gap: 10px; position: relative;
         }
         .row-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
         .row-stats { display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 8px; }
         
         .pulp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .p-box {
-            background: rgba(15, 23, 42, 0.6); border-radius: 8px;
-            padding: 4px 8px; border: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .p-box { background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .p-info { display: flex; flex-direction: column; }
         .p-idx { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; }
         .p-val { font-size: 0.9rem; font-weight: 700; }
         .p-obs { font-size: 0.55rem; color: var(--warning-amber); text-align: right; max-width: 60%; line-height: 1; }
         .obs-general { font-size: 0.7rem; background: rgba(56, 189, 248, 0.05); padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent-soft); }
 
-        /* AJUSTE PC: Espaciado para Ambiente y Humedad */
+        /* Botón de Foto */
+        .btn-photo {
+            background: var(--accent-soft); color: var(--bg-app);
+            border: none; border-radius: 8px; padding: 8px 12px;
+            font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-photo:hover { background: #fff; transform: scale(1.05); }
+        .btn-photo.disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
         @media (min-width: 992px) {
             .row-item { flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 20px; }
-            .row-header { border: none; padding: 0; min-width: 150px; }
-            .row-stats { 
-                background: none; 
-                min-width: 250px; /* Un poco más de ancho */
-                gap: 25px; /* Espacio extra entre columnas en PC */
-                justify-content: flex-start;
-                padding-left: 20px;
-            }
+            .row-header { border: none; padding: 0; min-width: 140px; }
+            .row-stats { background: none; min-width: 250px; gap: 25px; justify-content: flex-start; padding-left: 20px; }
             .pulp-grid { grid-template-columns: repeat(6, 1fr); flex-grow: 1; margin: 0 20px; }
             .p-box { flex-direction: column; text-align: center; justify-content: center; min-height: 55px; }
             .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
+            .photo-col { min-width: 50px; text-align: right; }
         }
 
         .badge-v { font-size: 0.7rem; color: var(--accent-soft); background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 5px; }
@@ -168,7 +147,10 @@
             const json = await response.json();
             if (!json || json.length < 2) return;
             const hoyStr = new Date().toLocaleDateString();
+            
+            // Filtramos por hoy, pero guardamos TODO el historial sin agrupar por cámara
             allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
+            
             drawUI();
         } catch (e) { console.error(e); }
     }
@@ -176,15 +158,17 @@
     function drawUI() {
         const listContainer = document.getElementById('data-list');
         const latest = {};
-        allData.forEach(row => { latest[row[3]] = row; });
-        const sorted = Object.values(latest).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
+        
+        // 1. GENERAR LISTA COMPLETA (Orden descendente por hora)
+        const historySorted = [...allData].sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
-        listContainer.innerHTML = sorted.map(r => {
+        listContainer.innerHTML = historySorted.map(r => {
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             const detalles = r[14] ? r[14].split(' | ') : [];
             const obsGral = r[13] || '';
+            const linkFoto = r[15]; // Asumiendo que el link de la foto está en la columna 15
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
@@ -206,10 +190,17 @@
                         <div class="text-center d-none d-lg-block"><span class="p-idx d-block">VARIEDAD</span><span class="badge-v">${r[2] || 'S/V'}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
-                    <div class="d-flex flex-column gap-1"><span class="badge-v d-lg-none text-center">${r[2] || 'S/V'}</span>${obsGral ? `<div class="obs-general"><i class="bi bi-info-circle me-1"></i>${obsGral}</div>` : ''}</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1"><span class="badge-v d-lg-none text-center">${r[2] || 'S/V'}</span>${obsGral ? `<div class="obs-general mt-1"><i class="bi bi-info-circle me-1"></i>${obsGral}</div>` : ''}</div>
+                        <div class="photo-col">
+                            ${linkFoto ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}
+                        </div>
+                    </div>
                 </div>`;
         }).join('');
 
+        // 2. GENERAR LATEST (Para los cuadros superiores)
+        allData.forEach(row => { latest[row[3]] = row; });
         renderCards(latest);
     }
 
@@ -221,7 +212,6 @@
         container.innerHTML = activeGroup.ids.map(id => {
             const r = latest[id];
             if(!r) return `<div class="cam-card text-muted small text-center">CÁMARA ${id}<br>OFFLINE</div>`;
-            
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             let pulpasHtml = "";
@@ -232,7 +222,6 @@
                 pulpasHtml += `<div class="p-dot"><span class="p-dot-idx">P${i}</span><span class="p-dot-val ${val > 2.0 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span></div>`;
             }
             const hasAlert = (tAmb > 1.5 || hum < 85 || pulseRed);
-
             return `
                 <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
