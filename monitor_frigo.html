@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Cámaras Pro</title>
+    <title>Monitor Frío Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
@@ -34,9 +34,9 @@
         }
         .logo-wrapper { display: flex; align-items: center; gap: 10px; }
         .logo-img { height: 35px; width: auto; object-fit: contain; }
-        .app-title { font-size: 1rem; font-weight: 700; margin: 0; }
+        .app-title { font-size: 1rem; font-weight: 700; margin: 0; text-transform: uppercase; }
 
-        /* --- CUADROS SUPERIORES (CON TODAS LAS PULPAS) --- */
+        /* --- CUADROS SUPERIORES --- */
         .interactive-zone { max-width: 1200px; margin: 0 auto; }
         .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .nav-btn { 
@@ -45,7 +45,7 @@
         }
 
         .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
             gap: 12px; margin-bottom: 15px;
         }
 
@@ -69,7 +69,6 @@
         .card-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
         .card-stat-val { font-size: 1.2rem; font-weight: 700; }
 
-        /* Mini Grilla de Pulpas para los Cuadros */
         .card-pulp-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 4px; margin-top: 8px;
@@ -83,7 +82,7 @@
         .p-dot-idx { font-size: 0.45rem; color: var(--text-muted); }
         .p-dot-val { font-weight: 700; }
 
-        /* --- LISTADO (MANTENIDO INTACTO) --- */
+        /* --- LISTADO --- */
         .list-container { display: flex; flex-direction: column; gap: 10px; }
         .row-item {
             background: var(--card-bg); border-radius: 16px; padding: 12px;
@@ -92,6 +91,7 @@
         }
         .row-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
         .row-stats { display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 8px; }
+        
         .pulp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .p-box {
             background: rgba(15, 23, 42, 0.6); border-radius: 8px;
@@ -104,10 +104,17 @@
         .p-obs { font-size: 0.55rem; color: var(--warning-amber); text-align: right; max-width: 60%; line-height: 1; }
         .obs-general { font-size: 0.7rem; background: rgba(56, 189, 248, 0.05); padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent-soft); }
 
+        /* AJUSTE PC: Espaciado para Ambiente y Humedad */
         @media (min-width: 992px) {
             .row-item { flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 20px; }
             .row-header { border: none; padding: 0; min-width: 150px; }
-            .row-stats { background: none; min-width: 200px; }
+            .row-stats { 
+                background: none; 
+                min-width: 250px; /* Un poco más de ancho */
+                gap: 25px; /* Espacio extra entre columnas en PC */
+                justify-content: flex-start;
+                padding-left: 20px;
+            }
             .pulp-grid { grid-template-columns: repeat(6, 1fr); flex-grow: 1; margin: 0 20px; }
             .p-box { flex-direction: column; text-align: center; justify-content: center; min-height: 55px; }
             .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
@@ -122,7 +129,7 @@
 <header class="app-header">
     <div class="logo-wrapper">
         <img src="logo-icono.png" alt="Logo" class="logo-img">
-        <h1 class="app-title">MONITOR FRIGO</h1>
+        <h1 class="app-title">MONITOR FRÍO</h1>
     </div>
     <div id="reloj" class="sync-info small">00:00:00</div>
 </header>
@@ -172,7 +179,6 @@
         allData.forEach(row => { latest[row[3]] = row; });
         const sorted = Object.values(latest).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
 
-        // LISTADO PRINCIPAL (INTACTO)
         listContainer.innerHTML = sorted.map(r => {
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
@@ -188,41 +194,19 @@
                     const match = detalles[i-1].match(/\(([^)]+)\)/);
                     obsFruto = match ? match[1] : "";
                 }
-                pulpasHtml += `
-                    <div class="p-box">
-                        <div class="p-info">
-                            <span class="p-idx">P${i}</span>
-                            <span class="p-val ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span>
-                        </div>
-                        ${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}
-                    </div>`;
+                pulpasHtml += `<div class="p-box"><div class="p-info"><span class="p-idx">P${i}</span><span class="p-val ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span></div>${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}</div>`;
             }
 
             return `
                 <div class="row-item">
-                    <div class="row-header">
-                        <span class="fw-bold text-primary">CÁMARA ${r[3]}</span>
-                        <span class="text-muted" style="font-size:0.7rem">${hora}</span>
-                    </div>
+                    <div class="row-header"><span class="fw-bold text-primary">CÁMARA ${r[3]}</span><span class="text-muted" style="font-size:0.7rem">${hora}</span></div>
                     <div class="row-stats">
-                        <div class="text-center">
-                            <span class="p-idx d-block">AMBIENTE</span>
-                            <span class="v-amb ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span>
-                        </div>
-                        <div class="text-center">
-                            <span class="p-idx d-block">HUMEDAD</span>
-                            <span class="v-amb ${hum < 85 ? 'text-danger' : 'text-main'}">${hum}%</span>
-                        </div>
-                        <div class="text-center d-none d-lg-block">
-                            <span class="p-idx d-block">VARIEDAD</span>
-                            <span class="badge-v">${r[2] || 'S/V'}</span>
-                        </div>
+                        <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
+                        <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${hum < 85 ? 'text-danger' : 'text-main'}">${hum}%</span></div>
+                        <div class="text-center d-none d-lg-block"><span class="p-idx d-block">VARIEDAD</span><span class="badge-v">${r[2] || 'S/V'}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
-                    <div class="d-flex flex-column gap-1">
-                        <span class="badge-v d-lg-none text-center">${r[2] || 'S/V'}</span>
-                        ${obsGral ? `<div class="obs-general"><i class="bi bi-info-circle me-1"></i>${obsGral}</div>` : ''}
-                    </div>
+                    <div class="d-flex flex-column gap-1"><span class="badge-v d-lg-none text-center">${r[2] || 'S/V'}</span>${obsGral ? `<div class="obs-general"><i class="bi bi-info-circle me-1"></i>${obsGral}</div>` : ''}</div>
                 </div>`;
         }).join('');
 
@@ -236,50 +220,31 @@
 
         container.innerHTML = activeGroup.ids.map(id => {
             const r = latest[id];
-            if(!r) return `<div class="cam-card text-muted small text-center">CAM ${id}<br>OFFLINE</div>`;
+            if(!r) return `<div class="cam-card text-muted small text-center">CÁMARA ${id}<br>OFFLINE</div>`;
             
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
-            
             let pulpasHtml = "";
             let pulseRed = false;
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
                 if(val > 2.0) pulseRed = true;
-                pulpasHtml += `
-                    <div class="p-dot">
-                        <span class="p-dot-idx">P${i}</span>
-                        <span class="p-dot-val ${val > 2.0 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span>
-                    </div>`;
+                pulpasHtml += `<div class="p-dot"><span class="p-dot-idx">P${i}</span><span class="p-dot-val ${val > 2.0 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span></div>`;
             }
-            
             const hasAlert = (tAmb > 1.5 || hum < 85 || pulseRed);
 
             return `
                 <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="badge bg-primary" style="font-size:0.6rem">CAM ${id}</span>
+                        <span class="badge bg-primary" style="font-size:0.6rem">CÁMARA ${id}</span>
                         <span class="p-idx" style="font-size:0.5rem">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                     </div>
-                    
                     <div class="d-flex justify-content-between align-items-end">
-                        <div>
-                            <div class="card-stat-label">Ambiente</div>
-                            <div class="card-stat-val ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
-                        </div>
-                        <div class="text-end">
-                            <div class="card-stat-label">Humedad</div>
-                            <div class="card-stat-val ${hum < 85 ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div>
-                        </div>
+                        <div><div class="card-stat-label">Ambiente</div><div class="card-stat-val ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
+                        <div class="text-end"><div class="card-stat-label">Humedad</div><div class="card-stat-val ${hum < 85 ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
                     </div>
-
-                    <div class="card-pulp-grid">
-                        ${pulpasHtml}
-                    </div>
-                    
-                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">
-                        ${r[2] || 'S/V'}
-                    </div>
+                    <div class="card-pulp-grid">${pulpasHtml}</div>
+                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[2] || 'S/V'}</div>
                 </div>`;
         }).join('');
     }
