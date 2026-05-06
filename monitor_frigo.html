@@ -3,370 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Cámaras Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Monitor Industrial Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root {
-            --bg-app: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-soft: #38bdf8;
-            --green-soft: #4ade80;
-            --red-soft: #f87171;
-            --warning-amber: #fbbf24;
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-dim: #8b949e;
         }
 
         body { 
-            background-color: var(--bg-app); 
+            background-color: var(--bg-dark); 
             color: var(--text-main); 
-            font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
+            padding: 5px; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* --- HEADER: LOGO MÁS GRANDE --- */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            margin-bottom: 15px;
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 20px;
-        }
-        .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo-img { width: 45px; height: 45px; object-fit: contain; }
-        .app-title { font-size: 1.2rem; font-weight: 700; margin: 0; }
-        
-        .sync-info {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            background: rgba(0,0,0,0.2);
-            padding: 4px 12px;
-            border-radius: 50px;
-        }
-
-        /* --- NAVEGACIÓN Y CARDS --- */
-        .group-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto 15px;
-        }
-        .nav-btn { 
-            background: var(--card-bg); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            color: white; 
-            border-radius: 50%; 
-            width: 38px; height: 38px;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .cam-card { 
-            background: var(--card-bg); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 24px; 
-            padding: 18px; 
-            min-height: 220px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .cam-card.alert { 
-            border: 1.5px solid var(--red-soft); 
-            animation: pulse-alert 2s infinite;
-        }
-
-        @keyframes pulse-alert {
-            0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
-        }
-
-        .label-text { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
-        .value-text { font-size: 1.2rem; font-weight: 700; }
-        .time-tag { font-size: 0.6rem; color: var(--text-muted); margin-top: auto; text-align: right; }
-
-        /* --- TABLA TRANSPARENTE --- */
-        .list-section { 
+        .header-bar {
             background: var(--card-bg);
-            border-radius: 24px;
-            padding: 15px;
-            margin-top: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .table { color: var(--text-main) !important; margin-bottom: 0; background-color: transparent !important; }
-        .table thead th { border: none !important; color: var(--accent-soft); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; padding: 8px !important; background-color: transparent !important; }
-        .table tbody td { border-color: rgba(255,255,255,0.05) !important; padding: 10px 8px !important; font-size: 0.8rem; vertical-align: middle; background-color: transparent !important; }
+        .brand-zone { display: flex; align-items: center; gap: 12px; }
+        .logo-img { height: 35px; width: auto; }
 
-        .pulp-container { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
-        
-        .pulp-box {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 4px 6px;
-            border-radius: 10px;
-            min-width: 70px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
+        .chart-card { 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            height: 29vh; 
+            margin-bottom: 1vh; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .pulp-box:hover { transform: translateY(-2px); border-color: var(--accent-soft); }
-        .pulp-num { font-size: 0.95rem; font-weight: 700; }
-        
-        .obs-tag { display: block; font-size: 0.55rem; color: var(--warning-amber); line-height: 1.1; margin-top: 1px; font-weight: 500; }
-        .obs-general-row { font-size: 0.7rem; color: #cbd5e1; background: rgba(56, 189, 248, 0.08); border-radius: 6px; padding: 6px 10px; margin-top: 8px; border-left: 3px solid var(--accent-soft); text-align: left; }
 
-        .val-danger { color: var(--red-soft) !important; font-weight: 800; }
-        .val-success { color: var(--green-soft) !important; font-weight: 700; }
-        .val-white { color: #ffffff !important; font-weight: 700; }
-        .badge-variety { background: rgba(56, 189, 248, 0.1); color: var(--accent-soft); padding: 2px 8px; border-radius: 50px; font-size: 0.65rem; }
+        .chart-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
 
-        /* Estilos para el selector de observaciones */
-        .obs-select-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; z-index: 1000;
-            justify-content: center; align-items: center; backdrop-filter: blur(4px);
+        .status-pill { 
+            padding: 3px 10px; 
+            border-radius: 4px; 
+            font-size: 0.7rem; 
+            font-weight: 800;
         }
-        .obs-modal {
-            background: var(--card-bg); width: 90%; max-width: 400px;
-            border-radius: 20px; padding: 20px; border: 1px solid var(--accent-soft);
-        }
-        .obs-item {
-            padding: 10px; margin-bottom: 8px; border-radius: 10px;
-            background: rgba(255,255,255,0.05); cursor: pointer; font-size: 0.85rem;
-        }
-        .obs-item:hover { background: rgba(56, 189, 248, 0.2); }
+
+        .bg-danger-live { background-color: #f85149; color: #fff; animation: blink 1.2s infinite; }
+        .bg-success-live { background-color: #238636; color: #fff; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .modal-content { background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); }
     </style>
 </head>
 <body>
 
-<header class="app-header">
-    <div class="logo-section">
-        <img src="logo-icono.png" alt="Logo" class="logo-img">
-        <h1 class="app-title">Monitor de Cámaras</h1>
-    </div>
-    <div class="sync-info"><i class="bi bi-clock me-1"></i> <span id="reloj">00:00:00</span></div>
-</header>
-
-<div class="cams-section" id="interactive-area">
-    <div class="group-nav">
-        <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-        <span id="group-label" class="badge rounded-pill bg-dark px-3 py-2">Cámaras</span>
-        <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
-    </div>
-    <div id="cards-container" class="cards-grid"></div>
-</div>
-
-<div class="list-section">
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>IDENTIFICACIÓN</th>
-                    <th>HORA</th>
-                    <th>VARIEDAD</th>
-                    <th class="text-center">AMB.</th>
-                    <th class="text-center">PULPAS (P1 - P6)</th>
-                    <th class="text-center">HUM%</th>
-                    <th class="text-center">FOTO</th>
-                </tr>
-            </thead>
-            <tbody id="data-table-body"></tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal de Observaciones -->
-<div id="obs-overlay" class="obs-select-overlay" onclick="closeObsModal()">
-    <div class="obs-modal" onclick="event.stopPropagation()">
-        <h6 class="mb-3 text-info">Seleccionar Observación</h6>
-        <div id="obs-list"></div>
-        <hr style="border-color: rgba(255,255,255,0.1)">
-        <div class="input-group input-group-sm">
-            <input type="text" id="new-obs-input" class="form-control bg-dark text-white border-secondary" placeholder="Otra observación...">
-            <button class="btn btn-primary" onclick="addNewObsOption()"><i class="bi bi-plus-lg"></i></button>
+<div class="container-fluid">
+    <div class="header-bar">
+        <div class="brand-zone">
+            <img src="logo-icono.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            <h6 class="mb-0 fw-bold text-white">SISTEMA DE MONITOREO</h6>
         </div>
-        <button class="btn btn-outline-danger btn-sm w-100 mt-3" onclick="selectObs('')">Limpiar Observación</button>
+        <div id="syncTime" style="color: var(--text-dim); font-size: 0.75rem; font-family: monospace;">SINCRONIZANDO...</div>
+    </div>
+
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-0">
+            <span class="chart-title" style="color: #58a6ff;">PPM (30-60)</span>
+            <div id="status_ppm"></div>
+        </div>
+        <div id="chart_ppm" style="height: 90%; width: 100%;"></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-0">
+            <span class="chart-title" style="color: #ffa657;">ORP (750-850)</span>
+            <div id="status_orp"></div>
+        </div>
+        <div id="chart_orp" style="height: 90%; width: 100%;"></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-0">
+            <span class="chart-title" style="color: #3fb950;">PH (6.5-7.5)</span>
+            <div id="status_ph"></div>
+        </div>
+        <div id="chart_ph" style="height: 90%; width: 100%;"></div>
     </div>
 </div>
 
+<div class="modal fade" id="fotoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h6 class="modal-title" id="modalTitulo">Registro Detallado</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="imgRegistro" src="" class="img-fluid rounded shadow mb-3">
+        <div id="infoRegistro" class="p-2 rounded bg-dark small text-info font-monospace"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwPxKSx5D9v7GZI-Vc3Z_-8mlLlRwqa6Plw3pLc6E0iy3rdtWnSkd2XdkyJ3tU3SO0/exec";
-    const BASE_URL = WEB_APP_URL + "?pestana=Frigorifico";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx0D_NnXpUlZIaq0Y0IZMlMA5SgkrQS8kxbvReuooLAabTdt5zObFzIKST8CawFtE88nA/exec";
+    const LIMITS = { ppm: [30, 60], orp: [750, 850], ph: [6.5, 7.5] };
     
-    let allData = [];
-    let currentGroup = 0;
-    let isPaused = false;
-    let activePulpTarget = null; // Para saber qué pulpa estamos editando
+    // Guardamos los objetos de los gráficos para que la animación funcione al actualizar
+    let charts = {};
 
-    // Opciones de observación
-    let obsOptions = [
-        "Fruta ingresada recientemente",
-        "Fruta ingreso hace mas de 3 dias a camara y aun con T° alta"
-    ];
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(refresh);
+    setInterval(refresh, 30000);
 
-    const groups = [
-        { label: "Cámaras 2 - 5", ids: ["2", "3", "4", "5"] },
-        { label: "Cámaras 6 - 9", ids: ["6", "7", "8", "9"] },
-        { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
-    ];
+    function refresh() {
+        fetch(WEB_APP_URL).then(r => r.json()).then(res => {
+            const hoy = new Date().setHours(0,0,0,0);
+            const rawData = res.slice(1).filter(f => f[0] && new Date(f[0]).setHours(0,0,0,0) === hoy);
+            document.getElementById('syncTime').innerText = "ACTUALIZADO: " + new Date().toLocaleTimeString();
 
-    async function syncData() {
-        try {
-            const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
-            const json = await response.json();
-            if (!json || json.length < 2) return;
-            const hoyStr = new Date().toLocaleDateString();
-            allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
-            drawTable();
-            drawCards();
-        } catch (e) { console.error(e); }
-    }
-
-    function drawTable() {
-        const body = document.getElementById('data-table-body');
-        const uniqueCams = {};
-        allData.forEach(row => { uniqueCams[row[3]] = row; });
-        const sortedRows = Object.values(uniqueCams).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
-
-        body.innerHTML = sortedRows.map(r => {
-            const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const tAmb = Number(r[4] || 0);
-            const hum = Number(r[11] || 0);
-            const obsGral = r[13] || '';
-            const detalles = r[14] ? r[14].split(' | ') : [];
-            const ambClass = (tAmb > 1.5) ? 'val-danger' : 'val-success';
-            const humClass = (hum < 85 || hum > 95) ? 'val-danger' : 'val-white';
-
-            let pulpasHtml = "";
-            for (let i = 1; i <= 6; i++) {
-                const val = Number(r[4 + i] || 0);
-                const pClass = (val > 2.0) ? 'text-danger' : 'text-success';
-                let obsFruto = "";
-                if (detalles[i-1]) {
-                    const match = detalles[i-1].match(/\(([^)]+)\)/);
-                    obsFruto = match ? match[1] : "";
-                }
-                pulpasHtml += `
-                    <div class="pulp-box" onclick="openObsModal('${r[3]}', ${i})">
-                        <span style="font-size:0.5rem; color:var(--text-muted); display:block;">P${i}</span>
-                        <span class="pulp-num ${pClass}">${val.toFixed(1)}°</span>
-                        <span id="obs-tag-${r[3]}-${i}" class="obs-tag">${obsFruto}</span>
-                    </div>`;
-            }
-
-            return `
-                <tr style="background-color: transparent !important;">
-                    <td class="fw-bold" style="color:var(--accent-soft) !important; font-size:1rem; background-color: transparent !important;">CÁMARA ${r[3]}</td>
-                    <td style="color: #cbd5e1 !important; font-size: 0.85rem; background-color: transparent !important;">${hora}</td>
-                    <td style="background-color: transparent !important;"><span class="badge-variety">${r[2] || 'S/V'}</span></td>
-                    <td class="text-center ${ambClass}" style="background-color: transparent !important;">${tAmb.toFixed(1)}°</td>
-                    <td style="background-color: transparent !important;">
-                        <div class="pulp-container">${pulpasHtml}</div>
-                        ${obsGral ? `<div class="obs-general-row"><i class="bi bi-chat-left-dots-fill me-2"></i>${obsGral}</div>` : ''}
-                    </td>
-                    <td class="text-center ${humClass}" style="font-size:1.1rem; background-color: transparent !important;">${hum}%</td>
-                    <td class="text-center" style="background-color: transparent !important; color: var(--text-main) !important;">
-                        ${r[12] && r[12].startsWith('http') ? `<a href="${r[12]}" target="_blank" style="color:var(--accent-soft)"><i class="bi bi-camera-fill"></i></a>` : '-'}
-                    </td>
-                </tr>`;
-        }).join('');
-    }
-
-    // Funciones para el Modal de Observaciones
-    function openObsModal(camId, pulpIndex) {
-        activePulpTarget = { camId, pulpIndex };
-        const listDiv = document.getElementById('obs-list');
-        listDiv.innerHTML = obsOptions.map(opt => `
-            <div class="obs-item" onclick="selectObs('${opt}')">${opt}</div>
-        `).join('');
-        document.getElementById('obs-overlay').style.display = 'flex';
-        isPaused = true; // Pausamos rotación mientras edita
-    }
-
-    function closeObsModal() {
-        document.getElementById('obs-overlay').style.display = 'none';
-        isPaused = false;
-    }
-
-    function selectObs(text) {
-        if(activePulpTarget) {
-            const tag = document.getElementById(`obs-tag-${activePulpTarget.camId}-${activePulpTarget.pulpIndex}`);
-            if(tag) tag.innerText = text;
-            
-            // Aquí podrías enviar este cambio a tu base de datos si fuera necesario
-            console.log(`Cámara ${activePulpTarget.camId}, Pulpa ${activePulpTarget.pulpIndex} obs: ${text}`);
-        }
-        closeObsModal();
-    }
-
-    function addNewObsOption() {
-        const input = document.getElementById('new-obs-input');
-        const text = input.value.trim();
-        if(text) {
-            obsOptions.push(text);
-            input.value = '';
-            openObsModal(activePulpTarget.camId, activePulpTarget.pulpIndex); // Recarga lista
-        }
-    }
-
-    function drawCards() {
-        const container = document.getElementById('cards-container');
-        const latestByCam = {};
-        allData.forEach(row => { latestByCam[row[3]] = row; });
-        const activeGroup = groups[currentGroup];
-        document.getElementById('group-label').innerText = activeGroup.label;
-        container.innerHTML = "";
-
-        activeGroup.ids.forEach(id => {
-            const r = latestByCam[id];
-            const div = document.createElement('div');
-            div.className = "cam-card";
-            if(!r) {
-                div.innerHTML = `<span class="label-text" style="color:var(--accent-soft)">Cámara ${id}</span><div class="text-muted small mt-2">Sin datos</div>`;
-            } else {
-                const tAmb = Number(r[4] || 0);
-                const hum = Number(r[11] || 0);
-                const pulpas = [r[5], r[6], r[7], r[8], r[9], r[10]].map(v => Number(v || 0));
-                const tPulpProm = (pulpas.reduce((a, b) => a + b, 0) / 6).toFixed(1);
-                if (tAmb > 1.5 || pulpas.some(p => p > 2) || hum < 85 || hum > 95) div.classList.add('alert');
-                div.innerHTML = `
-                    <span class="label-text" style="color:var(--accent-soft)">CÁMARA ${id}</span>
-                    <div class="fw-bold text-truncate mb-2" style="font-size:0.75rem;">${r[2] || 'S/V'}</div>
-                    <div class="row g-2 mb-2">
-                        <div class="col-6"><p class="label-text">Ambiente</p><div class="value-text ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
-                        <div class="col-6"><p class="label-text">Prom. Pulpa</p><div class="value-text">${tPulpProm}°</div></div>
-                    </div>
-                    <div class="mt-2"><p class="label-text">Humedad</p><div class="value-text ${hum < 85 || hum > 95 ? 'text-danger' : 'val-white'}">${hum.toFixed(0)}%</div></div>
-                    <div class="time-tag">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-                `;
-            }
-            container.appendChild(div);
+            drawChart(rawData, 'chart_ppm', 'status_ppm', LIMITS.ppm, '#58a6ff', 2, '#');
+            drawChart(rawData, 'chart_orp', 'status_orp', LIMITS.orp, '#ffa657', 3, '#');
+            drawChart(rawData, 'chart_ph', 'status_ph', LIMITS.ph, '#3fb950', 4, '#.0');
         });
     }
 
-    function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawCards(); }
-    setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(syncData, 60000);
-    setInterval(() => { if(!isPaused) changeGroup(1); }, 10000);
-    syncData();
+    function drawChart(data, divId, statusId, range, baseColor, colIdx, format) {
+        if (data.length === 0) return;
+        let dt = new google.visualization.DataTable();
+        dt.addColumn('string', 'X');
+        dt.addColumn('number', 'Valor');
+        dt.addColumn({type: 'string', role: 'style'});
+        dt.addColumn({type: 'string', role: 'annotation'});
+        dt.addColumn('number', 'Min');
+        dt.addColumn('number', 'Max');
+
+        let minVal = range[0], maxVal = range[1];
+
+        data.forEach(f => {
+            let h = new Date(f[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            let val = Number(f[colIdx]);
+            if(val < minVal) minVal = val;
+            if(val > maxVal) maxVal = val;
+            let fuera = (val < range[0] || val > range[1]);
+            let estilo = fuera ? 'point { size: 8; fill-color: #ff3b3b; }' : 'point { size: 5; fill-color: ' + baseColor + '; }';
+            dt.addRow([h + "\n" + (f[5]||"") + "k", val, estilo, f[6] === "SI" ? "CORRECCIÓN" : null, range[0], range[1]]);
+        });
+
+        const padding = (range[1] - range[0]) * 0.5; 
+        const vMin = Math.min(range[0], minVal) - padding;
+        const vMax = Math.max(range[1], maxVal) + padding;
+
+        // Inicializar gráfico si no existe para permitir animación
+        if (!charts[divId]) {
+            charts[divId] = new google.visualization.ComboChart(document.getElementById(divId));
+            
+            google.visualization.events.addListener(charts[divId], 'select', function() {
+                let sel = charts[divId].getSelection()[0];
+                if (sel && sel.row !== null) {
+                    let registro = data[sel.row];
+                    if (registro[7] && registro[7] !== "Sin foto") {
+                        document.getElementById('imgRegistro').src = registro[7];
+                        document.getElementById('modalTitulo').innerText = "Registro " + new Date(registro[0]).toLocaleTimeString();
+                        document.getElementById('infoRegistro').innerText = `OPERADOR: ${registro[1]} | ${registro[5]} KG`;
+                        new bootstrap.Modal(document.getElementById('fotoModal')).show();
+                    }
+                }
+            });
+        }
+        
+        charts[divId].draw(dt, {
+            backgroundColor: 'transparent', 
+            legend: 'none',
+            chartArea: { width: '92%', height: '70%', top: 15, left: 50, right: 15, bottom: 50 },
+            // CONFIGURACIÓN DE ANIMACIÓN
+            animation: {
+                duration: 1000,
+                easing: 'out',
+                startup: true
+            },
+            hAxis: { textStyle: { color: '#8b949e', fontSize: 8 }, gridlines: { color: 'transparent' } },
+            vAxis: { 
+                textStyle: { color: '#ffffff', fontSize: 9, bold: true }, 
+                gridlines: { color: '#21262d' },
+                viewWindow: { min: vMin, max: vMax },
+                ticks: [range[0], (range[0] + range[1])/2, range[1]],
+                format: format
+            },
+            series: { 
+                0: { color: baseColor, lineWidth: 3, pointsVisible: true }, 
+                1: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 }, 
+                2: { color: '#ffffff', lineDashStyle: [4, 2], lineWidth: 1.5, pointSize: 0 } 
+            },
+            annotations: { textStyle: { fontSize: 10, color: '#ff7b72', bold: true, auraColor: 'none' }, alwaysOutside: true }
+        });
+
+        const ultimoVal = Number(data[data.length-1][colIdx]);
+        document.getElementById(statusId).innerHTML = (ultimoVal < range[0] || ultimoVal > range[1]) ? 
+            '<span class="status-pill bg-danger-live">ALERTA</span>' : '<span class="status-pill bg-success-live">OK</span>';
+    }
 </script>
 </body>
 </html>
