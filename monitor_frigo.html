@@ -26,80 +26,69 @@
             margin: 0; padding: 10px;
         }
 
-        /* --- HEADER --- */
         .app-header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 15px; margin-bottom: 12px;
             background: rgba(30, 41, 59, 0.5); border-radius: 15px;
         }
-        .logo-img { width: 35px; height: 35px; object-fit: contain; }
-        .app-title { font-size: 1rem; font-weight: 700; margin: 0; }
 
-        /* --- CARDS SUPERIORES (Más elegantes) --- */
-        .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; font-size: 0.8rem; }
-
+        /* --- CARDS SUPERIORES --- */
         .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 10px; margin-bottom: 15px;
         }
-
         .cam-card { 
-            background: linear-gradient(145deg, #1e293b, #111827);
-            border-radius: 18px; padding: 12px; 
+            background: var(--card-bg); border-radius: 18px; padding: 12px; 
             border: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; justify-content: space-between;
         }
         .cam-card.alert { border: 1px solid var(--red-soft); background: rgba(248, 113, 113, 0.05); }
 
-        /* --- LISTADO INFERIOR (CORREGIDO Y COMPACTO) --- */
-        .list-container { display: flex; flex-direction: column; gap: 8px; }
-        
-        /* En PC se ve como tabla, en móvil como tarjeta compacta */
+        /* --- LISTADO DE DATOS (HÍBRIDO) --- */
+        .list-container { display: flex; flex-direction: column; gap: 10px; }
+
+        /* ESTILO PARA TELÉFONO (MOBILE FIRST) */
         .row-item {
-            background: var(--card-bg); border-radius: 14px;
-            padding: 10px; border: 1px solid rgba(255,255,255,0.05);
-            display: grid; grid-template-columns: 1fr 1fr 2fr 1fr; /* Estilo Desktop */
-            align-items: center;
+            background: var(--card-bg); border-radius: 16px; padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; gap: 10px;
         }
 
-        @media (max-width: 768px) {
+        .row-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .row-stats { display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 8px; }
+        
+        .pulp-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px; 
+        }
+
+        /* Caja de pulpa con observación */
+        .p-box {
+            background: rgba(15, 23, 42, 0.6); border-radius: 8px;
+            padding: 4px 8px; border: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+        .p-info { display: flex; flex-direction: column; }
+        .p-idx { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; }
+        .p-val { font-size: 0.9rem; font-weight: 700; }
+        .p-obs { font-size: 0.55rem; color: var(--warning-amber); text-align: right; max-width: 60%; line-height: 1; }
+
+        .obs-general { font-size: 0.7rem; background: rgba(56, 189, 248, 0.05); padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent-soft); }
+
+        /* --- AJUSTES PARA PC --- */
+        @media (min-width: 992px) {
             .row-item {
-                grid-template-columns: 1fr 1fr; /* 2 columnas en móvil */
-                grid-template-areas: 
-                    "head head"
-                    "info pulpas"
-                    "obs obs";
-                gap: 8px;
+                flex-direction: row; align-items: center; justify-content: space-between;
+                padding: 10px 20px;
             }
-            .header-info { grid-area: head; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; display: flex; justify-content: space-between; }
-            .main-stats { grid-area: info; display: flex; flex-direction: column; justify-content: center; }
-            .pulp-grid { grid-area: pulpas; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-            .obs-box { grid-area: obs; }
-            
-            /* Ocultar etiquetas de tabla clásica */
-            .desktop-only { display: none; }
+            .row-header { border: none; padding: 0; min-width: 150px; }
+            .row-stats { background: none; min-width: 200px; }
+            .pulp-grid { grid-template-columns: repeat(6, 1fr); flex-grow: 1; margin: 0 20px; }
+            .p-box { flex-direction: column; text-align: center; justify-content: center; min-height: 55px; }
+            .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
         }
 
-        @media (min-width: 769px) {
-            .list-container { display: block; }
-            .row-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
-            .pulp-grid { display: flex; gap: 5px; }
-            .header-info { min-width: 120px; }
-        }
-
-        /* Mini Cajas de Pulpa */
-        .p-mini {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 6px; padding: 2px 4px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .p-val { font-size: 0.75rem; font-weight: 700; display: block; }
-        .p-idx { font-size: 0.5rem; color: var(--text-muted); display: block; text-transform: uppercase; }
-
-        .badge-variety { font-size: 0.65rem; background: rgba(56, 189, 248, 0.1); color: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
-        .val-big { font-size: 1rem; font-weight: 700; }
-        .text-obs { font-size: 0.65rem; color: var(--warning-amber); font-style: italic; }
+        .badge-v { font-size: 0.7rem; color: var(--accent-soft); background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 5px; }
+        .v-amb { font-size: 1.1rem; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -109,20 +98,13 @@
         <img src="logo-icono.png" alt="Logo" class="logo-img">
         <h1 class="app-title">MONITOR FRIGO</h1>
     </div>
-    <div id="reloj" class="sync-info">00:00:00</div>
+    <div id="reloj" class="sync-info small">00:00:00</div>
 </header>
 
-<!-- Área de Cards -->
-<div class="group-nav">
-    <button class="nav-btn" onclick="changeGroup(-1)"><i class="bi bi-chevron-left"></i></button>
-    <span id="group-label" class="badge bg-dark">Cámaras</span>
-    <button class="nav-btn" onclick="changeGroup(1)"><i class="bi bi-chevron-right"></i></button>
-</div>
 <div id="cards-container" class="cards-grid"></div>
 
-<!-- Listado Compacto -->
 <div class="list-container" id="data-list">
-    <!-- Las filas se insertan aquí -->
+    <!-- Contenido dinámico -->
 </div>
 
 <script>
@@ -142,10 +124,8 @@
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
             if (!json || json.length < 2) return;
-            
             const hoyStr = new Date().toLocaleDateString();
             allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
-            
             drawUI();
         } catch (e) { console.error(e); }
     }
@@ -157,7 +137,7 @@
         allData.forEach(row => { latest[row[3]] = row; });
         const sorted = Object.values(latest).sort((a, b) => parseInt(a[3]) - parseInt(b[3]));
 
-        // DIBUJAR LISTADO COMPACTO
+        // LISTADO PRINCIPAL
         listContainer.innerHTML = sorted.map(r => {
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
@@ -168,46 +148,67 @@
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
+                let obsFruto = "";
+                if (detalles[i-1]) {
+                    const match = detalles[i-1].match(/\(([^)]+)\)/);
+                    obsFruto = match ? match[1] : "";
+                }
+                
                 pulpasHtml += `
-                    <div class="p-mini">
-                        <span class="p-idx">P${i}</span>
-                        <span class="p-val ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span>
+                    <div class="p-box">
+                        <div class="p-info">
+                            <span class="p-idx">P${i}</span>
+                            <span class="p-val ${val > 2 ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span>
+                        </div>
+                        ${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}
                     </div>`;
             }
 
             return `
                 <div class="row-item">
-                    <div class="header-info">
-                        <span class="fw-bold text-primary">CAM ${r[3]}</span>
-                        <span class="text-muted small">${hora}</span>
+                    <div class="row-header">
+                        <span class="fw-bold text-primary">CÁMARA ${r[3]}</span>
+                        <span class="text-muted" style="font-size:0.7rem">${hora}</span>
                     </div>
-                    <div class="main-stats">
-                        <span class="badge-variety mb-1">${r[2] || 'S/V'}</span>
-                        <div>
-                            <span class="val-big ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span>
-                            <span class="ms-2 val-big">${hum}% <i class="bi bi-droplets small"></i></span>
+                    
+                    <div class="row-stats">
+                        <div class="text-center">
+                            <span class="p-idx d-block">AMBIENTE</span>
+                            <span class="v-amb ${tAmb > 1.5 ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="p-idx d-block">HUMEDAD</span>
+                            <span class="v-amb ${hum < 85 ? 'text-danger' : 'text-main'}">${hum}%</span>
+                        </div>
+                        <div class="text-center d-none d-lg-block">
+                            <span class="p-idx d-block">VARIEDAD</span>
+                            <span class="badge-v">${r[2] || 'S/V'}</span>
                         </div>
                     </div>
+
                     <div class="pulp-grid">${pulpasHtml}</div>
-                    ${obsGral ? `<div class="obs-box text-obs"><i class="bi bi-chat-dots me-1"></i>${obsGral}</div>` : ''}
+
+                    <div class="d-flex flex-column gap-1">
+                        <span class="badge-v d-lg-none text-center">${r[2] || 'S/V'}</span>
+                        ${obsGral ? `<div class="obs-general"><i class="bi bi-info-circle me-1"></i>${obsGral}</div>` : ''}
+                    </div>
                 </div>`;
         }).join('');
 
-        // DIBUJAR CARDS SUPERIORES
+        // CARDS SUPERIORES (ROTATIVO)
         const activeGroup = groups[currentGroup];
-        document.getElementById('group-label').innerText = activeGroup.label;
         cardsContainer.innerHTML = activeGroup.ids.map(id => {
             const r = latest[id];
-            if(!r) return `<div class="cam-card text-muted small">CAM ${id}<br>Sin datos</div>`;
+            if(!r) return `<div class="cam-card text-muted small text-center">CAM ${id}<br>Sin datos</div>`;
             const tAmb = Number(r[4] || 0);
             return `
                 <div class="cam-card ${tAmb > 1.5 ? 'alert' : ''}">
-                    <div class="d-flex justify-content-between">
-                        <span class="label-text">CAM ${id}</span>
-                        <span class="label-text">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="p-idx">CAM ${id}</span>
+                        <span class="p-idx">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                     </div>
-                    <div class="val-big mt-1">${tAmb.toFixed(1)}°</div>
-                    <div class="badge-variety mt-1 text-truncate">${r[2] || 'S/V'}</div>
+                    <div class="v-amb mt-1">${tAmb.toFixed(1)}°</div>
+                    <div class="p-idx text-truncate">${r[2] || 'S/V'}</div>
                 </div>`;
         }).join('');
     }
@@ -215,7 +216,7 @@
     function changeGroup(n) { currentGroup = (currentGroup + n + groups.length) % groups.length; drawUI(); }
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
     setInterval(syncData, 60000);
-    setInterval(() => changeGroup(1), 10000);
+    setInterval(() => changeGroup(1), 8000);
     syncData();
 </script>
 </body>
