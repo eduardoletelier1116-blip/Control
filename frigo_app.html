@@ -16,12 +16,25 @@
         .form-control, .form-select { border-left: none; font-size: 0.9rem; }
         .variedad-badge { background: #e7f1ff; color: #0d6efd; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-block; margin: 2px; border: 1px solid #0d6efd; }
         
+        /* Estilo para el Interruptor Solfrut */
+        .switch-container {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .form-check-input { width: 3em !important; height: 1.5em !important; cursor: pointer; }
+        .label-switch { font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
+        .text-solfrut { color: #0d6efd; }
+        .text-planta { color: #6c757d; }
+
         .pulp-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 8px; margin-bottom: 8px; }
-        
         .obs-select-container { display: none; margin-top: 8px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #0d6efd; }
         .btn-add { font-size: 0.8rem; padding: 2px 10px; }
         .btn-save { padding: 15px; font-weight: bold; border-radius: 12px; background: #0d6efd; border: none; margin-top: 20px; }
-        
         .manage-texts { font-size: 0.7rem; color: #0d6efd; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
@@ -55,13 +68,12 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-primary fw-bold">EXPORTADORA / CLIENTE</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-building"></i></span>
-                        <select id="exportadora" class="form-select" required>
-                            <option value="VARIOS">VARIOS / OTROS</option>
-                            <option value="SOLFRUT">SOLFRUT</option>
-                        </select>
+                    <label class="form-label text-primary fw-bold">DESTINO / CLIENTE</label>
+                    <div class="switch-container">
+                        <span id="switchLabel" class="label-switch text-planta">PLANTA (NORMAL)</span>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="checkSolfrut" onchange="updateSwitchLabel()">
+                        </div>
                     </div>
                 </div>
 
@@ -85,7 +97,7 @@
 
                 <div class="mb-3">
                     <div class="d-flex justify-content-between">
-                        <label class="form-label text-danger fw-bold"><i class="bi bi-thermometer-half"></i> T° PULPAS Y NOTAS</label>
+                        <label class="form-label text-danger fw-bold"><i class="bi bi-thermometer-half"></i> T° PULPAS</label>
                         <span class="manage-texts" onclick="gestionarTextos()">Configurar Frases</span>
                     </div>
                     
@@ -126,14 +138,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">OBSERVACIÓN GENERAL</label>
-                    <textarea id="obsGeneral" class="form-control" rows="2" placeholder="Detalles de la cámara..."></textarea>
+                    <textarea id="obsGeneral" class="form-control" rows="2" placeholder="Detalles..."></textarea>
                 </div>
 
                 <div class="mb-4">
                     <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
                     <label for="fotoInput" class="file-label" id="fileLabel" style="display: block; border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer;">
                         <i class="bi bi-camera fs-2 d-block mb-1 text-primary"></i>
-                        <span id="fileName" class="fw-bold">TOCAR PARA TOMAR FOTO</span>
+                        <span id="fileName" class="fw-bold">TOMAR FOTO</span>
                     </label>
                 </div>
 
@@ -147,14 +159,11 @@
 <div class="modal fade" id="modalTextos" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
-        <h6 class="modal-title fw-bold">CONFIGURAR FRASES PREDETERMINADAS</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+      <div class="modal-header"><h6 class="modal-title fw-bold">FRASES PREDEFINIDAS</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <div id="lista-frases-config" class="mb-3"></div>
         <div class="input-group">
-            <input type="text" id="nueva-frase-input" class="form-control" placeholder="Escribir nueva frase...">
+            <input type="text" id="nueva-frase-input" class="form-control" placeholder="Nueva frase...">
             <button class="btn btn-primary" onclick="guardarNuevaFrase()"><i class="bi bi-plus"></i></button>
         </div>
       </div>
@@ -171,17 +180,24 @@
     window.onload = function() {
         const nombreGuardado = localStorage.getItem('nombreOperador');
         if (nombreGuardado) document.getElementById('operador').value = nombreGuardado;
-
         const frasesGuardadas = localStorage.getItem('frases_pulpas');
-        if (frasesGuardadas) {
-            frasesPredeterminadas = JSON.parse(frasesGuardadas);
-        }
+        if (frasesGuardadas) frasesPredeterminadas = JSON.parse(frasesGuardadas);
         actualizarSelectoresObservacion();
     };
 
-    function guardarOperador() {
-        localStorage.setItem('nombreOperador', document.getElementById('operador').value);
+    function updateSwitchLabel() {
+        const check = document.getElementById('checkSolfrut');
+        const label = document.getElementById('switchLabel');
+        if(check.checked) {
+            label.innerText = "SOLFRUT";
+            label.className = "label-switch text-solfrut";
+        } else {
+            label.innerText = "PLANTA (NORMAL)";
+            label.className = "label-switch text-planta";
+        }
     }
+
+    function guardarOperador() { localStorage.setItem('nombreOperador', document.getElementById('operador').value); }
 
     function actualizarSelectoresObservacion() {
         const dropdowns = document.querySelectorAll('.obs-dropdown');
@@ -190,8 +206,7 @@
             select.innerHTML = '<option value="">-- Sin observación --</option>';
             frasesPredeterminadas.forEach(frase => {
                 const opt = document.createElement('option');
-                opt.value = frase;
-                opt.textContent = frase;
+                opt.value = frase; opt.textContent = frase;
                 select.appendChild(opt);
             });
             select.value = currentVal;
@@ -199,18 +214,12 @@
     }
 
     const modalTxt = new bootstrap.Modal(document.getElementById('modalTextos'));
-    
-    function gestionarTextos() {
-        renderListaConfig();
-        modalTxt.show();
-    }
-
+    function gestionarTextos() { renderListaConfig(); modalTxt.show(); }
     function renderListaConfig() {
         const cont = document.getElementById('lista-frases-config');
         cont.innerHTML = frasesPredeterminadas.map((f, i) => `
             <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-                <small>${f}</small>
-                <i class="bi bi-trash text-danger cursor-pointer" onclick="eliminarFrase(${i})"></i>
+                <small>${f}</small><i class="bi bi-trash text-danger cursor-pointer" onclick="eliminarFrase(${i})"></i>
             </div>
         `).join('');
     }
@@ -220,18 +229,15 @@
         if (input.value.trim()) {
             frasesPredeterminadas.push(input.value.trim());
             localStorage.setItem('frases_pulpas', JSON.stringify(frasesPredeterminadas));
-            input.value = "";
-            renderListaConfig();
-            actualizarSelectoresObservacion();
+            input.value = ""; renderListaConfig(); actualizarSelectoresObservacion();
         }
     }
 
     function eliminarFrase(index) {
-        if(confirm("¿Eliminar esta frase?")) {
+        if(confirm("¿Eliminar?")) {
             frasesPredeterminadas.splice(index, 1);
             localStorage.setItem('frases_pulpas', JSON.stringify(frasesPredeterminadas));
-            renderListaConfig();
-            actualizarSelectoresObservacion();
+            renderListaConfig(); actualizarSelectoresObservacion();
         }
     }
 
@@ -243,33 +249,25 @@
     function agregarVariedad() {
         const sel = document.getElementById('selector-variedad');
         if (sel.value && !variedadesSeleccionadas.includes(sel.value)) {
-            variedadesSeleccionadas.push(sel.value);
-            renderVariedades();
+            variedadesSeleccionadas.push(sel.value); renderVariedades();
         }
         sel.value = "";
     }
 
     function eliminarVariedad(v) {
-        variedadesSeleccionadas = variedadesSeleccionadas.filter(item => item !== v);
-        renderVariedades();
+        variedadesSeleccionadas = variedadesSeleccionadas.filter(item => item !== v); renderVariedades();
     }
 
     function renderVariedades() {
         const cont = document.getElementById('lista-variedades');
-        cont.innerHTML = variedadesSeleccionadas.map(v => `
-            <span class="variedad-badge">
-                ${v} <i class="bi bi-x-circle-fill ms-1" style="cursor:pointer" onclick="eliminarVariedad('${v}')"></i>
-            </span>
-        `).join('');
+        cont.innerHTML = variedadesSeleccionadas.map(v => `<span class="variedad-badge">${v} <i class="bi bi-x-circle-fill ms-1" style="cursor:pointer" onclick="eliminarVariedad('${v}')"></i></span>`).join('');
     }
 
     document.getElementById('formFrigo').addEventListener('submit', function(e) {
         e.preventDefault();
-        if (variedadesSeleccionadas.length === 0) { alert("Agrega al menos una variedad"); return; }
-
+        if (variedadesSeleccionadas.length === 0) { alert("Agrega variedad"); return; }
         const btn = document.getElementById('btnEnviar');
-        btn.disabled = true;
-        btn.innerText = "ENVIANDO...";
+        btn.disabled = true; btn.innerText = "ENVIANDO...";
 
         let detalleNotas = [];
         for(let i=1; i<=6; i++){
@@ -294,7 +292,7 @@
                 humedad: document.getElementById('humedad').value,
                 obsGeneral: document.getElementById('obsGeneral').value,
                 pulpasDetalle: detalleNotas.join(' | '),
-                exportadora: document.getElementById('exportadora').value, // NUEVO: Se envía a la columna P
+                exportadora: document.getElementById('checkSolfrut').checked ? "SOLFRUT" : "PLANTA",
                 foto: base64
             };
 
@@ -303,11 +301,7 @@
                 document.getElementById('mensaje').classList.remove('d-none');
                 setTimeout(() => location.reload(), 2000);
             })
-            .catch(() => {
-                alert("Error al enviar. Intente de nuevo.");
-                btn.disabled = false;
-                btn.innerText = "GUARDAR REGISTRO";
-            });
+            .catch(() => { alert("Error"); btn.disabled = false; btn.innerText = "GUARDAR"; });
         };
 
         const file = document.getElementById('fotoInput').files[0];
@@ -319,7 +313,7 @@
     });
 
     document.getElementById('fotoInput').onchange = function() {
-        if(this.files[0]) document.getElementById('fileName').innerText = "FOTO: " + this.files[0].name;
+        if(this.files[0]) document.getElementById('fileName').innerText = "LISTO: " + this.files[0].name;
     };
 </script>
 </body>
