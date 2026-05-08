@@ -112,19 +112,24 @@
         { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
-    // --- FUNCIÓN DE RANGOS INTELIGENTES ---
-    function getLimits(variedad) {
-        const v = variedad ? variedad.toLowerCase() : "";
-        
-        // Grupo Galas, Fuji, Red Delicius
-        if (v.includes("gala") || v.includes("fuji") || v.includes("red delicius") || v.includes("red del")) {
+    // --- FUNCIÓN DE RANGOS ACTUALIZADA ---
+    function getLimits(row) {
+        const variedad = row[2] ? row[2].toLowerCase() : "";
+        const exportadora = row[15] ? row[15].toString().toUpperCase() : ""; // Columna P (Indice 15)
+
+        // Rango Solfrut (1.0° a 2.0°)
+        if (exportadora === "SOLFRUT") {
+            return { ambMin: 1, ambMax: 2, pulpMin: 1, pulpMax: 2 };
+        }
+
+        // Variedades Frío Convencional
+        if (variedad.includes("gala") || variedad.includes("fuji") || variedad.includes("red delicius") || variedad.includes("red del")) {
             return { ambMin: -1, ambMax: 0, pulpMin: -0.5, pulpMax: 0.5 };
         }
-        // Grupo Granny Smith y Cripps Pink
-        if (v.includes("granny") || v.includes("cripps") || v.includes("pink")) {
+        if (variedad.includes("granny") || variedad.includes("cripps") || variedad.includes("pink")) {
             return { ambMin: 0, ambMax: 1, pulpMin: 1, pulpMax: 2 };
         }
-        // Rango por defecto (Seguridad)
+
         return { ambMin: -1, ambMax: 1.5, pulpMin: -0.5, pulpMax: 2.0 };
     }
 
@@ -152,21 +157,22 @@
         const historySorted = [...allData].sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
         listContainer.innerHTML = historySorted.map(r => {
+            const limits = getLimits(r);
             const variedad = r[2];
-            const limits = getLimits(variedad);
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const detalles = r[14] ? r[14].split(' | ') : [];
-            const linkFoto = r[15];
+            const obsGeneral = r[13]; // Columna N
+            const detallesRaw = r[14] ? r[14].split(' | ') : []; // Columna O
+            const linkFoto = r[12]; // Columna M (Foto)
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
                 const isPulpAlert = checkAlert(val, limits.pulpMin, limits.pulpMax);
                 let obsFruto = "";
-                if (detalles[i-1]) {
-                    const match = detalles[i-1].match(/\(([^)]+)\)/);
+                if (detallesRaw[i-1]) {
+                    const match = detallesRaw[i-1].match(/\(([^)]+)\)/);
                     obsFruto = match ? match[1] : "";
                 }
                 pulpasHtml += `<div class="p-box"><div class="p-info"><span class="p-idx">P${i}</span><span class="p-val ${isPulpAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span></div>${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}</div>`;
@@ -185,8 +191,8 @@
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
                     <div class="d-flex align-items-center gap-2">
-                        <div class="flex-grow-1"><span class="badge-v d-lg-none text-center">${variedad || 'S/V'}</span>${r[13] ? `<div class="obs-general mt-1"><i class="bi bi-info-circle me-1"></i>${r[13]}</div>` : ''}</div>
-                        <div class="photo-col">${linkFoto ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}</div>
+                        <div class="flex-grow-1"><span class="badge-v d-lg-none text-center">${variedad || 'S/V'}</span>${obsGeneral ? `<div class="obs-general mt-1"><i class="bi bi-info-circle me-1"></i>${obsGeneral}</div>` : ''}</div>
+                        <div class="photo-col">${linkFoto && linkFoto !== "Sin foto" ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}</div>
                     </div>
                 </div>`;
         }).join('');
@@ -204,7 +210,7 @@
             const r = latest[id];
             if(!r) return `<div class="cam-card text-muted small text-center">CÁMARA ${id}<br>OFFLINE</div>`;
             
-            const limits = getLimits(r[2]);
+            const limits = getLimits(r);
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             let pulpasHtml = "";
@@ -232,7 +238,7 @@
                         <div class="text-end"><div class="card-stat-label">Humedad</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
                     </div>
                     <div class="card-pulp-grid">${pulpasHtml}</div>
-                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[2] || 'S/V'}</div>
+                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[15] === "SOLFRUT" ? "SOLFRUT" : (r[2] || 'S/V')}</div>
                 </div>`;
         }).join('');
     }
