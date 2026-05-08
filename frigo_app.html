@@ -16,20 +16,20 @@
         .form-control, .form-select { border-left: none; font-size: 0.9rem; }
         .variedad-badge { background: #e7f1ff; color: #0d6efd; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-block; margin: 2px; border: 1px solid #0d6efd; }
         
-        /* Estilo para el Interruptor Solfrut */
-        .switch-container {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            padding: 12px 15px;
+        /* Interruptor Compacto Solfrut */
+        .switch-compact {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            background: #fff;
+            padding: 5px 15px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            width: fit-content;
         }
-        .form-check-input { width: 3em !important; height: 1.5em !important; cursor: pointer; }
-        .label-switch { font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
-        .text-solfrut { color: #0d6efd; }
-        .text-planta { color: #6c757d; }
+        .form-check-input { width: 2.5em !important; height: 1.2em !important; cursor: pointer; margin-top: 0 !important; }
+        .label-solfrut { font-weight: 700; font-size: 0.85rem; color: #6c757d; transition: 0.3s; }
+        .check-active { color: #0d6efd !important; }
 
         .pulp-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 8px; margin-bottom: 8px; }
         .obs-select-container { display: none; margin-top: 8px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #0d6efd; }
@@ -67,12 +67,11 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label text-primary fw-bold">DESTINO / CLIENTE</label>
-                    <div class="switch-container">
-                        <span id="switchLabel" class="label-switch text-planta">PLANTA (NORMAL)</span>
+                <div class="mb-3 d-flex justify-content-end">
+                    <div class="switch-compact">
+                        <span id="txtSolfrut" class="label-solfrut">SOLFRUT</span>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="checkSolfrut" onchange="updateSwitchLabel()">
+                            <input class="form-check-input" type="checkbox" role="switch" id="checkSolfrut" onchange="updateSwitchStyle()">
                         </div>
                     </div>
                 </div>
@@ -100,7 +99,6 @@
                         <label class="form-label text-danger fw-bold"><i class="bi bi-thermometer-half"></i> T° PULPAS</label>
                         <span class="manage-texts" onclick="gestionarTextos()">Configurar Frases</span>
                     </div>
-                    
                     <div id="pulpas-contenedor">
                         <script>
                             for(let i=1; i<=6; i++) {
@@ -127,25 +125,25 @@
 
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="form-label text-primary"><i class="bi bi-thermometer-snow"></i> T° AMBIENTE</label>
+                        <label class="form-label text-primary"><i class="bi bi-thermometer-snow"></i> T° AMB</label>
                         <input type="number" id="tAmbiente" class="form-control text-center fw-bold" step="0.1" required>
                     </div>
                     <div class="col-6">
-                        <label class="form-label text-info"><i class="bi bi-droplets-fill"></i> HUMEDAD %</label>
+                        <label class="form-label text-info"><i class="bi bi-droplets-fill"></i> HUM %</label>
                         <input type="number" id="humedad" class="form-control text-center fw-bold" required>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">OBSERVACIÓN GENERAL</label>
-                    <textarea id="obsGeneral" class="form-control" rows="2" placeholder="Detalles..."></textarea>
+                    <textarea id="obsGeneral" class="form-control" rows="2" placeholder="Notas..."></textarea>
                 </div>
 
                 <div class="mb-4">
                     <input type="file" id="fotoInput" class="d-none" accept="image/*" capture="environment">
                     <label for="fotoInput" class="file-label" id="fileLabel" style="display: block; border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer;">
                         <i class="bi bi-camera fs-2 d-block mb-1 text-primary"></i>
-                        <span id="fileName" class="fw-bold">TOMAR FOTO</span>
+                        <span id="fileName" class="fw-bold">FOTO</span>
                     </label>
                 </div>
 
@@ -159,7 +157,7 @@
 <div class="modal fade" id="modalTextos" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header"><h6 class="modal-title fw-bold">FRASES PREDEFINIDAS</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header"><h6 class="modal-title fw-bold">FRASES</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <div id="lista-frases-config" class="mb-3"></div>
         <div class="input-group">
@@ -185,16 +183,10 @@
         actualizarSelectoresObservacion();
     };
 
-    function updateSwitchLabel() {
+    function updateSwitchStyle() {
         const check = document.getElementById('checkSolfrut');
-        const label = document.getElementById('switchLabel');
-        if(check.checked) {
-            label.innerText = "SOLFRUT";
-            label.className = "label-switch text-solfrut";
-        } else {
-            label.innerText = "PLANTA (NORMAL)";
-            label.className = "label-switch text-planta";
-        }
+        const txt = document.getElementById('txtSolfrut');
+        check.checked ? txt.classList.add('check-active') : txt.classList.remove('check-active');
     }
 
     function guardarOperador() { localStorage.setItem('nombreOperador', document.getElementById('operador').value); }
@@ -206,8 +198,7 @@
             select.innerHTML = '<option value="">-- Sin observación --</option>';
             frasesPredeterminadas.forEach(frase => {
                 const opt = document.createElement('option');
-                opt.value = frase; opt.textContent = frase;
-                select.appendChild(opt);
+                opt.value = frase; opt.textContent = frase; select.appendChild(opt);
             });
             select.value = currentVal;
         });
