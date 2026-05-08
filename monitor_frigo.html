@@ -21,13 +21,11 @@
 
         body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding: 10px; }
 
-        /* --- HEADER --- */
         .app-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; margin-bottom: 12px; background: rgba(30, 41, 59, 0.5); border-radius: 15px; }
         .logo-wrapper { display: flex; align-items: center; gap: 10px; }
         .logo-img { height: 35px; width: auto; object-fit: contain; }
         .app-title { font-size: 1rem; font-weight: 700; margin: 0; text-transform: uppercase; }
 
-        /* --- CUADROS SUPERIORES --- */
         .interactive-zone { max-width: 1200px; margin: 0 auto; }
         .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; }
@@ -48,7 +46,6 @@
         .p-dot-idx { font-size: 0.45rem; color: var(--text-muted); }
         .p-dot-val { font-weight: 700; }
 
-        /* --- LISTADO --- */
         .list-container { display: flex; flex-direction: column; gap: 10px; }
         .row-item { background: var(--card-bg); border-radius: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px; position: relative; }
         .row-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
@@ -112,33 +109,44 @@
         { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
-    // --- FUNCIÓN DE RANGOS ACTUALIZADA ---
+    // --- LÓGICA DE RANGOS DINÁMICOS POR MEZCLA ---
     function getLimits(row) {
-        const variedad = row[2] ? row[2].toLowerCase() : "";
-        const exportadora = row[15] ? row[15].toString().toUpperCase() : ""; // Columna P (Indice 15)
+        const rawVariedades = row[2] ? row[2].toLowerCase() : "";
+        const listaVariedades = rawVariedades.split(',').map(v => v.trim());
+        const exportadora = row[15] ? row[15].toString().toUpperCase() : "";
 
-        // Rango Solfrut (1.0° a 2.0°)
+        // Si es Solfrut, rango fijo
         if (exportadora === "SOLFRUT") {
             return { ambMin: 1, ambMax: 2, pulpMin: 1, pulpMax: 2 };
         }
 
-        // Variedades Frío Convencional
-        if (variedad.includes("gala") || variedad.includes("fuji") || variedad.includes("red delicius") || variedad.includes("red del")) {
-            return { ambMin: -1, ambMax: 0, pulpMin: -0.5, pulpMax: 0.5 };
-        }
-        if (variedad.includes("granny") || variedad.includes("cripps") || variedad.includes("pink")) {
-            return { ambMin: 0, ambMax: 1, pulpMin: 1, pulpMax: 2 };
-        }
+        let mins = [];
+        let maxs = [];
 
-        return { ambMin: -1, ambMax: 1.5, pulpMin: -0.5, pulpMax: 2.0 };
+        listaVariedades.forEach(variedad => {
+            if (variedad.includes("gala") || variedad.includes("fuji") || variedad.includes("red delicius") || variedad.includes("red del")) {
+                mins.push(-0.5); maxs.push(0.5);
+            } else if (variedad.includes("granny") || variedad.includes("cripps") || variedad.includes("pink")) {
+                mins.push(1.0); maxs.push(2.0);
+            } else {
+                // Rango genérico si no reconoce la variedad
+                mins.push(-0.5); maxs.push(2.0);
+            }
+        });
+
+        // Lógica de "Valor más bajo de una y el más alto de la otra"
+        const finalPulpMin = Math.min(...mins);
+        const finalPulpMax = Math.max(...maxs);
+
+        return {
+            ambMin: finalPulpMin - 0.5, // Tolerancia ambiente
+            ambMax: finalPulpMax - 0.5,
+            pulpMin: finalPulpMin,
+            pulpMax: finalPulpMax
+        };
     }
 
-    function checkAlert(val, min, max) {
-        return val < min || val > max;
-    }
-
-    document.getElementById('main-carousel').onmouseenter = () => isPaused = true;
-    document.getElementById('main-carousel').onmouseleave = () => isPaused = false;
+    function checkAlert(val, min, max) { return val < min || val > max; }
 
     async function syncData() {
         try {
@@ -162,9 +170,9 @@
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const obsGeneral = r[13]; // Columna N
-            const detallesRaw = r[14] ? r[14].split(' | ') : []; // Columna O
-            const linkFoto = r[12]; // Columna M (Foto)
+            const obsGeneral = r[13];
+            const detallesRaw = r[14] ? r[14].split(' | ') : [];
+            const linkFoto = r[12];
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
@@ -187,11 +195,10 @@
                     <div class="row-stats">
                         <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
                         <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span></div>
-                        <div class="text-center d-none d-lg-block"><span class="p-idx d-block">VARIEDAD</span><span class="badge-v">${variedad || 'S/V'}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
                     <div class="d-flex align-items-center gap-2">
-                        <div class="flex-grow-1"><span class="badge-v d-lg-none text-center">${variedad || 'S/V'}</span>${obsGeneral ? `<div class="obs-general mt-1"><i class="bi bi-info-circle me-1"></i>${obsGeneral}</div>` : ''}</div>
+                        <div class="flex-grow-1"><span class="badge-v text-center">${variedad || 'S/V'}</span>${obsGeneral ? `<div class="obs-general mt-1">${obsGeneral}</div>` : ''}</div>
                         <div class="photo-col">${linkFoto && linkFoto !== "Sin foto" ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}</div>
                     </div>
                 </div>`;
@@ -231,11 +238,10 @@
                 <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="badge bg-primary" style="font-size:0.6rem">CÁMARA ${id}</span>
-                        <span class="p-idx" style="font-size:0.5rem">${new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-end">
-                        <div><div class="card-stat-label">Ambiente</div><div class="card-stat-val ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
-                        <div class="text-end"><div class="card-stat-label">Humedad</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
+                        <div><div class="card-stat-label">Amb</div><div class="card-stat-val ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
+                        <div class="text-end"><div class="card-stat-label">Hum</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
                     </div>
                     <div class="card-pulp-grid">${pulpasHtml}</div>
                     <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[15] === "SOLFRUT" ? "SOLFRUT" : (r[2] || 'S/V')}</div>
