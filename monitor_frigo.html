@@ -109,15 +109,22 @@
         { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
-    // --- LÓGICA DE RANGOS DINÁMICOS POR MEZCLA ---
+    // --- LÓGICA DE RANGOS DINÁMICOS CORREGIDA ---
     function getLimits(row) {
         const rawVariedades = row[2] ? row[2].toLowerCase() : "";
         const listaVariedades = rawVariedades.split(',').map(v => v.trim());
-        const exportadora = row[15] ? row[15].toString().toUpperCase() : "";
+        
+        // CORRECCIÓN: Limpieza profunda de espacios y aseguramos que sea texto
+        const exportadora = row[15] ? String(row[15]).trim().toUpperCase() : "";
 
-        // Si es Solfrut, rango fijo
+        // Si es SOLFRUT, aplicamos rango estricto de 1.0 a 2.0
         if (exportadora === "SOLFRUT") {
-            return { ambMin: 1, ambMax: 2, pulpMin: 1, pulpMax: 2 };
+            return { 
+                ambMin: 0.5, 
+                ambMax: 1.5, 
+                pulpMin: 1.0, 
+                pulpMax: 2.0 
+            };
         }
 
         let mins = [];
@@ -129,17 +136,15 @@
             } else if (variedad.includes("granny") || variedad.includes("cripps") || variedad.includes("pink")) {
                 mins.push(1.0); maxs.push(2.0);
             } else {
-                // Rango genérico si no reconoce la variedad
                 mins.push(-0.5); maxs.push(2.0);
             }
         });
 
-        // Lógica de "Valor más bajo de una y el más alto de la otra"
         const finalPulpMin = Math.min(...mins);
         const finalPulpMax = Math.max(...maxs);
 
         return {
-            ambMin: finalPulpMin - 0.5, // Tolerancia ambiente
+            ambMin: finalPulpMin - 0.5,
             ambMax: finalPulpMax - 0.5,
             pulpMin: finalPulpMin,
             pulpMax: finalPulpMax
@@ -244,7 +249,7 @@
                         <div class="text-end"><div class="card-stat-label">Hum</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
                     </div>
                     <div class="card-pulp-grid">${pulpasHtml}</div>
-                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[15] === "SOLFRUT" ? "SOLFRUT" : (r[2] || 'S/V')}</div>
+                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${(row[15] && String(row[15]).toUpperCase().includes("SOLFRUT")) ? "SOLFRUT" : (r[2] || 'S/V')}</div>
                 </div>`;
         }).join('');
     }
