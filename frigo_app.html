@@ -21,24 +21,23 @@
         .form-control, .form-select { border-radius: 14px !important; font-size: 0.95rem; padding: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; }
         .form-control:focus, .form-select:focus { background-color: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); border-color: var(--primary-blue); }
 
-        /* Widgets de Ambiente y Humedad */
+        /* Widgets de Ambiente y Humedad Sin Iconos */
         .widget-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
-            padding: 15px;
+            padding: 20px 10px;
             text-align: center;
             transition: 0.3s;
         }
         .widget-box:focus-within { border-color: var(--primary-blue); background: #fff; }
-        .widget-icon { font-size: 1.2rem; margin-bottom: 5px; display: block; }
         .widget-input {
             border: none;
             background: transparent;
             width: 100%;
             text-align: center;
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 800;
             color: #1e293b;
             outline: none;
         }
@@ -170,16 +169,14 @@
 
                 <div class="row g-3 mb-4">
                     <div class="col-6">
-                        <label class="form-label text-center">T° AMBIENTE</script></label>
+                        <label class="form-label text-center">T° AMBIENTE</label>
                         <div class="widget-box">
-                            <i class="bi bi-thermometer-snow widget-icon text-primary"></i>
                             <input type="number" id="tAmbiente" class="widget-input" step="0.1" placeholder="0.0" required>
                         </div>
                     </div>
                     <div class="col-6">
                         <label class="form-label text-center">HUMEDAD %</label>
                         <div class="widget-box">
-                            <i class="bi bi-droplets widget-icon text-info"></i>
                             <input type="number" id="humedad" class="widget-input" placeholder="0" required>
                         </div>
                     </div>
