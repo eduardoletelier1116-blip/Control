@@ -314,9 +314,12 @@
         }
 
         const enviar = (base64) => {
+            // SEGURIDAD: Forzamos el valor de exportadora como String limpio
+            const expValue = document.getElementById('checkSolfrut').checked ? "SOLFRUT" : "PLANTA";
+
             const datos = {
                 origen: "frigorifico",
-                operador: document.getElementById('operador').value,
+                operador: document.getElementById('operador').value.trim(),
                 variedad: variedadesSeleccionadas.join(', '),
                 camara: document.getElementById('camara').value,
                 tAmbiente: document.getElementById('tAmbiente').value,
@@ -327,14 +330,12 @@
                 p5: document.getElementById('p5').value,
                 p6: document.getElementById('p6').value,
                 humedad: document.getElementById('humedad').value,
-                obsGeneral: document.getElementById('obsGeneral').value,
+                obsGeneral: document.getElementById('obsGeneral').value.trim(),
                 pulpasDetalle: detalleNotas.join(' | '),
-                // Cambio crítico: Aseguramos el valor antes de enviar
-                exportadora: document.getElementById('checkSolfrut').checked ? "SOLFRUT" : "PLANTA",
+                exportadora: String(expValue), // Seguridad extra
                 foto: base64
             };
 
-            // Usamos fetch directo sin no-cors para asegurar el JSON íntegro
             fetch(WEB_APP_URL, { 
                 method: 'POST', 
                 body: JSON.stringify(datos) 
