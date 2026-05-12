@@ -21,7 +21,6 @@
         .form-control, .form-select { border-radius: 14px !important; font-size: 0.95rem; padding: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; }
         .form-control:focus, .form-select:focus { background-color: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); border-color: var(--primary-blue); }
 
-        /* Widgets de Ambiente y Humedad Sin Iconos */
         .widget-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -42,7 +41,6 @@
             outline: none;
         }
 
-        /* Switch Solfrut Minimalista */
         .switch-pro {
             display: flex;
             align-items: center;
@@ -56,11 +54,9 @@
         .label-solfrut { font-weight: 700; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
         .check-active { color: var(--primary-blue) !important; }
 
-        /* Pulpas */
         .pulp-card { background: #ffffff; border: 1px solid #f1f5f9; border-radius: 18px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .obs-select-container { display: none; margin-top: 10px; }
 
-        /* Botón Capturar Foto */
         .capture-container {
             border: 2px dashed #cbd5e1;
             padding: 25px;
@@ -135,6 +131,7 @@
                         <option value="Fuji">Fuji</option>
                         <option value="Red Delicius">Red Delicius</option>
                         <option value="Cripps Pink">Cripps Pink</option>
+                        <option value="Pink Lady">Pink Lady</option>
                     </select>
                 </div>
 
@@ -155,8 +152,8 @@
                                                 <i class="bi bi-chat-text"></i>
                                             </button>
                                         </div>
-                                        <div id="container-obs-p${id=i}" class="obs-select-container">
-                                            <select id="obs-p${id}" class="form-select form-select-sm obs-dropdown">
+                                        <div id="container-obs-p${i}" class="obs-select-container">
+                                            <select id="obs-p${i}" class="form-select form-select-sm obs-dropdown">
                                                 <option value="">-- Sin nota --</option>
                                             </select>
                                         </div>
@@ -332,16 +329,26 @@
                 humedad: document.getElementById('humedad').value,
                 obsGeneral: document.getElementById('obsGeneral').value,
                 pulpasDetalle: detalleNotas.join(' | '),
+                // Cambio crítico: Aseguramos el valor antes de enviar
                 exportadora: document.getElementById('checkSolfrut').checked ? "SOLFRUT" : "PLANTA",
                 foto: base64
             };
 
-            fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
+            // Usamos fetch directo sin no-cors para asegurar el JSON íntegro
+            fetch(WEB_APP_URL, { 
+                method: 'POST', 
+                body: JSON.stringify(datos) 
+            })
             .then(() => {
                 document.getElementById('mensaje').classList.remove('d-none');
                 setTimeout(() => location.reload(), 2000);
             })
-            .catch(() => { alert("Error de conexión"); btn.disabled = false; btn.innerText = "GUARDAR REGISTRO"; });
+            .catch(err => { 
+                console.error(err);
+                alert("Error de conexión"); 
+                btn.disabled = false; 
+                btn.innerText = "GUARDAR REGISTRO"; 
+            });
         };
 
         const file = document.getElementById('fotoInput').files[0];
