@@ -124,7 +124,7 @@
         const exportadora = row[15] ? String(row[15]).trim().toUpperCase() : "";
 
         if (exportadora === "SOLFRUT") {
-            return { ambMin: 0.5, ambMax: 1.5, pulpMin: 1.0, pulpMax: 2.0 };
+            return { ambMin: 0.5, ambMax: 1.5, pulpMin: 0.0, pulpMax: 2.0 };
         }
 
         let mins = [];
