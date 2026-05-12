@@ -64,7 +64,7 @@
         @media (min-width: 992px) {
             .row-item { flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 20px; }
             .row-header { border: none; padding: 0; min-width: 140px; }
-            .row-stats { background: none; min-width: 250px; gap: 25px; justify-content: flex-start; padding-left: 20px; }
+            .row-stats { background: none; min-width: 320px; gap: 20px; justify-content: flex-start; padding-left: 20px; }
             .pulp-grid { grid-template-columns: repeat(6, 1fr); flex-grow: 1; margin: 0 20px; }
             .p-box { flex-direction: column; text-align: center; justify-content: center; min-height: 55px; }
             .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
@@ -72,6 +72,9 @@
         }
         .badge-v { font-size: 0.7rem; color: var(--accent-soft); background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 5px; }
         .v-amb { font-size: 1.1rem; font-weight: 700; }
+        .label-exportadora { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; }
+        .text-solfrut { color: var(--accent-soft); }
+        .text-planta { color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -109,27 +112,17 @@
         { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
-    // --- LÓGICA DE RANGOS DINÁMICOS CORREGIDA ---
     function getLimits(row) {
         const rawVariedades = row[2] ? row[2].toLowerCase() : "";
         const listaVariedades = rawVariedades.split(',').map(v => v.trim());
-        
-        // CORRECCIÓN: Limpieza profunda de espacios y aseguramos que sea texto
         const exportadora = row[15] ? String(row[15]).trim().toUpperCase() : "";
 
-        // Si es SOLFRUT, aplicamos rango estricto de 1.0 a 2.0
         if (exportadora === "SOLFRUT") {
-            return { 
-                ambMin: 0.5, 
-                ambMax: 1.5, 
-                pulpMin: 1.0, 
-                pulpMax: 2.0 
-            };
+            return { ambMin: 0.5, ambMax: 1.5, pulpMin: 1.0, pulpMax: 2.0 };
         }
 
         let mins = [];
         let maxs = [];
-
         listaVariedades.forEach(variedad => {
             if (variedad.includes("gala") || variedad.includes("fuji") || variedad.includes("red delicius") || variedad.includes("red del")) {
                 mins.push(-0.5); maxs.push(0.5);
@@ -139,16 +132,9 @@
                 mins.push(-0.5); maxs.push(2.0);
             }
         });
-
         const finalPulpMin = Math.min(...mins);
         const finalPulpMax = Math.max(...maxs);
-
-        return {
-            ambMin: finalPulpMin - 0.5,
-            ambMax: finalPulpMax - 0.5,
-            pulpMin: finalPulpMin,
-            pulpMax: finalPulpMax
-        };
+        return { ambMin: finalPulpMin - 0.5, ambMax: finalPulpMax - 0.5, pulpMin: finalPulpMin, pulpMax: finalPulpMax };
     }
 
     function checkAlert(val, min, max) { return val < min || val > max; }
@@ -178,6 +164,7 @@
             const obsGeneral = r[13];
             const detallesRaw = r[14] ? r[14].split(' | ') : [];
             const linkFoto = r[12];
+            const expName = (r[15] && String(r[15]).toUpperCase() === "SOLFRUT") ? "SOLFRUT" : "PLANTA";
 
             let pulpasHtml = "";
             for (let i = 1; i <= 6; i++) {
@@ -200,10 +187,14 @@
                     <div class="row-stats">
                         <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
                         <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span></div>
+                        <div class="ms-2 d-flex align-items-center"><span class="badge-v text-center">${variedad || 'S/V'}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="flex-grow-1"><span class="badge-v text-center">${variedad || 'S/V'}</span>${obsGeneral ? `<div class="obs-general mt-1">${obsGeneral}</div>` : ''}</div>
+                    <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
+                        <div class="flex-grow-1 text-end">
+                            <div class="label-exportadora ${expName === 'SOLFRUT' ? 'text-solfrut' : 'text-planta'}">${expName}</div>
+                            ${obsGeneral ? `<div class="obs-general mt-1 text-start">${obsGeneral}</div>` : ''}
+                        </div>
                         <div class="photo-col">${linkFoto && linkFoto !== "Sin foto" ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}</div>
                     </div>
                 </div>`;
@@ -225,6 +216,7 @@
             const limits = getLimits(r);
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
+            const expName = (r[15] && String(r[15]).toUpperCase() === "SOLFRUT") ? "SOLFRUT" : "PLANTA";
             let pulpasHtml = "";
             let anyPulpAlert = false;
             
@@ -243,13 +235,14 @@
                 <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="badge bg-primary" style="font-size:0.6rem">CÁMARA ${id}</span>
+                        <span class="label-exportadora ${expName === 'SOLFRUT' ? 'text-solfrut' : 'text-planta'}" style="font-size:0.55rem">${expName}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-end">
                         <div><div class="card-stat-label">Amb</div><div class="card-stat-val ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
                         <div class="text-end"><div class="card-stat-label">Hum</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
                     </div>
                     <div class="card-pulp-grid">${pulpasHtml}</div>
-                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${(row[15] && String(row[15]).toUpperCase().includes("SOLFRUT")) ? "SOLFRUT" : (r[2] || 'S/V')}</div>
+                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[2] || 'S/V'}</div>
                 </div>`;
         }).join('');
     }
