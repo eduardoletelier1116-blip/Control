@@ -30,7 +30,7 @@
         .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; }
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 12px; margin-bottom: 15px; }
-        .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
+        .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s ease, box-shadow 0.3s ease; }
         .cam-card.alert-active { border: 2px solid var(--red-soft); animation: pulse-border 1.5s infinite; }
 
         @keyframes pulse-border {
@@ -71,6 +71,7 @@
             .photo-col { min-width: 50px; text-align: right; }
         }
         .badge-v { font-size: 0.7rem; color: var(--accent-soft); background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 5px; }
+        .badge-v b { color: var(--text-main); margin-right: 4px; font-weight: 600; }
         .v-amb { font-size: 1.1rem; font-weight: 700; }
         .label-exportadora { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; }
         .text-solfrut { color: var(--accent-soft); }
@@ -187,7 +188,7 @@
                     <div class="row-stats">
                         <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
                         <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span></div>
-                        <div class="ms-2 d-flex align-items-center"><span class="badge-v text-center">${variedad || 'S/V'}</span></div>
+                        <div class="ms-2 d-flex align-items-center"><span class="badge-v text-center"><b>VAR:</b> ${variedad || 'S/V'}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
                     <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
