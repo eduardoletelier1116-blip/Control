@@ -30,7 +30,11 @@
         .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; }
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 12px; margin-bottom: 15px; }
-        .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s ease, box-shadow 0.3s ease; }
+        
+        /* Tarjetas estáticas sin movimiento */
+        .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s ease; }
+        .cam-card:hover { transform: none !important; } 
+        
         .cam-card.alert-active { border: 2px solid var(--red-soft); animation: pulse-border 1.5s infinite; }
 
         @keyframes pulse-border {
@@ -57,22 +61,23 @@
         .p-val { font-size: 0.9rem; font-weight: 700; }
         .p-obs { font-size: 0.55rem; color: var(--warning-amber); text-align: right; max-width: 60%; line-height: 1; }
         .obs-general { font-size: 0.7rem; background: rgba(56, 189, 248, 0.05); padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent-soft); }
+        
         .btn-photo { background: var(--accent-soft); color: var(--bg-app); border: none; border-radius: 8px; padding: 8px 12px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
-        .btn-photo:hover { background: #fff; transform: scale(1.05); }
+        .btn-photo:hover { background: #fff; }
         .btn-photo.disabled { background: #334155; color: #64748b; cursor: not-allowed; }
 
         @media (min-width: 992px) {
             .row-item { flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 20px; }
             .row-header { border: none; padding: 0; min-width: 140px; }
-            .row-stats { background: none; min-width: 320px; gap: 20px; justify-content: flex-start; padding-left: 20px; }
+            .row-stats { background: none; min-width: 400px; gap: 30px; justify-content: flex-start; padding-left: 20px; }
             .pulp-grid { grid-template-columns: repeat(6, 1fr); flex-grow: 1; margin: 0 20px; }
             .p-box { flex-direction: column; text-align: center; justify-content: center; min-height: 55px; }
             .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
             .photo-col { min-width: 50px; text-align: right; }
         }
-        .badge-v { font-size: 0.7rem; color: var(--accent-soft); background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 5px; }
-        .badge-v b { color: var(--text-main); margin-right: 4px; font-weight: 600; }
+        
         .v-amb { font-size: 1.1rem; font-weight: 700; }
+        .v-var { font-size: 0.85rem; font-weight: 700; color: var(--accent-soft); text-transform: uppercase; }
         .label-exportadora { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; }
         .text-solfrut { color: var(--accent-soft); }
         .text-planta { color: var(--text-muted); }
@@ -88,7 +93,7 @@
     <div id="reloj" class="sync-info small">00:00:00</div>
 </header>
 
-<div class="interactive-zone" id="main-carousel">
+<div class="interactive-zone" id="main-carousel" onmouseover="isPaused=true" onmouseout="isPaused=false">
     <div class="group-nav">
         <button class="nav-btn" onclick="manualChange(-1)"><i class="bi bi-chevron-left"></i></button>
         <span id="group-label" class="badge bg-primary px-3 py-2">Grupo</span>
@@ -105,7 +110,7 @@
     
     let allData = [];
     let currentGroup = 0;
-    let isPaused = false;
+    let isPaused = false; // Controla la pausa del carrusel
 
     const groups = [
         { label: "Cámaras 2 - 5", ids: ["2", "3", "4", "5"] },
@@ -153,12 +158,11 @@
 
     function drawUI() {
         const listContainer = document.getElementById('data-list');
-        const latest = {};
         const historySorted = [...allData].sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
         listContainer.innerHTML = historySorted.map(r => {
             const limits = getLimits(r);
-            const variedad = r[2];
+            const variedad = r[2] || 'S/V';
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
@@ -188,7 +192,7 @@
                     <div class="row-stats">
                         <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
                         <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span></div>
-                        <div class="ms-2 d-flex align-items-center"><span class="badge-v text-center"><b>VAR:</b> ${variedad || 'S/V'}</span></div>
+                        <div class="text-center"><span class="p-idx d-block">VARIEDAD</span><span class="v-var">${variedad}</span></div>
                     </div>
                     <div class="pulp-grid">${pulpasHtml}</div>
                     <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
@@ -201,6 +205,7 @@
                 </div>`;
         }).join('');
 
+        const latest = {};
         allData.forEach(row => { latest[row[3]] = row; });
         renderCards(latest);
     }
@@ -257,7 +262,10 @@
 
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
     setInterval(syncData, 60000);
+    
+    // El carrusel solo avanza si isPaused es false
     setInterval(() => { if(!isPaused && allData.length > 0) manualChange(1); }, 8000);
+    
     syncData();
 </script>
 </body>
