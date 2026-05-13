@@ -78,26 +78,45 @@
             margin: 0;
         }
 
-        .date-control input {
-    background: #0f172a;
-    color: var(--text-main);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 50px;
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    outline: none;
-}
+        .date-field {
+            position: relative;
+            min-width: 155px;
+        }
 
-.date-control input[type="date"] {
-    color-scheme: dark;
-}
+        .date-field input {
+            background: #0f172a;
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            padding: 4px 38px 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            outline: none;
+            width: 100%;
+            height: 30px;
+            color-scheme: dark;
+            box-sizing: border-box;
+        }
 
-.date-control input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    opacity: 0.9;
-    cursor: pointer;
-}
+        .date-field input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            font-size: 1rem;
+            pointer-events: none;
+            opacity: 0.95;
+        }
           
         .btn-hoy {
             border: none;
@@ -130,6 +149,7 @@
             font-size: 0.72rem;
             color: var(--text-muted);
             font-weight: 600;
+            flex-wrap: wrap;
         }
 
         .summary-pill {
@@ -221,8 +241,9 @@
                 padding: 8px;
             }
 
-            .date-control input {
+            .date-field {
                 flex: 1;
+                min-width: 0;
             }
 
             .sync-info {
@@ -253,7 +274,12 @@
 
         <div class="date-control">
             <label for="fechaConsulta">Día</label>
-            <input type="date" id="fechaConsulta" onchange="refresh()">
+
+            <div class="date-field">
+                <input type="date" id="fechaConsulta" onchange="refresh()">
+                <i class="bi bi-calendar3 calendar-icon"></i>
+            </div>
+
             <button class="btn-hoy" onclick="volverAHoy()">Hoy</button>
         </div>
 
@@ -412,6 +438,11 @@
         return partes[0] * 3600 + partes[1] * 60;
     }
 
+    function normalizarNumero(valor) {
+        if (valor === null || valor === undefined || valor === "") return NaN;
+        return Number(String(valor).replace(",", ".").trim());
+    }
+
     function limpiarGrafico(divId, statusId, mensaje) {
         charts[divId] = null;
 
@@ -502,11 +533,13 @@
         let minVal = range[0];
         let maxVal = range[1];
 
-        data.forEach(f => {
+        data.forEach((f, index) => {
             let h = extraerHora(f[0]);
-            let val = Number(f[colIdx]);
+            let val = normalizarNumero(f[colIdx]);
             let kilos = f[5] ? f[5] + "k" : ""; 
             
+            if (isNaN(val)) return;
+
             if (val < minVal) minVal = val;
             if (val > maxVal) maxVal = val;
             
@@ -516,7 +549,7 @@
                 : 'point { size: 5; fill-color: ' + baseColor + '; }';
             
             dt.addRow([
-                h + "\n" + kilos, 
+                `${index + 1}\n${h}\n${kilos}`, 
                 val, 
                 estilo, 
                 f[6] === "SI" ? "MOD" : null, 
@@ -528,6 +561,7 @@
         const padding = (range[1] - range[0]) * 0.5;
         const vMin = Math.min(range[0], minVal) - padding;
         const vMax = Math.max(range[1], maxVal) + padding;
+        const muchasEtiquetas = data.length > 8;
 
         charts[divId] = new google.visualization.ComboChart(document.getElementById(divId));
 
@@ -552,11 +586,11 @@
             legend: 'none',
             chartArea: { 
                 width: '90%', 
-                height: '70%', 
+                height: muchasEtiquetas ? '62%' : '70%', 
                 top: 10, 
                 left: 45, 
                 right: 10, 
-                bottom: 50 
+                bottom: muchasEtiquetas ? 70 : 50
             },
             animation: { 
                 duration: 500, 
@@ -566,11 +600,15 @@
             hAxis: { 
                 textStyle: { 
                     color: '#64748b', 
-                    fontSize: 9 
+                    fontSize: muchasEtiquetas ? 8 : 9
                 }, 
                 gridlines: { 
                     color: 'transparent' 
-                } 
+                },
+                showTextEvery: 1,
+                slantedText: muchasEtiquetas,
+                slantedTextAngle: 45,
+                maxAlternation: 1
             },
             vAxis: { 
                 textStyle: { 
@@ -617,7 +655,7 @@
             }
         });
 
-        const ultimoVal = Number(data[data.length - 1][colIdx]);
+        const ultimoVal = normalizarNumero(data[data.length - 1][colIdx]);
         const isOk = !(ultimoVal < range[0] || ultimoVal > range[1]);
 
         document.getElementById(statusId).innerHTML = isOk ? 
