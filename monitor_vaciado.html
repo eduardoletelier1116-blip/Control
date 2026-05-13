@@ -79,16 +79,26 @@
         }
 
         .date-control input {
-            background: #0f172a;
-            color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50px;
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            outline: none;
-        }
+    background: #0f172a;
+    color: var(--text-main);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    outline: none;
+}
 
+.date-control input[type="date"] {
+    color-scheme: dark;
+}
+
+.date-control input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.9;
+    cursor: pointer;
+}
+          
         .btn-hoy {
             border: none;
             background: var(--accent-soft);
