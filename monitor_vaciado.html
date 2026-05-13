@@ -339,6 +339,7 @@
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyST5aqRacT9MQ5lAYP3PIL9Kx4TIYflXyErnK4YptO8VHPFE7lFA4WbwgWkSD7rLN9VQ/exec?pestana=Vaciado";
+    
     const LIMITS = { 
         ppm: [30, 100], 
         orp: [750, 850], 
@@ -371,40 +372,79 @@
 
     function formatearFechaCL(fechaISO) {
         if (!fechaISO || !fechaISO.includes("-")) return "--/--/----";
+
         const p = fechaISO.split("-");
         return `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    function formatearFechaChileDesdeDate(date) {
+        const partes = new Intl.DateTimeFormat("es-CL", {
+            timeZone: "America/Santiago",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).formatToParts(date);
+
+        const obj = {};
+        partes.forEach(p => {
+            obj[p.type] = p.value;
+        });
+
+        return `${obj.year}-${obj.month}-${obj.day}`;
+    }
+
+    function formatearHoraChileDesdeDate(date) {
+        const partes = new Intl.DateTimeFormat("es-CL", {
+            timeZone: "America/Santiago",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            hourCycle: "h23"
+        }).formatToParts(date);
+
+        const obj = {};
+        partes.forEach(p => {
+            obj[p.type] = p.value;
+        });
+
+        return `${obj.hour}:${obj.minute}`;
     }
 
     function normalizarFechaISO(valor) {
         if (!valor) return "";
 
-        if (valor instanceof Date) {
-            const y = valor.getFullYear();
-            const m = String(valor.getMonth() + 1).padStart(2, '0');
-            const d = String(valor.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        }
-
         const str = String(valor).trim();
 
-        if (str.includes("/")) {
-            const fechaParte = str.split(" ")[0];
-            const p = fechaParte.split("/");
-            if (p.length === 3) {
-                return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+        // Fecha que viene desde Apps Script como UTC:
+        // Ej: 2026-05-13T18:18:41.000Z
+        if (/^\d{4}-\d{2}-\d{2}T/.test(str)) {
+            const date = new Date(str);
+
+            if (!isNaN(date.getTime())) {
+                return formatearFechaChileDesdeDate(date);
             }
         }
 
+        // Formato chileno:
+        // Ej: 13/5/2026 14:18:41
+        if (str.includes("/")) {
+            const fechaParte = str.split(" ")[0];
+            const p = fechaParte.split("/");
+
+            if (p.length === 3) {
+                return `${p[2]}-${p[1].padStart(2, "0")}-${p[0].padStart(2, "0")}`;
+            }
+        }
+
+        // Formato ISO simple:
+        // Ej: 2026-05-13
         if (str.includes("-")) {
             return str.split("T")[0].split(" ")[0];
         }
 
         const date = new Date(str);
         if (!isNaN(date.getTime())) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+            return formatearFechaChileDesdeDate(date);
         }
 
         return "";
@@ -414,16 +454,38 @@
         if (!valor) return "--:--";
 
         const str = String(valor).trim();
-        const match = str.match(/(\d{1,2}:\d{2})/);
 
-        if (match) return match[1];
+        // Fecha que viene desde Apps Script como UTC:
+        // Ej: 2026-05-13T18:18:41.000Z
+        // Se convierte correctamente a hora Chile.
+        if (/^\d{4}-\d{2}-\d{2}T/.test(str)) {
+            const date = new Date(str);
+
+            if (!isNaN(date.getTime())) {
+                return formatearHoraChileDesdeDate(date);
+            }
+        }
+
+        // Formato chileno:
+        // Ej: 13/5/2026 7:32:39
+        const matchFechaChile = str.match(/\d{1,2}\/\d{1,2}\/\d{4}\s+(\d{1,2}:\d{2})/);
+
+        if (matchFechaChile) {
+            return matchFechaChile[1].padStart(5, "0");
+        }
+
+        // Hora suelta:
+        // Ej: 14:18:41 o 14:18
+        const matchHora = str.match(/^(\d{1,2}:\d{2})/);
+
+        if (matchHora) {
+            return matchHora[1].padStart(5, "0");
+        }
 
         const date = new Date(str);
+
         if (!isNaN(date.getTime())) {
-            return date.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            return formatearHoraChileDesdeDate(date);
         }
 
         return "--:--";
