@@ -477,7 +477,7 @@
     function refresh() {
         const fechaSeleccionada = document.getElementById("fechaConsulta").value || obtenerFechaHoyISO();
 
-        fetch(WEB_APP_URL + "&t=" + new Date().getTime())
+        fetch(WEB_APP_URL + "&fecha=" + fechaSeleccionada + "&t=" + new Date().getTime())
             .then(r => r.json())
             .then(res => {
                 if (res.error) {
