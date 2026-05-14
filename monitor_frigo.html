@@ -58,6 +58,14 @@
             text-transform: uppercase; 
         }
 
+        .sync-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.2);
+            padding: 5px 10px;
+            border-radius: 50px;
+        }
+
         .interactive-zone { 
             max-width: 1200px; 
             margin: 0 auto; 
@@ -409,14 +417,9 @@
     function normalizarExportadora(valor) {
         const exp = String(valor || "").trim().toUpperCase();
 
-        if (exportadora === "SURFRUT") {
-    return { 
-        ambMin: -0.5, 
-        ambMax: 0.5, 
-        pulpMin: -1.0, 
-        pulpMax: 1.0 
-    };
-}
+        if (exp === "SURFRUT" || exp === "SOLFRUT") {
+            return "SURFRUT";
+        }
 
         return "PLANTA";
     }
@@ -458,8 +461,6 @@
     }
 
     function obtenerVariedadPulpa(row, index, detallesRaw) {
-        // Soporte por si después agregamos una columna extra con:
-        // "Galas | Fuji | Granny | ..."
         const variedadesPorPulpaExtra = row[16] 
             ? String(row[16]).split("|").map(v => v.trim()) 
             : [];
@@ -473,11 +474,16 @@
 
     function getLimits(row) {
         const rawVariedades = row[2] ? row[2].toLowerCase() : "";
-        const listaVariedades = rawVariedades.split(',').map(v => v.trim());
+        const listaVariedades = rawVariedades.split(',').map(v => v.trim()).filter(v => v);
         const exportadora = normalizarExportadora(row[15]);
 
         if (exportadora === "SURFRUT") {
-            return { ambMin: 0.5, ambMax: 1.5, pulpMin: 0.0, pulpMax: 2.0 };
+            return { 
+                ambMin: -0.5, 
+                ambMax: 0.5, 
+                pulpMin: -1.0, 
+                pulpMax: 1.0 
+            };
         }
 
         let mins = [];
@@ -488,6 +494,7 @@
                 variedad.includes("gala") || 
                 variedad.includes("fuji") || 
                 variedad.includes("red delicius") || 
+                variedad.includes("red delicious") ||
                 variedad.includes("red del")
             ) {
                 mins.push(-0.5); 
@@ -504,6 +511,15 @@
                 maxs.push(2.0);
             }
         });
+
+        if (mins.length === 0 || maxs.length === 0) {
+            return { 
+                ambMin: -1.5, 
+                ambMax: 1.5, 
+                pulpMin: -0.5, 
+                pulpMax: 2.0 
+            };
+        }
 
         const finalPulpMin = Math.min(...mins);
         const finalPulpMax = Math.max(...maxs);
@@ -525,7 +541,11 @@
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
 
-            if (!json || json.length < 2) return;
+            if (!json || json.length < 2) {
+                allData = [];
+                drawUI();
+                return;
+            }
 
             const hoyStr = new Date().toLocaleDateString();
 
@@ -537,12 +557,28 @@
 
         } catch (e) { 
             console.error(e); 
+            document.getElementById('data-list').innerHTML = `
+                <div class="row-item text-center text-danger fw-bold">
+                    Error al conectar con la base de datos
+                </div>
+            `;
         }
     }
 
     function drawUI() {
         const listContainer = document.getElementById('data-list');
         const historySorted = [...allData].sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+        if (historySorted.length === 0) {
+            listContainer.innerHTML = `
+                <div class="row-item text-center text-muted fw-bold">
+                    Sin registros de frigorífico para el día actual
+                </div>
+            `;
+
+            renderCards({});
+            return;
+        }
 
         listContainer.innerHTML = historySorted.map(r => {
             const limits = getLimits(r);
