@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitor Frío Pro</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+
     <style>
         :root {
             --bg-app: #0f172a;
@@ -19,23 +21,87 @@
             --warning-amber: #fbbf24;
         }
 
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding: 10px; }
+        body { 
+            background-color: var(--bg-app); 
+            color: var(--text-main); 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 10px; 
+        }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; margin-bottom: 12px; background: rgba(30, 41, 59, 0.5); border-radius: 15px; }
-        .logo-wrapper { display: flex; align-items: center; gap: 10px; }
-        .logo-img { height: 35px; width: auto; object-fit: contain; }
-        .app-title { font-size: 1rem; font-weight: 700; margin: 0; text-transform: uppercase; }
+        .app-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 8px 15px; 
+            margin-bottom: 12px; 
+            background: rgba(30, 41, 59, 0.5); 
+            border-radius: 15px; 
+        }
 
-        .interactive-zone { max-width: 1200px; margin: 0 auto; }
-        .group-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .nav-btn { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 32px; height: 32px; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .logo-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .logo-img { 
+            height: 35px; 
+            width: auto; 
+            object-fit: contain; 
+        }
+
+        .app-title { 
+            font-size: 1rem; 
+            font-weight: 700; 
+            margin: 0; 
+            text-transform: uppercase; 
+        }
+
+        .interactive-zone { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+
+        .group-nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+        }
+
+        .nav-btn { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: white; 
+            border-radius: 50%; 
+            width: 32px; 
+            height: 32px; 
+        }
+
+        .cards-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); 
+            gap: 12px; 
+            margin-bottom: 15px; 
+        }
         
-        /* Tarjetas estáticas sin movimiento */
-        .cam-card { background: var(--card-bg); border-radius: 18px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s ease; }
-        .cam-card:hover { transform: none !important; } 
+        .cam-card { 
+            background: var(--card-bg); 
+            border-radius: 18px; 
+            padding: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            transition: border 0.3s ease; 
+        }
+
+        .cam-card:hover { 
+            transform: none !important; 
+        } 
         
-        .cam-card.alert-active { border: 2px solid var(--red-soft); animation: pulse-border 1.5s infinite; }
+        .cam-card.alert-active { 
+            border: 2px solid var(--red-soft); 
+            animation: pulse-border 1.5s infinite; 
+        }
 
         @keyframes pulse-border {
             0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
@@ -43,46 +109,260 @@
             100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
         }
 
-        .card-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
-        .card-stat-val { font-size: 1.2rem; font-weight: 700; }
-        .card-pulp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; background: rgba(0,0,0,0.15); padding: 6px; border-radius: 10px; }
-        .p-dot { display: flex; flex-direction: column; align-items: center; font-size: 0.65rem; border-radius: 4px; padding: 2px; background: rgba(255,255,255,0.03); }
-        .p-dot-idx { font-size: 0.45rem; color: var(--text-muted); }
-        .p-dot-val { font-weight: 700; }
+        .card-stat-label { 
+            font-size: 0.55rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+        }
 
-        .list-container { display: flex; flex-direction: column; gap: 10px; }
-        .row-item { background: var(--card-bg); border-radius: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .row-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
-        .row-stats { display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 8px; }
-        .pulp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .p-box { background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .p-info { display: flex; flex-direction: column; }
-        .p-idx { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; }
-        .p-val { font-size: 0.9rem; font-weight: 700; }
-        .p-obs { font-size: 0.55rem; color: var(--warning-amber); text-align: right; max-width: 60%; line-height: 1; }
-        .obs-general { font-size: 0.7rem; background: rgba(56, 189, 248, 0.05); padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent-soft); }
-        
-        .btn-photo { background: var(--accent-soft); color: var(--bg-app); border: none; border-radius: 8px; padding: 8px 12px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
-        .btn-photo:hover { background: #fff; }
-        .btn-photo.disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        .card-stat-val { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+        }
 
-        @media (min-width: 992px) {
-            .row-item { flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 20px; }
-            .row-header { border: none; padding: 0; min-width: 140px; }
-            .row-stats { background: none; min-width: 400px; gap: 30px; justify-content: flex-start; padding-left: 20px; }
-            .pulp-grid { grid-template-columns: repeat(6, 1fr); flex-grow: 1; margin: 0 20px; }
-            .p-box { flex-direction: column; text-align: center; justify-content: center; min-height: 55px; }
-            .p-obs { text-align: center; max-width: 100%; margin-top: 2px; }
-            .photo-col { min-width: 50px; text-align: right; }
+        .card-pulp-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 4px; 
+            margin-top: 8px; 
+            background: rgba(0,0,0,0.15); 
+            padding: 6px; 
+            border-radius: 10px; 
+        }
+
+        .p-dot { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-size: 0.65rem; 
+            border-radius: 4px; 
+            padding: 2px; 
+            background: rgba(255,255,255,0.03); 
+            min-width: 0;
+        }
+
+        .p-dot-idx { 
+            font-size: 0.45rem; 
+            color: var(--text-muted); 
+        }
+
+        .p-dot-val { 
+            font-weight: 700; 
+        }
+
+        .p-dot-var {
+            font-size: 0.42rem;
+            color: var(--accent-soft);
+            font-weight: 700;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .list-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+
+        .row-item { 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            padding: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            position: relative; 
+        }
+
+        .row-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            padding-bottom: 5px; 
+        }
+
+        .row-stats { 
+            display: flex; 
+            justify-content: space-around; 
+            background: rgba(0,0,0,0.2); 
+            border-radius: 10px; 
+            padding: 8px; 
+        }
+
+        .pulp-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 6px; 
+        }
+
+        .p-box { 
+            background: rgba(15, 23, 42, 0.6); 
+            border-radius: 8px; 
+            padding: 6px 8px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 6px;
+        }
+
+        .p-info { 
+            display: flex; 
+            flex-direction: column; 
+            min-width: 0;
+        }
+
+        .p-idx { 
+            font-size: 0.6rem; 
+            color: var(--text-muted); 
+            font-weight: 600; 
+        }
+
+        .p-val { 
+            font-size: 0.95rem; 
+            font-weight: 800; 
+            line-height: 1.1;
+        }
+
+        .p-var {
+            font-size: 0.55rem;
+            color: var(--accent-soft);
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1.1;
+            max-width: 90px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .p-obs { 
+            font-size: 0.55rem; 
+            color: var(--warning-amber); 
+            text-align: right; 
+            max-width: 60%; 
+            line-height: 1; 
+        }
+
+        .obs-general { 
+            font-size: 0.7rem; 
+            background: rgba(56, 189, 248, 0.05); 
+            padding: 6px; 
+            border-radius: 8px; 
+            border-left: 3px solid var(--accent-soft); 
         }
         
-        .v-amb { font-size: 1.1rem; font-weight: 700; }
-        .v-var { font-size: 0.85rem; font-weight: 700; color: var(--accent-soft); text-transform: uppercase; }
-        .label-exportadora { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; }
-        .text-solfrut { color: var(--accent-soft); }
-        .text-planta { color: var(--text-muted); }
+        .btn-photo { 
+            background: var(--accent-soft); 
+            color: var(--bg-app); 
+            border: none; 
+            border-radius: 8px; 
+            padding: 8px 12px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .btn-photo:hover { 
+            background: #fff; 
+        }
+
+        .btn-photo.disabled { 
+            background: #334155; 
+            color: #64748b; 
+            cursor: not-allowed; 
+        }
+
+        @media (min-width: 992px) {
+            .row-item { 
+                flex-direction: row; 
+                align-items: center; 
+                justify-content: space-between; 
+                padding: 10px 20px; 
+            }
+
+            .row-header { 
+                border: none; 
+                padding: 0; 
+                min-width: 140px; 
+            }
+
+            .row-stats { 
+                background: none; 
+                min-width: 400px; 
+                gap: 30px; 
+                justify-content: flex-start; 
+                padding-left: 20px; 
+            }
+
+            .pulp-grid { 
+                grid-template-columns: repeat(6, 1fr); 
+                flex-grow: 1; 
+                margin: 0 20px; 
+            }
+
+            .p-box { 
+                flex-direction: column; 
+                text-align: center; 
+                justify-content: center; 
+                min-height: 68px; 
+                padding: 6px 4px;
+            }
+
+            .p-var {
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .p-obs { 
+                text-align: center; 
+                max-width: 100%; 
+                margin-top: 2px; 
+            }
+
+            .photo-col { 
+                min-width: 50px; 
+                text-align: right; 
+            }
+        }
+        
+        .v-amb { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+        }
+
+        .v-var { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: var(--accent-soft); 
+            text-transform: uppercase; 
+        }
+
+        .label-exportadora { 
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            letter-spacing: 0.5px; 
+        }
+
+        .text-surfrut { 
+            color: var(--accent-soft); 
+        }
+
+        .text-planta { 
+            color: var(--text-muted); 
+        }
     </style>
 </head>
+
 <body>
 
 <header class="app-header">
@@ -90,15 +370,23 @@
         <img src="logo-icono.png" alt="Logo" class="logo-img">
         <h1 class="app-title">MONITOR FRÍO</h1>
     </div>
+
     <div id="reloj" class="sync-info small">00:00:00</div>
 </header>
 
 <div class="interactive-zone" id="main-carousel" onmouseover="isPaused=true" onmouseout="isPaused=false">
     <div class="group-nav">
-        <button class="nav-btn" onclick="manualChange(-1)"><i class="bi bi-chevron-left"></i></button>
+        <button class="nav-btn" onclick="manualChange(-1)">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+
         <span id="group-label" class="badge bg-primary px-3 py-2">Grupo</span>
-        <button class="nav-btn" onclick="manualChange(1)"><i class="bi bi-chevron-right"></i></button>
+
+        <button class="nav-btn" onclick="manualChange(1)">
+            <i class="bi bi-chevron-right"></i>
+        </button>
     </div>
+
     <div id="cards-container" class="cards-grid"></div>
 </div>
 
@@ -110,7 +398,7 @@
     
     let allData = [];
     let currentGroup = 0;
-    let isPaused = false; // Controla la pausa del carrusel
+    let isPaused = false;
 
     const groups = [
         { label: "Cámaras 2 - 5", ids: ["2", "3", "4", "5"] },
@@ -118,42 +406,133 @@
         { label: "Cámaras 10 - 12", ids: ["10", "11", "12"] }
     ];
 
+    function normalizarExportadora(valor) {
+        const exp = String(valor || "").trim().toUpperCase();
+
+        if (exp === "SURFRUT" || exp === "SOLFRUT") {
+            return "SURFRUT";
+        }
+
+        return "PLANTA";
+    }
+
+    function extraerDetallePulpa(detalle, variedadGeneral) {
+        const texto = String(detalle || "").trim();
+
+        let variedad = "";
+        let obs = "";
+
+        if (texto) {
+            const sinIndice = texto.replace(/^P\d+:\s*/i, "").trim();
+
+            if (sinIndice.includes("|")) {
+                variedad = sinIndice.split("|")[0].trim();
+            }
+
+            const matchObs = texto.match(/\(([^)]+)\)/);
+            if (matchObs) {
+                obs = matchObs[1].trim();
+            }
+        }
+
+        if (!variedad) {
+            const variedades = String(variedadGeneral || "")
+                .split(",")
+                .map(v => v.trim())
+                .filter(v => v);
+
+            if (variedades.length === 1) {
+                variedad = variedades[0];
+            }
+        }
+
+        return {
+            variedad: variedad || "S/V",
+            obs
+        };
+    }
+
+    function obtenerVariedadPulpa(row, index, detallesRaw) {
+        // Soporte por si después agregamos una columna extra con:
+        // "Galas | Fuji | Granny | ..."
+        const variedadesPorPulpaExtra = row[16] 
+            ? String(row[16]).split("|").map(v => v.trim()) 
+            : [];
+
+        if (variedadesPorPulpaExtra[index]) {
+            return variedadesPorPulpaExtra[index];
+        }
+
+        return extraerDetallePulpa(detallesRaw[index], row[2]).variedad;
+    }
+
     function getLimits(row) {
         const rawVariedades = row[2] ? row[2].toLowerCase() : "";
         const listaVariedades = rawVariedades.split(',').map(v => v.trim());
-        const exportadora = row[15] ? String(row[15]).trim().toUpperCase() : "";
+        const exportadora = normalizarExportadora(row[15]);
 
-        if (exportadora === "SOLFRUT") {
+        if (exportadora === "SURFRUT") {
             return { ambMin: 0.5, ambMax: 1.5, pulpMin: 0.0, pulpMax: 2.0 };
         }
 
         let mins = [];
         let maxs = [];
+
         listaVariedades.forEach(variedad => {
-            if (variedad.includes("gala") || variedad.includes("fuji") || variedad.includes("red delicius") || variedad.includes("red del")) {
-                mins.push(-0.5); maxs.push(0.5);
-            } else if (variedad.includes("granny") || variedad.includes("cripps") || variedad.includes("pink")) {
-                mins.push(1.0); maxs.push(2.0);
+            if (
+                variedad.includes("gala") || 
+                variedad.includes("fuji") || 
+                variedad.includes("red delicius") || 
+                variedad.includes("red del")
+            ) {
+                mins.push(-0.5); 
+                maxs.push(0.5);
+            } else if (
+                variedad.includes("granny") || 
+                variedad.includes("cripps") || 
+                variedad.includes("pink")
+            ) {
+                mins.push(1.0); 
+                maxs.push(2.0);
             } else {
-                mins.push(-0.5); maxs.push(2.0);
+                mins.push(-0.5); 
+                maxs.push(2.0);
             }
         });
+
         const finalPulpMin = Math.min(...mins);
         const finalPulpMax = Math.max(...maxs);
-        return { ambMin: finalPulpMin - 0.5, ambMax: finalPulpMax - 0.5, pulpMin: finalPulpMin, pulpMax: finalPulpMax };
+
+        return { 
+            ambMin: finalPulpMin - 0.5, 
+            ambMax: finalPulpMax - 0.5, 
+            pulpMin: finalPulpMin, 
+            pulpMax: finalPulpMax 
+        };
     }
 
-    function checkAlert(val, min, max) { return val < min || val > max; }
+    function checkAlert(val, min, max) { 
+        return val < min || val > max; 
+    }
 
     async function syncData() {
         try {
             const response = await fetch(BASE_URL + "&t=" + new Date().getTime());
             const json = await response.json();
+
             if (!json || json.length < 2) return;
+
             const hoyStr = new Date().toLocaleDateString();
-            allData = json.slice(1).filter(row => row[0] && new Date(row[0]).toLocaleDateString() === hoyStr);
+
+            allData = json.slice(1).filter(row => 
+                row[0] && new Date(row[0]).toLocaleDateString() === hoyStr
+            );
+
             drawUI();
-        } catch (e) { console.error(e); }
+
+        } catch (e) { 
+            console.error(e); 
+        }
     }
 
     function drawUI() {
@@ -167,20 +546,31 @@
             const hum = Number(r[11] || 0);
             const hora = new Date(r[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             const obsGeneral = r[13];
-            const detallesRaw = r[14] ? r[14].split(' | ') : [];
+            const detallesRaw = r[14] ? String(r[14]).split(' | ') : [];
             const linkFoto = r[12];
-            const expName = (r[15] && String(r[15]).toUpperCase() === "SOLFRUT") ? "SOLFRUT" : "PLANTA";
+            const expName = normalizarExportadora(r[15]);
 
             let pulpasHtml = "";
+
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
                 const isPulpAlert = checkAlert(val, limits.pulpMin, limits.pulpMax);
-                let obsFruto = "";
-                if (detallesRaw[i-1]) {
-                    const match = detallesRaw[i-1].match(/\(([^)]+)\)/);
-                    obsFruto = match ? match[1] : "";
-                }
-                pulpasHtml += `<div class="p-box"><div class="p-info"><span class="p-idx">P${i}</span><span class="p-val ${isPulpAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span></div>${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}</div>`;
+
+                const detallePulpa = extraerDetallePulpa(detallesRaw[i - 1], variedad);
+                const variedadPulpa = obtenerVariedadPulpa(r, i - 1, detallesRaw);
+                const obsFruto = detallePulpa.obs;
+
+                pulpasHtml += `
+                    <div class="p-box">
+                        <div class="p-info">
+                            <span class="p-idx">P${i}</span>
+                            <span class="p-val ${isPulpAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}°</span>
+                            <span class="p-var">${variedadPulpa}</span>
+                        </div>
+
+                        ${obsFruto ? `<span class="p-obs">${obsFruto}</span>` : ''}
+                    </div>
+                `;
             }
 
             const isAmbAlert = checkAlert(tAmb, limits.ambMin, limits.ambMax);
@@ -188,49 +578,93 @@
 
             return `
                 <div class="row-item">
-                    <div class="row-header"><span class="fw-bold text-primary">CÁMARA ${r[3]}</span><span class="text-muted" style="font-size:0.7rem">${hora}</span></div>
-                    <div class="row-stats">
-                        <div class="text-center"><span class="p-idx d-block">AMBIENTE</span><span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span></div>
-                        <div class="text-center"><span class="p-idx d-block">HUMEDAD</span><span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span></div>
-                        <div class="text-center"><span class="p-idx d-block">VARIEDAD</span><span class="v-var">${variedad}</span></div>
+                    <div class="row-header">
+                        <span class="fw-bold text-primary">CÁMARA ${r[3]}</span>
+                        <span class="text-muted" style="font-size:0.7rem">${hora}</span>
                     </div>
+
+                    <div class="row-stats">
+                        <div class="text-center">
+                            <span class="p-idx d-block">AMBIENTE</span>
+                            <span class="v-amb ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</span>
+                        </div>
+
+                        <div class="text-center">
+                            <span class="p-idx d-block">HUMEDAD</span>
+                            <span class="v-amb ${isHumAlert ? 'text-danger' : 'text-main'}">${hum}%</span>
+                        </div>
+
+                        <div class="text-center">
+                            <span class="p-idx d-block">VARIEDAD CÁMARA</span>
+                            <span class="v-var">${variedad}</span>
+                        </div>
+                    </div>
+
                     <div class="pulp-grid">${pulpasHtml}</div>
+
                     <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
                         <div class="flex-grow-1 text-end">
-                            <div class="label-exportadora ${expName === 'SOLFRUT' ? 'text-solfrut' : 'text-planta'}">${expName}</div>
+                            <div class="label-exportadora ${expName === 'SURFRUT' ? 'text-surfrut' : 'text-planta'}">${expName}</div>
                             ${obsGeneral ? `<div class="obs-general mt-1 text-start">${obsGeneral}</div>` : ''}
                         </div>
-                        <div class="photo-col">${linkFoto && linkFoto !== "Sin foto" ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`}</div>
+
+                        <div class="photo-col">
+                            ${
+                                linkFoto && linkFoto !== "Sin foto" 
+                                ? `<button class="btn-photo" onclick="window.open('${linkFoto}', '_blank')"><i class="bi bi-camera"></i></button>` 
+                                : `<button class="btn-photo disabled"><i class="bi bi-camera"></i></button>`
+                            }
+                        </div>
                     </div>
-                </div>`;
+                </div>
+            `;
         }).join('');
 
         const latest = {};
-        allData.forEach(row => { latest[row[3]] = row; });
+
+        allData.forEach(row => { 
+            latest[row[3]] = row; 
+        });
+
         renderCards(latest);
     }
 
     function renderCards(latest) {
         const container = document.getElementById('cards-container');
         const activeGroup = groups[currentGroup];
+
         document.getElementById('group-label').innerText = activeGroup.label;
 
         container.innerHTML = activeGroup.ids.map(id => {
             const r = latest[id];
-            if(!r) return `<div class="cam-card text-muted small text-center">CÁMARA ${id}<br>OFFLINE</div>`;
+
+            if(!r) {
+                return `<div class="cam-card text-muted small text-center">CÁMARA ${id}<br>OFFLINE</div>`;
+            }
             
             const limits = getLimits(r);
             const tAmb = Number(r[4] || 0);
             const hum = Number(r[11] || 0);
-            const expName = (r[15] && String(r[15]).toUpperCase() === "SOLFRUT") ? "SOLFRUT" : "PLANTA";
+            const detallesRaw = r[14] ? String(r[14]).split(' | ') : [];
+            const expName = normalizarExportadora(r[15]);
+
             let pulpasHtml = "";
             let anyPulpAlert = false;
             
             for (let i = 1; i <= 6; i++) {
                 const val = Number(r[4 + i] || 0);
                 const isAlert = checkAlert(val, limits.pulpMin, limits.pulpMax);
+                const variedadPulpa = obtenerVariedadPulpa(r, i - 1, detallesRaw);
+
                 if(isAlert) anyPulpAlert = true;
-                pulpasHtml += `<div class="p-dot"><span class="p-dot-idx">P${i}</span><span class="p-dot-val ${isAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span></div>`;
+
+                pulpasHtml += `
+                    <div class="p-dot">
+                        <span class="p-dot-idx">P${i}</span>
+                        <span class="p-dot-val ${isAlert ? 'text-danger' : 'text-success'}">${val.toFixed(1)}</span>
+                        <span class="p-dot-var">${variedadPulpa}</span>
+                    </div>
+                `;
             }
 
             const isAmbAlert = checkAlert(tAmb, limits.ambMin, limits.ambMax);
@@ -241,32 +675,55 @@
                 <div class="cam-card ${hasAlert ? 'alert-active' : ''}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="badge bg-primary" style="font-size:0.6rem">CÁMARA ${id}</span>
-                        <span class="label-exportadora ${expName === 'SOLFRUT' ? 'text-solfrut' : 'text-planta'}" style="font-size:0.55rem">${expName}</span>
+                        <span class="label-exportadora ${expName === 'SURFRUT' ? 'text-surfrut' : 'text-planta'}" style="font-size:0.55rem">${expName}</span>
                     </div>
+
                     <div class="d-flex justify-content-between align-items-end">
-                        <div><div class="card-stat-label">Amb</div><div class="card-stat-val ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div></div>
-                        <div class="text-end"><div class="card-stat-label">Hum</div><div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div></div>
+                        <div>
+                            <div class="card-stat-label">Amb</div>
+                            <div class="card-stat-val ${isAmbAlert ? 'text-danger' : 'text-success'}">${tAmb.toFixed(1)}°</div>
+                        </div>
+
+                        <div class="text-end">
+                            <div class="card-stat-label">Hum</div>
+                            <div class="card-stat-val ${isHumAlert ? 'text-danger' : 'text-main'}" style="font-size:0.95rem">${hum}%</div>
+                        </div>
                     </div>
+
                     <div class="card-pulp-grid">${pulpasHtml}</div>
-                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">${r[2] || 'S/V'}</div>
-                </div>`;
+
+                    <div class="p-idx text-truncate mt-2 text-center" style="color:var(--accent-soft); font-size:0.55rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:3px;">
+                        ${r[2] || 'S/V'}
+                    </div>
+                </div>
+            `;
         }).join('');
     }
 
     function manualChange(direction) {
         currentGroup = (currentGroup + direction + groups.length) % groups.length;
+
         const latest = {};
-        allData.forEach(row => { latest[row[3]] = row; });
+
+        allData.forEach(row => { 
+            latest[row[3]] = row; 
+        });
+
         renderCards(latest);
     }
 
-    setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
+    setInterval(() => { 
+        document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); 
+    }, 1000);
+
     setInterval(syncData, 60000);
     
-    // El carrusel solo avanza si isPaused es false
-    setInterval(() => { if(!isPaused && allData.length > 0) manualChange(1); }, 8000);
+    setInterval(() => { 
+        if(!isPaused && allData.length > 0) manualChange(1); 
+    }, 8000);
     
     syncData();
 </script>
+
 </body>
 </html>
