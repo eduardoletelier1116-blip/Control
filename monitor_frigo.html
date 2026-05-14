@@ -409,9 +409,14 @@
     function normalizarExportadora(valor) {
         const exp = String(valor || "").trim().toUpperCase();
 
-        if (exp === "SURFRUT" || exp === "SOLFRUT") {
-            return "SURFRUT";
-        }
+        if (exportadora === "SURFRUT") {
+    return { 
+        ambMin: -0.5, 
+        ambMax: 0.5, 
+        pulpMin: -1.0, 
+        pulpMax: 1.0 
+    };
+}
 
         return "PLANTA";
     }
