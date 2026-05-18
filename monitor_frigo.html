@@ -523,8 +523,10 @@
             };
         }
 
-        let mins = [];
-        let maxs = [];
+        let ambMins = [];
+        let ambMaxs = [];
+        let pulpMins = [];
+        let pulpMaxs = [];
 
         listaVariedades.forEach(variedad => {
             if (
@@ -534,38 +536,48 @@
                 variedad.includes("red delicious") ||
                 variedad.includes("red del")
             ) {
-                mins.push(-0.5); 
-                maxs.push(0.5);
+                ambMins.push(-1.0);
+                ambMaxs.push(0.0);
+                pulpMins.push(-0.5); 
+                pulpMaxs.push(0.5);
+
             } else if (
                 variedad.includes("granny") || 
                 variedad.includes("cripps") || 
                 variedad.includes("pink")
             ) {
-                mins.push(0.5); 
-                maxs.push(1.5);
+                ambMins.push(0.0);
+                ambMaxs.push(1.0);
+                pulpMins.push(0.5); 
+                pulpMaxs.push(1.5);
+
             } else {
-                mins.push(-0.5); 
-                maxs.push(2.0);
+                ambMins.push(-1.0);
+                ambMaxs.push(1.0);
+                pulpMins.push(-0.5); 
+                pulpMaxs.push(1.5);
             }
         });
 
-        if (mins.length === 0 || maxs.length === 0) {
+        if (
+            ambMins.length === 0 || 
+            ambMaxs.length === 0 || 
+            pulpMins.length === 0 || 
+            pulpMaxs.length === 0
+        ) {
             return { 
-                ambMin: -1.5, 
-                ambMax: 1.5, 
+                ambMin: -1.0, 
+                ambMax: 1.0, 
                 pulpMin: -0.5, 
-                pulpMax: 2.0 
+                pulpMax: 1.5 
             };
         }
 
-        const finalPulpMin = Math.min(...mins);
-        const finalPulpMax = Math.max(...maxs);
-
         return { 
-            ambMin: finalPulpMin - 0.5, 
-            ambMax: finalPulpMax - 0.5, 
-            pulpMin: finalPulpMin, 
-            pulpMax: finalPulpMax 
+            ambMin: Math.min(...ambMins), 
+            ambMax: Math.max(...ambMaxs), 
+            pulpMin: Math.min(...pulpMins), 
+            pulpMax: Math.max(...pulpMaxs)
         };
     }
 
